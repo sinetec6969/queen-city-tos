@@ -527,6 +527,16 @@ async def main():
         assert app.state.location == "lake_norman" and "chapter2" in app.state.flags
         assert app.state.quests["rate_your_experience"] == "done"
         await shot(app, "38_end_of_chapter")
+        # chapter two's road: teaser -> lake map -> Charlotte map
+        await walk(pilot, app, 1, 2)
+        await press(pilot, app, "left")
+        assert isinstance(app.screen, CityScreen) and app.screen.region_id == "lake_norman"
+        await shot(app, "39_lake_map")
+        scr = app.screen
+        for _ in range(scr.order.index("ln_charlotte") - scr.cursor):
+            await press(pilot, app, "down")
+        await press(pilot, app, "enter")
+        assert app.screen.region_id == "charlotte" and app.state.location == "city:lake_norman"
         print("tips shown:", TIPS_SEEN)
         print("UI playthrough OK. HP", app.state.player.hp, "/", app.state.player.max_hp,
               "LV", app.state.player.level, "signal", int(app.state.player.signal))

@@ -12,11 +12,11 @@ import random
 import re
 from collections import deque
 
-from ..engine import tutorial
+from ..engine import travel, tutorial
 from ..engine.combat import MAX_AP, Combat, use_aid
-from ..engine.content import Content, check
+from ..engine.content import Content
 from ..engine.dialogue import Dialogue
-from ..engine.game import follow_exit, new_game, place
+from ..engine.game import follow_exit, new_game
 from ..engine.hack import Hack, attempts_for
 from ..engine.state import STAT_BLURBS, STAT_BUDGET, STAT_MAX, STAT_MIN, STATS, has_save, load_game, save_game
 from ..engine.world import Location
@@ -58,8 +58,6 @@ class Session:
         self.go_text = ""
         self.last_beside: tuple = ()
         self.done = False
-        nodes = content.city["nodes"]
-        self.city_order = sorted(nodes, key=lambda n: (nodes[n]["y"], nodes[n]["x"]))
 
     # ---- output -----------------------------------------------------------
     def say(self, text: str, log: bool = True) -> None:
@@ -677,19 +675,26 @@ class Session:
             self.show_tip("city")
         self.show_city()
 
-    def unlocked(self, nid: str) -> bool:
-        return check(self.c.city["nodes"][nid].get("unlocked_if"), self.state)
+    @property
+    def city_order(self) -> list[str]:
+        """Node ids of the region you're in, in menu order (numbers are per region)."""
+        here = travel.current_node(self.state) if self.state else None
+        rid = travel.region_of(self.c, here) if here else travel.DEFAULT_REGION
+        return travel.region_nodes(self.c, rid)
 
     def show_city(self) -> None:
-        here = self.state.location.split(":", 1)[1]
+        here = travel.current_node(self.state)
+        rid = travel.region_of(self.c, here) if here else travel.DEFAULT_REGION
         nodes = self.c.city["nodes"]
-        self.lines(["CHARLOTTE - CITY MAP"])
+        self.lines([f"{travel.region(self.c, rid)['name']} - MAP"])
         for i, nid in enumerate(self.city_order, 1):
             n = nodes[nid]
             if nid == here:
                 status = "you are here"
-            elif not self.unlocked(nid):
+            elif not travel.unlocked(self.c, self.state, nid):
                 status = "locked"
+            elif n.get("goto"):
+                status = "other map"
             elif not n.get("location"):
                 status = "not built yet"
             else:
@@ -701,19 +706,20 @@ class Session:
         k = cmd.lower()
         verb, _, arg = k.partition(" ")
         nodes = self.c.city["nodes"]
-        if k.isdigit() and 0 < int(k) <= len(self.city_order):
-            nid = self.city_order[int(k) - 1]
-            n = nodes[nid]
-            if not self.unlocked(nid):
-                self.lines(["SERVICE UNAVAILABLE IN YOUR AREA. The Concierge thanks you for your patience."])
-            elif not n.get("location"):
-                self.lines([f"{n['name'].title()} isn't built yet. The Concierge apologizes for the inconvenience."])
-            else:
-                place(self.state, self.c, n["location"], n["spawn"])
+        order = self.city_order
+        if k.isdigit() and 0 < int(k) <= len(order):
+            r = travel.go(self.state, self.c, order[int(k) - 1])
+            if r["kind"] == "location":
                 save_game(self.state, self.slot)
-                self.enter_world([("log", f"You head back to {n['name'].title()}.")])
-        elif verb == "x" and arg.isdigit() and 0 < int(arg) <= len(self.city_order):
-            n = nodes[self.city_order[int(arg) - 1]]
+                self.enter_world(r["events"])
+            elif r["kind"] == "region":
+                save_game(self.state, self.slot)
+                self.say(r["msg"], log=False)
+                self.show_city()
+            else:
+                self.lines([r["msg"]])
+        elif verb == "x" and arg.isdigit() and 0 < int(arg) <= len(order):
+            n = nodes[order[int(arg) - 1]]
             self.say(f"{n['name'].title()}: {n.get('blurb', '')}", log=False)
         elif k in ("", "m", "map", "l", "look"):
             self.show_city()

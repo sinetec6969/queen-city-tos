@@ -442,6 +442,17 @@ def test_quests_1_to_6():
     walk(s, 22, 3)
     send(s, "e")  # freight elevator
     assert s.state.location == "lake_norman" and s.state.quests["rate_your_experience"] == "done"
+    # the chapter-two road: teaser -> lake map -> back to Charlotte
+    walk(s, 1, 2)
+    r = send(s, "w")
+    assert s.mode == "city" and "LAKE NORMAN - MAP" in r
+    r = send(s, str(s.city_order.index("mcguire") + 1))
+    assert "isn't built yet" in r
+    r = send(s, str(s.city_order.index("ln_charlotte") + 1))
+    assert "CHARLOTTE - MAP" in r and s.state.location == "city:lake_norman"
+    send(s, str(s.city_order.index("lake_norman") + 1))
+    send(s, str(s.city_order.index("ln_shore") + 1))
+    assert s.state.location == "lake_norman"
     send(s, "st")
     send(s, "notes")
     send(s, "notes 1")

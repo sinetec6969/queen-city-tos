@@ -25,9 +25,9 @@ lake_norman:
     E:
       id: ln_road
       type: door
-      name: Road back to the city
+      name: Road to the lake map
       glyph: "»"
-      to: {city: lake_norman}
+      to: {city: ln_shore}
     "~":
       id: lake
       type: object

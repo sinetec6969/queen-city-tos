@@ -10,11 +10,10 @@ from textual.containers import Horizontal, Vertical
 from textual.screen import ModalScreen, Screen
 from textual.widgets import Input, RichLog, Static
 
-from ..engine import tutorial
+from ..engine import travel, tutorial
 from ..engine.combat import MAX_AP, Combat, use_aid
-from ..engine.content import check
 from ..engine.dialogue import Dialogue
-from ..engine.game import follow_exit, new_game, place
+from ..engine.game import follow_exit, new_game
 from ..engine.hack import Hack, attempts_for
 from ..engine.state import STAT_BLURBS, STAT_BUDGET, STAT_MAX, STAT_MIN, STATS, has_save, load_game, save_game
 from ..engine.world import Location
@@ -725,29 +724,35 @@ class CityScreen(Screen):
         yield Static(id="help")
 
     def on_mount(self) -> None:
-        city = self.app.content.city
-        self.order = sorted(city["nodes"], key=lambda n: (city["nodes"][n]["y"], city["nodes"][n]["x"]))
-        here = self.app.state.location.split(":", 1)[1]
-        self.cursor = self.order.index(here) if here in self.order else 0
-        self.query_one("#citymap", Static).border_title = "CHARLOTTE · CITY MAP"
         self.query_one("#help", Static).update(Text("↑↓ choose destination · ENTER travel · TAB WristLink · S save · Q quit", style="grey62"))
-        self.msg = "You're on the street. The air smells like ozone and somebody's grill."
+        self.load_region()
+        self.msg = travel.region(self.app.content, self.region_id).get("flavor", "")
         self.draw()
         if tutorial.take_tip(self.app.state, "city"):
             self.app.push_screen(TipScreen("city"))
 
+    def load_region(self) -> None:
+        c = self.app.content
+        here = travel.current_node(self.app.state)
+        self.region_id = travel.region_of(c, here) if here else travel.DEFAULT_REGION
+        self.order = travel.region_nodes(c, self.region_id)
+        self.cursor = self.order.index(here) if here in self.order else 0
+        self.query_one("#citymap", Static).border_title = f"{travel.region(c, self.region_id)['name']} · MAP"
+
     def unlocked(self, nid: str) -> bool:
-        return check(self.app.content.city["nodes"][nid].get("unlocked_if"), self.app.state)
+        return travel.unlocked(self.app.content, self.app.state, nid)
 
     def draw(self) -> None:
         city = self.app.content.city
         sel = self.order[self.cursor]
-        self.query_one("#citymap", Static).update(render_city(city, self.app.state, sel, self.unlocked))
+        self.query_one("#citymap", Static).update(render_city(self.app.content, self.app.state, sel, self.unlocked, self.region_id))
         n = city["nodes"][sel]
         t = Text()
         t.append(n["name"] + "\n", style="bold bright_yellow")
         if not self.unlocked(sel):
             t.append("SERVICE UNAVAILABLE\nIN YOUR AREA\n\n", style="bold red")
+        elif n.get("goto"):
+            t.append("Another map\n\n", style="bold cyan")
         elif not n.get("location"):
             t.append("Not built yet\n\n", style="yellow")
         else:
@@ -765,17 +770,15 @@ class CityScreen(Screen):
         self.draw()
 
     def action_travel(self) -> None:
-        nid = self.order[self.cursor]
-        n = self.app.content.city["nodes"][nid]
-        if not self.unlocked(nid):
-            self.msg = "SERVICE UNAVAILABLE IN YOUR AREA. The Concierge thanks you for your patience."
-        elif not n.get("location"):
-            self.msg = f"{n['name']} isn't built yet. (Next build phase.) The Concierge apologizes for the inconvenience."
-        else:
-            place(self.app.state, self.app.content, n["location"], n["spawn"])
+        r = travel.go(self.app.state, self.app.content, self.order[self.cursor])
+        if r["kind"] == "location":
             save_game(self.app.state)
-            self.app.switch_screen(LocationScreen([("log", f"You head back to {n['name'].title()}.")]))
+            self.app.switch_screen(LocationScreen(r["events"]))
             return
+        if r["kind"] == "region":
+            save_game(self.app.state)
+            self.load_region()
+        self.msg = r["msg"]
         self.draw()
 
     def action_save(self) -> None:

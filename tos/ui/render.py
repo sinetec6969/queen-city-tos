@@ -115,11 +115,14 @@ def stars(n: int, of: int = 5) -> Text:
     return t
 
 
-def render_city(city: dict, state, selected: str, unlocked) -> Text:
-    w, h = city["width"], city["height"]
+def render_city(content, state, selected: str, unlocked, region_id: str = "charlotte") -> Text:
+    from ..engine import travel
+    reg = travel.region(content, region_id)
+    w, h = reg["width"], reg["height"]
     grid = [[(" ", "")] * w for _ in range(h)]
-    nodes = city["nodes"]
-    for a, b in city["links"]:
+    all_nodes = content.city["nodes"]
+    nodes = {n: all_nodes[n] for n in travel.region_nodes(content, region_id)}
+    for a, b in travel.region_links(content, region_id):
         x0, y0, x1, y1 = nodes[a]["x"], nodes[a]["y"], nodes[b]["x"], nodes[b]["y"]
         steps = max(abs(x1 - x0), abs(y1 - y0))
         for i in range(1, steps):
@@ -132,7 +135,7 @@ def render_city(city: dict, state, selected: str, unlocked) -> Text:
         if nid == here:
             mark, style = "◉", "bold bright_yellow"
         elif unlocked(nid):
-            mark, style = "◆", "bold white" if n.get("location") else "white"
+            mark, style = "◆", "bold white" if n.get("location") or n.get("goto") else "white"
         else:
             mark, style = "◇", "grey42"
         if nid == selected:

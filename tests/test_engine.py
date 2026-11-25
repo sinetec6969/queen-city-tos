@@ -582,6 +582,36 @@ def test_every_enemy_has_its_own_cell():
                 assert loc["map"].count(ch) == 1, (lid, ch)
 
 
+def test_regions_and_gateways():
+    from tos.engine import travel
+    st, _ = new_game(C, STATS)
+    assert travel.region_nodes(C, "charlotte")[0] == "lake_norman"
+    lake = travel.region_nodes(C, "lake_norman")
+    assert "ln_shore" in lake and "south_end" not in lake
+    st.location = "city:lake_norman"
+    assert travel.go(st, C, "lake_norman")["kind"] == "locked", "needs chapter2"
+    st.flags.add("chapter2")
+    r = travel.go(st, C, "lake_norman")
+    assert r["kind"] == "region" and st.location == "city:ln_shore"
+    assert travel.region_of(C, travel.current_node(st)) == "lake_norman"
+    assert travel.go(st, C, "mcguire")["kind"] == "unbuilt"
+    r = travel.go(st, C, "ln_shore")
+    assert r["kind"] == "location" and st.location == "lake_norman"
+    st.location = "city:ln_shore"
+    assert travel.go(st, C, "ln_charlotte")["kind"] == "region" and st.location == "city:lake_norman"
+    for a, b in C.city["links"]:
+        assert travel.region_of(C, a) == travel.region_of(C, b), ("links stay inside a region", a, b)
+
+
+def test_city_labels_fit_their_canvas():
+    from tos.engine import travel
+    for rid in C.city.get("regions", {}):
+        reg = travel.region(C, rid)
+        for nid in travel.region_nodes(C, rid):
+            n = C.city["nodes"][nid]
+            assert 0 <= n["y"] < reg["height"] and n["x"] + 2 + len(n["name"]) <= reg["width"], (rid, nid)
+
+
 def test_stat_and_max_hp_effects():
     from tos.engine.content import apply_effects
     from tos.engine.state import STAT_CAP, GameState
