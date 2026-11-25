@@ -1,5 +1,20 @@
 # Changelog
 
+## 0.4.1 — AX.25 playability audit (2026-11-25)
+
+An audit of line mode at 0.4.0, without radio hardware:
+- **Text:** no unmapped non-ASCII in anything the game can send, and no key-specific instructions without a `line:` variant.
+- **Playthrough:** quests 1–4 play end to end through line mode.
+- **Worst-case combat replies:** every enemy awake, Signal 80. The largest is 410 B (~3.7 s), at the mini boss's death; per-location means are 88–165 B.
+- **Maps:** the five new line-mode maps are ~225 B each with no glyph clashes.
+- **Python:** the engine and line test suites pass on Python 3.10.22 and 3.11.18 (Docker), not just 3.14.
+- **Deploy:** the PyYAML-only deploy layout runs at HEAD without loading Textual.
+
+**Fixes from the audit**
+- `content.py` uses libyaml's `CSafeLoader` when PyYAML has it (falls back to `SafeLoader`). Content parse drops from 194 ms to 18 ms, and line-mode startup from 0.29 s to 0.11 s on the dev box. Every packet connection starts a fresh process, so on a Pi this is roughly 1–2 s saved per connect (estimated). The parse result is identical for every content file.
+- `deploy/digipi/install.sh` stops with a clear message if `python3` is older than 3.10. Older DigiPi images may ship 3.9.
+- The Fulfillment Unit's `on_death` line no longer repeats its death text: ~70 B less on that turn.
+
 ## 0.4.0 — Quest 4: Service Interruption (2026-11-25)
 
 **Content**

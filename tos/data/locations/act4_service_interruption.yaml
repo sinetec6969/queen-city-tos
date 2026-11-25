@@ -166,7 +166,7 @@ relay_yard:
             - {set: overtime}
             - {log: "The Fulfillment Unit's light turns from green to amber. \"Volume exceeds forecast. Activating overtime.\" The dock doors rattle open."}
       on_death:
-        - {log: "The Fulfillment Unit kneels, forklift arms dropping into the dirt, and announces: \"Shift complete.\" The cabinet behind it is open to you."}
+        - {log: "\"Shift complete.\" The cabinet behind it is open to you."}
     "1":
       id: picker1
       type: enemy

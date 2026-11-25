@@ -25,6 +25,8 @@ import yaml
 from .state import GameState
 
 DATA = Path(__file__).resolve().parent.parent / "data"
+# libyaml's loader is ~10x faster; it matters on a Pi, where every packet connection starts a new process
+_LOADER = getattr(yaml, "CSafeLoader", yaml.SafeLoader)
 
 
 class Content:
@@ -44,13 +46,13 @@ class Content:
 
     def _load(self, name: str):
         with open(self.root / name, encoding="utf-8") as f:
-            return yaml.safe_load(f) or {}
+            return yaml.load(f, Loader=_LOADER) or {}
 
     def _load_dir(self, name: str) -> dict:
         out = {}
         for p in sorted((self.root / name).glob("*.yaml")):
             with open(p, encoding="utf-8") as f:
-                out.update(yaml.safe_load(f) or {})
+                out.update(yaml.load(f, Loader=_LOADER) or {})
         return out
 
     def item(self, iid: str) -> dict:

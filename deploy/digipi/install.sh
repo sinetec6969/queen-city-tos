@@ -14,6 +14,11 @@ SRC="$(cd "$(dirname "$0")/../.." && pwd)"
 PREFIX=/opt/qcts
 SAVES=/var/lib/qcts
 
+if ! python3 -c 'import sys; sys.exit(sys.version_info < (3, 10))'; then
+  echo "needs Python 3.10+ (this image has $(python3 -V 2>&1)); older DigiPi images may ship 3.9" >&2
+  exit 1
+fi
+
 if findmnt -no OPTIONS / | grep -qw ro; then
   echo "root filesystem is read-only; remount it read-write first (and see README.md about saves)" >&2
   exit 1
