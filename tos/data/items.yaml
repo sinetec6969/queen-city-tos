@@ -58,3 +58,8 @@ faraday_drive:
   name: Faraday Pouch
   type: key
   desc: "A silver pouch, heavy as a brick, sealed with electrical tape. A hard drive inside, pulled from something the Concierge owns. It's for Mags."
+
+thermite:
+  name: Thermite Charge
+  type: key
+  desc: "A taped brick with a pull tab and SORRY written on it in marker. Tape it to the relay's main bus bar, pull, walk away. Don't run."

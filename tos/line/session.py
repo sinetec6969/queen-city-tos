@@ -396,8 +396,12 @@ class Session:
             i = int(arg) - 1
             return items[i] if 0 <= i < len(items) else None
         arg = arg.lower()
-        for iid in items:
+        for iid in items:  # id or name prefix first ("med", "sweet tea"), then any word ("tea", "gummy")
             if iid.startswith(arg.replace(" ", "_")) or self.c.item(iid)["name"].lower().startswith(arg):
+                return iid
+        for iid in items:
+            words = re.split(r"[^a-z0-9]+", self.c.item(iid)["name"].lower())
+            if any(w.startswith(arg) for w in words if w):
                 return iid
         return None
 

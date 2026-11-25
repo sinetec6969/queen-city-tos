@@ -357,6 +357,98 @@ def test_analog_only_stealth():
     print("  act 3 end (stealth): HP", st.player.hp, "/", st.player.max_hp, "LV", st.player.level)
 
 
+def play_act4(rng, deny_overtime=False, prep_between=True):
+    """Quest 4 on top of quest 3 (fight route). deny_overtime: hack the dock controller first."""
+    from tos.engine.content import check
+    from tos.engine.game import place
+    st = play_act3(rng)
+    assert not check(C.city["nodes"]["central_ave"].get("unlocked_if"), st)
+    talk("mags", st, 0, 0)  # "Let's take down the relay."
+    assert st.quests["service_interruption"] == 2
+    node = C.city["nodes"]["central_ave"]
+    assert check(node.get("unlocked_if"), st)
+    if prep_between:
+        prep(st)
+    place(st, C, node["location"], node["spawn"])
+    ave = Location(st.location, st, C)
+    assert not ave.door_open(ave.get("yard_gate"))
+    for _ in range(4):  # the street drone is awake; Ruth is at (18,4)
+        events = []
+        walk_to(ave, 17, 4, events)
+        if ("combat",) in events:
+            assert fight(ave, rng) == "won", st.player.hp
+            continue
+        break
+    assert ("dialogue", "ruth_relay") in ave.player_move(1, 0)
+    talk("ruth_relay", st, 1, 0, 0)  # Wits 3: the intel, then the plan
+    assert "fence_cut" in st.flags and st.player.has("thermite") and st.quests["service_interruption"] == 3
+    assert any(n[0] == "Relay yard intel" for n in st.notes)
+    ave.player_move(0, -1)  # Ruth's stash (17,3)
+    assert "central_ave:optout_stash" in st.taken
+    if prep_between:
+        prep(st)
+    assert exit_via(ave, 22, 4, 1, 0, rng) == "location" and st.location == "relay_yard"
+    yard = Location(st.location, st, C)
+    yard.update_rules()
+    if deny_overtime:
+        events = []
+        walk_to(yard, 2, 7, events)
+        assert ("combat",) not in events, "the dock controller is outside the boss's aggro"
+        assert ("hack", "dock_controller") in yard.player_move(1, 0)
+        yard.terminal_result("dock_controller", True)
+        assert "pickers_off" in st.flags
+    if prep_between:
+        prep(st)
+    for _ in range(4):
+        events = []
+        walk_to(yard, 12, 5, events)
+        if yard.awake_enemies() and ("combat",) in events or yard.awake_enemies():
+            assert fight(yard, rng) == "won", st.player.hp
+        if "relay_yard:fulfillment" in st.taken:
+            break
+    assert "relay_yard:fulfillment" in st.taken
+    assert "overtime" in st.flags, "the boss passed half HP"
+    pickers = [k for k in ("relay_yard:picker1", "relay_yard:picker2") if k in st.taken]
+    assert (not pickers) if deny_overtime else len(pickers) == 2
+    # the cabinet (12,2): stand where the boss stood
+    events = []
+    walk_to(yard, 12, 3, events)
+    yard.player_move(0, -1)
+    assert "relay_down" in st.flags and not st.player.has("thermite")
+    assert st.quests["service_interruption"] == "done" and st.quests["teo"] == 5
+    assert check(C.city["nodes"]["uptown"].get("unlocked_if"), st)
+    place(st, C, "noda", "city")
+    d = talk("mags", st)
+    assert d.node_id == "blind"
+    return st
+
+
+def test_service_interruption_overtime():
+    st = play_act4(random.Random(5))
+    print("  act 4 end (overtime): HP", st.player.hp, "/", st.player.max_hp, "LV", st.player.level)
+
+
+def test_service_interruption_denied():
+    st = play_act4(random.Random(9), deny_overtime=True)
+    print("  act 4 end (overtime denied): HP", st.player.hp, "/", st.player.max_hp, "LV", st.player.level)
+
+
+def test_boss_phase_fires_once():
+    from tos.engine.game import place
+    st, _ = new_game(C, STATS)
+    place(st, C, "relay_yard", "gate")
+    yard = Location("relay_yard", st, C)
+    cb = Combat(yard, random.Random(1))
+    boss = yard.get("fulfillment")
+    boss.hp = boss.max_hp // 2 + 1
+    assert cb.phases(boss) == [] and "overtime" not in st.flags
+    boss.hp = boss.max_hp // 2 - 1
+    msgs = cb.phases(boss)
+    assert "overtime" in st.flags and any("overtime" in m for m in msgs)
+    assert {e.id for e in yard.awake_enemies()} >= {"picker1", "picker2"}, "pickers join mid-fight"
+    assert cb.phases(boss) == [], "a phase fires only once"
+
+
 def test_ruth_needs_a_voucher():
     from tos.engine.game import place
     st, _ = new_game(C, {**STATS, "Charm": 2})

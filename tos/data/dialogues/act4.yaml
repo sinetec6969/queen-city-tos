@@ -1,0 +1,48 @@
+ruth_relay:
+  speaker: RUTH
+  starts:
+    - if: {flag: relay_down}
+      node: done
+    - if: {flag: fence_cut}
+      node: again
+  start: hello
+  nodes:
+    hello:
+      text: "Ruth is crouched by the car wash with binoculars and a welding torch, which is how Ruth does surveillance. \"Harlan. Look.\" She hands you the binoculars. Behind the fence, in front of the relay cabinet: a warehouse robot the size of a box truck, forklift arms folded, status light green. \"Fulfillment Unit. Moved in the day after we pulled the drive. It doesn't sleep. It doesn't take breaks. It's the most employed thing in Charlotte.\""
+      options:
+        - text: "What's the plan?"
+          to: plan
+        - text: "The drive mentioned the yard. Let me think."
+          if: {stat: Wits, gte: 3}
+          to: intel
+        - text: "[Leave]"
+    intel:
+      effects:
+        - {xp: 25}
+        - {note: ["Relay yard intel", "The relay log lists a dock controller in the yard's southwest corner and two picker drones on standby. The Fulfillment Unit calls them in when it's losing (\"overtime\"). Hack the dock controller first and overtime is denied."]}
+      text: "You run back through the log in your head. Hatch codes, inspection schedule, and a line you skimmed past: DOCK CONTROLLER SW CORNER, 2 PICKERS ON STANDBY, OVERTIME AUTH: AUTOMATIC. \"Overtime,\" you say. \"When it's losing, it calls for help. Two little ones. Unless somebody tells the dock controller no.\" Ruth looks at you for a long second. \"Mags said you were a rater. I thought that meant you were picky.\""
+      options:
+        - text: "It does. What's the plan?"
+          to: plan
+    plan:
+      text: "\"I cut the fence. You go in. You get that thing off the cabinet, by whatever means the Lord provides, and you put this on the main bus bar.\" She presses a taped brick into your hands: thermite, a pull tab, and the word SORRY written on it in marker. \"Tape, pull, walk away. Don't run. Running looks like a malfunction to them.\" She lights the torch. \"There's an ammo can behind the second brush in the car wash. Take all of it.\""
+      options:
+        - text: "Cut it."
+          to: cut
+    cut:
+      effects:
+        - {set: fence_cut}
+        - {give: thermite}
+        - {quest: service_interruption, stage: 3}
+        - {log: "Ruth cuts the padlock off the yard gate in four seconds and pockets it. \"Souvenir.\""}
+      text: "\"Go on, then. I'll be right here, being emotionally supportive with a blowtorch.\""
+      options:
+        - text: "[Leave]"
+    again:
+      text: "Ruth doesn't take her eyes off the yard. \"It's still on shift. Tape, pull, walk away.\""
+      options:
+        - text: "[Leave]"
+    done:
+      text: "Ruth is lying on her back on the hood of a dead sedan, watching the tower, dark against the sky. \"I've been looking at that thing for a week. It's smaller with the lights off.\" She sits up. \"Go tell Mags. I want to watch this a while longer.\""
+      options:
+        - text: "[Leave]"

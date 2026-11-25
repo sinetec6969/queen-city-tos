@@ -1,4 +1,4 @@
-"""Line-mode (packet radio) frontend: scripted playthrough of quests 1-3 using text
+"""Line-mode (packet radio) frontend: scripted playthrough of quests 1-4 using text
 commands only, plus entry-point checks. Prints reply sizes and an airtime estimate.
 
 Run: python tests/test_line.py
@@ -111,13 +111,24 @@ def leave(sess):
         send(sess, str(len(sess.dlg.options())))
 
 
+def heal(sess, frac=0.6):
+    p = sess.state.player
+    for iid in ("med_gummy", "sweet_tea"):
+        for _ in range(10):
+            if p.hp >= p.max_hp * frac or not p.has(iid):
+                break
+            n = p.inventory[iid]
+            send(sess, f"use {iid}")
+            assert p.inventory.get(iid, 0) < n, f"use {iid} did nothing"
+
+
 def new_session(seed=11, slot="TEST1"):
     s = Session(C, random.Random(seed), slot=slot)
     REPLIES.append(s.start().encode())
     return s
 
 
-def test_quests_1_to_3():
+def test_quests_1_to_4():
     s = new_session()
     send(s, "n")
     assert s.mode == "profile"
@@ -302,11 +313,59 @@ def test_quests_1_to_3():
     assert s.state.quests["analog_only"] == "done" and s.state.quests["service_interruption"] == 1
     assert "lynx_train:pxu" not in s.state.taken
 
+    # ---- quest 4: Service Interruption (overtime denied at the dock controller) ----
+    send(s, "e")  # Mags again
+    talk(s, 1, 1)
+    assert s.state.quests["service_interruption"] == 2
+    heal(s)
+    walk(s, 1, 4)
+    send(s, "w")
+    send(s, str(s.city_order.index("central_ave") + 1))
+    assert s.state.location == "central_ave"
+    for _ in range(4):
+        walk(s, 17, 4)
+        fight(s)
+    send(s, "e")  # Ruth
+    talk(s, 1, 1, 1)
+    assert s.state.player.has("thermite")
+    send(s, "n")  # stash
+    heal(s)
+    for _ in range(3):
+        walk(s, 22, 4)
+        fight(s)
+    send(s, "e")
+    assert s.state.location == "relay_yard"
+    walk(s, 2, 7)
+    send(s, "e")  # dock controller
+    assert s.mode == "hack"
+    send(s, s.hack.password)
+    assert "pickers_off" in s.state.flags
+    heal(s, 0.9)
+    for _ in range(6):
+        walk(s, 12, 5)
+        fight(s)
+        if "relay_yard:fulfillment" in s.state.taken:
+            break
+    assert "relay_yard:fulfillment" in s.state.taken
+    walk(s, 12, 3)
+    send(s, "n")  # the cabinet
+    assert "relay_down" in s.state.flags and s.state.quests["service_interruption"] == "done"
+    walk(s, 1, 4)
+    send(s, "w")
+    for _ in range(3):
+        walk(s, 1, 3)
+        fight(s)
+    send(s, "w")
+    send(s, str(s.city_order.index("noda") + 1))
+    walk(s, 10, 3)
+    send(s, "e")
+    assert s.mode == "dialogue" and s.dlg.node_id == "blind"
+    talk(s, 1)
     send(s, "st")
     send(s, "notes")
     send(s, "notes 1")
     p = s.state.player
-    print(f"  quest 3 end: HP {p.hp}/{p.max_hp} LV {p.level} cells {p.cells}")
+    print(f"  quest 4 end: HP {p.hp}/{p.max_hp} LV {p.level} cells {p.cells}")
     send(s, "bye")
     assert s.done
     # reconnect: same callsign resumes in NoDa
@@ -342,6 +401,21 @@ def test_tutorial_off_and_new_game_confirm():
     assert s.mode == "title", "a new game over a save needs confirmation"
     send(s, "new")
     assert s.mode == "profile"
+
+
+def test_item_names_players_type():
+    s = new_session(slot="TEST4")
+    send(s, "n")
+    send(s, "ok")
+    send(s, "x")
+    p = s.state.player
+    p.give("sweet_tea")
+    p.give("med_gummy")
+    p.hp = 5
+    for cmd, iid in (("use tea", "sweet_tea"), ("use gummy", "med_gummy")):
+        n = p.inventory[iid]
+        send(s, cmd)
+        assert p.inventory.get(iid, 0) == n - 1, cmd
 
 
 def test_callsigns_and_allowlist():

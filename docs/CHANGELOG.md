@@ -1,5 +1,49 @@
 # Changelog
 
+## 0.4.0 — Quest 4: Service Interruption (2026-11-25)
+
+**Content**
+- Two new locations in `locations/act4_service_interruption.yaml`: Central Avenue (the old car wash, Ruth, a street patrol) and the Relay Yard.
+- **Mini boss: the Fulfillment Unit.** It hits once per turn but hard. At half HP it goes into **Overtime** and calls two **Pickers** (new enemy), unless you hacked the yard's **dock controller** first.
+- New `key` item: the Thermite Charge. Ruth gives it to you; blowing the relay cabinet uses it.
+- Dialogue:
+  - Mags has a kickoff option, plus a new `blind` node once the relay is down. That node is where quest 5 will start.
+  - Ruth has a new tree, `ruth_relay`, in `dialogues/act4.yaml`. It includes a **Wits ★★★** intel option that explains Overtime.
+- Quests:
+  - *Service Interruption*: stages 2, 3 and done.
+  - *Pending Onboarding*: stage 5.
+- City map:
+  - Central Ave gets a location. It unlocks at *Service Interruption* stage 2, not on reaching Midwood.
+  - Blowing the relay sets `relay_down`, which unlocks the Uptown node. Uptown is not built yet.
+
+**Engine**
+- New enemy-entity key, `phases: [{hp_below: 0.5, effects: [...]}]`. Each phase runs once, the first time the enemy is hurt below that fraction of its max HP. Its flag is `<loc>:<id>:phase:<i>`.
+  - It's checked after every kind of damage: your attacks, the companion, and surprises.
+  - Enemies woken by a phase's flags join the fight in progress.
+  - Documented in `content.py` and `Combat.phases`.
+
+**Line mode**
+- Fix: `USE TEA` and `USE GUMMY` now work. Item lookup falls back to matching any word in the item name. The low-HP tip already told players to type exactly that, and before this it silently failed.
+
+**Balance**
+- Bot passes of 24 seeds per route, quests 1–4. The bot never aims at parts and only heals below 12 HP in combat; between fights it uses foil and heals to 60%.
+
+| Route | Deaths | End-of-quest HP |
+| --- | --- | --- |
+| Overtime on | 1 in 24 | 12–36 of 52 (mean 24) |
+| Overtime denied | 0 in 24 | 6–46 of 52 (mean 30) |
+
+- The first tuning was far too lethal: 6 deaths in 24 with Overtime on, 2 with it denied. Changes to the Fulfillment Unit:
+  - HP 72 → 64.
+  - Attack cost 3 → 4 AP, so one swing per turn.
+  - Damage 3–6 → 5–8.
+- Side effect, kept on purpose: a Drive Track (slow) shot leaves it 3 AP, which is below its attack cost. Slowing it stops its attacks for 2 rounds.
+
+**Tests**
+- `test_engine.py`: quest 4 with Overtime on, quest 4 with Overtime denied, and a unit test that a phase fires exactly once and wakes the Pickers.
+- `test_ui.py`: the headless run continues through quest 4 with Overtime on. A new `heal_up` helper uses the WristLink between fights.
+- `test_line.py`: the run continues through quest 4 with Overtime denied (dock controller hack). New test that players can type item nicknames. 331 replies, mean 163 B.
+
 ## 0.3.0 — Quest 3: Analog Only (2026-11-25)
 
 **Content**

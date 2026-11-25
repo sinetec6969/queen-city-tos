@@ -30,7 +30,9 @@ nodes:
     name: CENTRAL AVE
     x: 26
     y: 7
-    unlocked_if: {flag: reached_midwood}
+    unlocked_if: {quest: service_interruption, gte: 2}
+    location: central_ave
+    spawn: city
     blurb: "A relay tower on Central keeps Uptown's eyes open."
   noda:
     name: NODA

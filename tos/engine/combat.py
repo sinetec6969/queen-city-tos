@@ -113,6 +113,20 @@ class Combat:
         msgs.insert(0, f"You hit {e.name}{aim} for {dmg}.")
         if e.hp <= 0:
             msgs += self.kill(e)
+        else:
+            msgs += self.phases(e)
+        return msgs
+
+    def phases(self, e: Entity) -> list[str]:
+        """Entity `phases: [{hp_below: 0.5, effects: [...]}]`: each runs its effects once, the
+        first time the enemy is hurt below that fraction of max HP (flag `<loc>:<id>:phase:<i>`).
+        Enemies woken by a phase's flags join the fight at once: `enemies()` is live."""
+        msgs: list[str] = []
+        for i, ph in enumerate(e.data.get("phases", [])):
+            key = f"{e.key}:phase:{i}"
+            if key not in self.state.flags and e.hp < e.max_hp * ph.get("hp_below", 0.5):
+                self.state.flags.add(key)
+                msgs += [ev[1] for ev in apply_effects(ph.get("effects"), self.state, self.content) if ev[0] == "log"]
         return msgs
 
     def kill(self, e: Entity) -> list[str]:
@@ -222,6 +236,8 @@ class Combat:
         msgs = [f"{name} rams {target.name} for {dmg}. \"{self.rng.choice(c.get('barks', ['Beep.']))}\""]
         if target.hp <= 0:
             msgs += self.kill(target)
+        else:
+            msgs += self.phases(target)
         return msgs
 
     def enemy_act(self, e: Entity) -> list[str]:
@@ -286,6 +302,8 @@ class Combat:
             victim.hp -= n
             if victim.hp <= 0:
                 msgs += self.kill(victim)
+            else:
+                msgs += self.phases(victim)
         return msgs
 
     def _check_outcome(self) -> None:

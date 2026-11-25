@@ -10,6 +10,10 @@ Content files never touch Python. Conditions and effects are small dicts:
               {cells: n} {xp: n} {quest: id, stage: 2|done} {note: [title, body]}
               {log: text} {signal: n} {heal: n} {game_over: text}
               {companion: id} {take_entity: "loc:entity"} (removes it from the world)
+
+Enemy entities may also carry `on_death: [effects]` and
+`phases: [{hp_below: 0.5, effects: [...]}]` (each phase runs once, the first time
+the enemy drops below that fraction of its max HP; see Combat.phases).
 """
 from __future__ import annotations
 

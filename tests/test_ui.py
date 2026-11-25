@@ -85,6 +85,22 @@ async def fight(pilot, app):
         await pilot.pause()
 
 
+async def heal_up(pilot, app, frac=0.6):
+    """Between fights: drink from the WristLink until HP is above frac (what a player would do)."""
+    p = app.state.player
+    if p.hp >= p.max_hp * frac or not any(p.has(i) for i in ("med_gummy", "sweet_tea")):
+        return
+    await press(pilot, app, "tab")
+    await press(pilot, app, "right")
+    scr = app.screen
+    for item in ("med_gummy", "sweet_tea"):
+        while p.hp < p.max_hp * frac and p.has(item):
+            while scr.items()[scr.cursor] != item:
+                await press(pilot, app, "down")
+            await press(pilot, app, "enter")
+    await press(pilot, app, "tab")
+
+
 async def main():
     app = QCApp(seed=11)
     async with app.run_test(size=(80, 24)) as pilot:
@@ -349,6 +365,48 @@ async def main():
         assert app.state.quests["analog_only"] == "done", app.state.quests
         assert app.state.quests["service_interruption"] == 1
 
+        # ---- QUEST 4: Service Interruption (mini boss, overtime on) ----
+        await press(pilot, app, "right")  # Mags again
+        assert isinstance(app.screen, DialogueScreen)
+        await press(pilot, app, "1", "1")  # "Let's take down the relay." / "On my way."
+        assert app.state.quests["service_interruption"] == 2
+        await heal_up(pilot, app)
+        await walk(pilot, app, 1, 4)
+        await press(pilot, app, "left")
+        assert isinstance(app.screen, CityScreen)
+        await press(pilot, app, "down", "down")  # NoDa -> Lynx -> Central Ave
+        await press(pilot, app, "enter")
+        assert app.state.location == "central_ave", app.state.location
+        for _ in range(4):  # Ruth (18,4) from (17,4); the street drone is awake
+            await walk(pilot, app, 17, 4)
+            await fight(pilot, app)
+        await press(pilot, app, "right")
+        assert isinstance(app.screen, DialogueScreen)
+        await shot(app, "25_ruth_relay")
+        await press(pilot, app, "1", "1", "1")  # plan, cut, leave
+        assert "fence_cut" in app.state.flags and app.state.player.has("thermite")
+        await press(pilot, app, "up")  # Ruth's stash (17,3)
+        await heal_up(pilot, app)
+        for _ in range(3):
+            await walk(pilot, app, 22, 4)
+            await fight(pilot, app)
+        await press(pilot, app, "right")
+        assert app.state.location == "relay_yard", app.state.location
+        await shot(app, "26_yard")
+        await heal_up(pilot, app, 0.9)
+        for _ in range(6):
+            await walk(pilot, app, 12, 5)
+            await fight(pilot, app)
+            if "relay_yard:fulfillment" in app.state.taken:
+                break
+        assert app.state.player.hp > 0, "died to the Fulfillment Unit"
+        assert "relay_yard:fulfillment" in app.state.taken and "overtime" in app.state.flags
+        await shot(app, "27_after_boss")
+        await walk(pilot, app, 12, 3)
+        await press(pilot, app, "up")  # the relay cabinet
+        assert "relay_down" in app.state.flags, app.state.pos
+        assert app.state.quests["service_interruption"] == "done" and app.state.quests["teo"] == 5
+        await shot(app, "28_relay_down")
         print("tips shown:", TIPS_SEEN)
         print("UI playthrough OK. HP", app.state.player.hp, "/", app.state.player.max_hp,
               "LV", app.state.player.level, "signal", int(app.state.player.signal))

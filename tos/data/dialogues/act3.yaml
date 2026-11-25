@@ -50,6 +50,8 @@ ruth:
 mags:
   speaker: MAGS
   starts:
+    - if: {flag: relay_down}
+      node: blind
     - if: {flag: optout_trusted}
       node: after
     - if: {item: faraday_drive}
@@ -114,8 +116,22 @@ mags:
     after:
       text: "Mags nods at you. \"Harlan.\" From her, it sounds like a rank."
       options:
+        - text: "Let's take down the relay."
+          show_if: {not_flag: relay_go}
+          to: relay_go
         - text: "Tell me about the relay again."
           to: relay
+        - text: "[Leave]"
+    relay_go:
+      effects:
+        - {set: relay_go}
+        - {quest: service_interruption, stage: 2}
+      text: "Mags rolls up a street map of Central Avenue and taps a square behind the old car wash. \"Ruth's already there. She's been watching the yard for a week, and she has the thermite, which is a sentence I never wanted to say about Ruth.\" She hands you the map. \"Something big moved into that yard after the last time we got close. Ruth will tell you. Go.\""
+      options:
+        - text: "On my way."
+    blind:
+      text: "The brewery is loud for once. Ossie is typing in all caps. Bev has the headphones off and is grinning at the static. Mags looks up from the photo wall. \"Every camera between here and the Crown, Harlan. Snow. Beautiful snow.\" Then, quieter: \"Now we figure out how to get you inside before they fix it. Sit down. This part we plan.\""
+      options:
         - text: "[Leave]"
     relay:
       text: "\"Central Avenue, past the old car wash. It talks to every camera between here and the Crown. Take it down and Uptown goes blind long enough for someone to walk in.\" She taps the log. \"It won't be unguarded. Nothing the Concierge loves is unguarded.\""

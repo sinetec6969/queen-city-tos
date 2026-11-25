@@ -193,3 +193,59 @@ pxu:
     - {id: bogies, name: Rail Bogies, mod: -15, effect: slow}
     - {id: battery, name: Battery, mod: -30, effect: explode}
     - {id: chassis, name: Torso, mod: 10, effect: none}
+
+fulfillment_unit:
+  name: Fulfillment Unit
+  glyph: "U"
+  hp: 64
+  ap: 6
+  range: 2
+  attack_ap: 4
+  hit: 60
+  dmg: [5, 8]
+  evade: 0
+  xp: 180
+  cells: [15, 25]
+  drops:
+    - {id: sweet_tea, chance: 1.0}
+  attacks:
+    - "swings a forklift arm like a door slamming"
+    - "drops a pallet of bottled water on you"
+    - "scans you as a damaged item and tries to return you"
+  barks:
+    - "Your order is our order."
+    - "Obstruction detected in the fulfillment path."
+    - "Please hold. You are important to us."
+    - "Same-day removal available."
+  death: "The Fulfillment Unit rocks once on its tracks, then settles with a long hydraulic sigh."
+  parts:
+    - {id: mast, name: Optical Mast, mod: -25, effect: blind}
+    - {id: track, name: Drive Track, mod: -15, effect: slow}
+    - {id: battery, name: Battery Bank, mod: -30, effect: explode}
+    - {id: chassis, name: Cargo Frame, mod: 10, effect: none}
+
+picker:
+  name: Picker
+  glyph: "k"
+  hp: 9
+  ap: 6
+  range: 1
+  attack_ap: 3
+  hit: 50
+  dmg: [1, 3]
+  evade: 10
+  xp: 20
+  cells: [1, 3]
+  attacks:
+    - "grabs you with three arms and tries to box you"
+    - "applies a shipping label to your face"
+  barks:
+    - "Picking."
+    - "Item located."
+    - "Overtime is a privilege."
+  death: "The picker folds its arms, all six, and lies down in the dirt."
+  parts:
+    - {id: camera, name: Camera, mod: -25, effect: blind}
+    - {id: arms, name: Arms, mod: -15, effect: slow}
+    - {id: battery, name: Battery, mod: -30, effect: explode}
+    - {id: chassis, name: Frame, mod: 10, effect: none}

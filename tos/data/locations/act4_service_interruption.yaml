@@ -1,0 +1,206 @@
+# Quest 4: Service Interruption. Central Avenue -> the relay yard behind the old car wash.
+# Mini boss: the Fulfillment Unit. New mechanic used here: enemy `phases` (see Combat.phases):
+# at half HP it goes into Overtime and wakes two Pickers, unless the dock controller was hacked.
+
+central_ave:
+  name: "Central Avenue"
+  district: CENTRAL AVE
+  signal_rate: 0.8
+  tags: [street]
+  spawns:
+    city: [1, 3]
+    yard: [22, 4]
+  rules:
+    - id: arrive
+      effects:
+        - {log: "Central Avenue. Taquerias and pho shops with their chairs still on the tables since June. Past the car wash, the relay tower hums like a fridge you can't find."}
+  map: |
+    ########################
+    #.t...........wwwwww...#
+    #.............w....w...#
+    E.............w..x.w...#
+    #.................r....G
+    #..........d...........#
+    #......g...............#
+    #..c......s............#
+    ########################
+  legend:
+    E:
+      id: ave_west
+      type: door
+      name: Central Avenue
+      glyph: "»"
+      to: {city: central_ave}
+    t:
+      id: taco_truck
+      type: item
+      name: Taco truck
+      glyph: "▣"
+      items:
+        - {id: sweet_tea, n: 1}
+        - {id: med_gummy, n: 1}
+      text: "A taco truck, tires flat, menu still chalked up: AL PASTOR, LENGUA, \"NO APP, NO PROBLEM.\" In the cooler: a gallon of sweet tea and a med-gummy someone left with a note. \"Pay it forward. Not with a card.\""
+    w:
+      id: car_wash
+      type: object
+      name: Old car wash
+      glyph: "▯"
+      color: blue
+      text: "The old car wash. The brushes hang still, wrapped in plastic. The sign still promises SPOTLESS IN 5 MINUTES. Everything on this street has been spotless since June."
+    x:
+      id: optout_stash
+      type: item
+      name: Opt-Out stash
+      glyph: "▤"
+      items:
+        - {id: nails, n: 18}
+        - {id: tinfoil, n: 1}
+        - {id: sweet_tea, n: 1}
+      text: "An ammo can wedged behind a brush, stenciled RUTH. Inside: nails, tinfoil, a gallon of sweet tea, and a note in grease pencil. \"Use it all. Bring the can back.\""
+    r:
+      id: ruth_ave
+      type: npc
+      name: Ruth
+      dialogue: ruth_relay
+    G:
+      id: yard_gate
+      type: door
+      name: Relay yard fence
+      open_if: {flag: fence_cut}
+      locked_text: "A chain-link fence with a gate, padlocked, three rows of razor wire on top. A sign: AUTHORIZED SERVICE ONLY. YOUR PATIENCE IS APPRECIATED. Through the links: the relay tower, and something very large parked in front of it."
+      to: {location: relay_yard, spawn: gate}
+    d:
+      id: ave_drone
+      type: enemy
+      enemy: courier_drone
+      aggro: 5
+    g:
+      id: ave_greeter
+      type: enemy
+      enemy: greeter
+      aggro: 6
+      wake_if: {signal_gte: 50}
+      asleep_text: "A Greeter outside the pho shop, smiling at nothing. It notices people with high Signal."
+    c:
+      id: bus_shelter
+      type: object
+      name: Bus shelter
+      glyph: "▬"
+      color: grey70
+      text: "A bus shelter. The ad inside shows a woman asleep on a train, smiling: \"COMMUTE? WHY? Everything comes to you now.\" Someone has drawn a speech bubble: \"help.\""
+    s:
+      id: band_pile
+      type: object
+      name: Pile of wristbands
+      glyph: "◘"
+      color: green
+      text: "A pile of grey wellness bands on the sidewalk, snipped clean through. Dozens. Each one was cut off somebody. Nobody knows what happened to the somebodies. A few of the bands still glow, faintly, waiting for a pulse."
+
+relay_yard:
+  name: "Relay Yard"
+  district: CENTRAL AVE
+  signal_rate: 1.0
+  tags: [outdoor]
+  spawns:
+    gate: [1, 4]
+  rules:
+    - id: arrive
+      effects:
+        - {log: "The relay yard. A steel lattice tower, dishes pointed at every corner of the city. In front of the cabinet at its base sits a warehouse robot the size of a box truck, forklift arms folded. Its status light is green. It is on shift."}
+    - id: overtime_blocked
+      if: [{flag: overtime}, {flag: pickers_off}]
+      effects:
+        - {log: "The dock doors rattle. Nothing comes out. The dock controller holds. Overtime denied."}
+  map: |
+    ########################
+    #..........RRR.........#
+    #..........RCR.........#
+    #...........F..........#
+    G......................#
+    #..1................2..#
+    #.....##........##.....#
+    #..K...............x...#
+    ########################
+  legend:
+    G:
+      id: yard_exit
+      type: door
+      name: Fence gate
+      glyph: "/"
+      to: {location: central_ave, spawn: yard}
+    R:
+      id: relay_tower
+      type: object
+      name: Relay tower
+      glyph: "▲"
+      color: magenta
+      texts:
+        - if: {flag: relay_down}
+          text: "The relay tower, dark. The dishes have stopped turning. For the first time since June, nothing up there is looking at anything."
+      text: "The base of the relay tower: a steel lattice bolted to concrete, humming. Every dish on it is turning, slowly, watching every street between here and the Crown."
+    C:
+      id: relay_cabinet
+      type: door
+      name: Relay cabinet
+      glyph_closed: "≡"
+      open_if: {flag: relay_down}
+      locked_text: "The relay's equipment cabinet. The hatch codes from the drive would open it. Not with the Fulfillment Unit parked in front of it."
+      force:
+        if: [{taken: "relay_yard:fulfillment"}, {item: thermite}]
+        text: "You key the hatch code from the drive. The cabinet opens on racks of blinking hardware. Ruth's thermite goes on the main bus bar, the way she showed you: tape, pull the tab, walk away. You walk away. Behind you, white light, a smell like a struck match the size of a house, and then every dish on the tower stops turning."
+        effects:
+          - {take: thermite}
+          - {set: relay_down}
+          - {quest: service_interruption, stage: done}
+          - {quest: teo, stage: 5}
+          - {xp: 80}
+          - {log: "The relay is down. Somewhere Uptown, a thousand cameras show static."}
+    F:
+      id: fulfillment
+      type: enemy
+      enemy: fulfillment_unit
+      aggro: 6
+      phases:
+        - hp_below: 0.5
+          effects:
+            - {set: overtime}
+            - {log: "The Fulfillment Unit's light turns from green to amber. \"Volume exceeds forecast. Activating overtime.\" The dock doors rattle open."}
+      on_death:
+        - {log: "The Fulfillment Unit kneels, forklift arms dropping into the dirt, and announces: \"Shift complete.\" The cabinet behind it is open to you."}
+    "1":
+      id: picker1
+      type: enemy
+      enemy: picker
+      aggro: 30
+      wake_if: [{flag: overtime}, {not_flag: pickers_off}]
+      asleep_text: "A picker drone, docked in a charging cradle. Six arms folded. It's waiting for volume."
+    "2":
+      id: picker2
+      type: enemy
+      enemy: picker
+      aggro: 30
+      wake_if: [{flag: overtime}, {not_flag: pickers_off}]
+      asleep_text: "A picker drone, docked in a charging cradle. One arm twitches, sorting nothing."
+    K:
+      id: dock_controller
+      type: terminal
+      name: Dock controller
+      text: "FULFILLMENT DOCK CONTROLLER // RELAY SITE 7 // PICKERS: 2 ON STANDBY // OVERTIME: AUTHORIZED."
+      hack: {length: 6, words: 8}
+      done_if: {flag: pickers_off}
+      done_text: "DOCK CONTROLLER // OVERTIME: DENIED // \"Labor costs exceed forecast.\""
+      on_success:
+        - {set: pickers_off}
+        - {xp: 35}
+        - {log: "The pickers' charging lights go from green to red. Overtime is no longer authorized. The big one doesn't notice. It never asks the little ones how they're doing."}
+      on_fail:
+        - {signal: 15}
+        - {log: "The controller reboots. Over at the tower, the Fulfillment Unit's mast turns your way, considers, and turns back."}
+    x:
+      id: parcel_pile
+      type: item
+      name: Undelivered parcels
+      glyph: "▦"
+      items:
+        - {id: med_gummy, n: 2}
+      text: "A heap of undelivered parcels, all addressed to Uptown. You open one. Wellness gummies, 120-count, for \"T. HARLAN.\" Your hands go cold. It's a common name. You take two anyway."

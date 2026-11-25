@@ -273,5 +273,81 @@ D......................#     D door back to the platform
 Talk to Mags with the pouch to finish *Analog Only*:
 - Rewards: +100 XP and 30 cells.
 - *Pending Onboarding* moves to stage 4.
-- **Service Interruption** (quest 4) begins: a relay on Central Avenue. Central Ave is still "not built yet" on the city map.
+- **Service Interruption** (quest 4) begins: a relay on Central Avenue.
 - After this, Ruth, Ossie, Priya, Bev and the photo wall all have new lines.
+
+---
+
+## Quest 4 — Service Interruption
+
+**Goal:** take down the relay on Central Avenue so Uptown goes blind. **Mini boss:** the Fulfillment Unit. **Time:** about 20–25 min. **Route:** NoDa (Mags) → city map → **Central Ave** → relay yard → back to NoDa.
+
+**Starting it:** talk to Mags again after *Analog Only* and pick "Let's take down the relay." That moves the quest to stage 2 and unlocks Central Ave on the city map.
+
+### Central Avenue
+
+```
+########################
+#.t...........wwwwww...#     t taco truck (sweet tea + med-gummy)
+#.............w....w...#     w old car wash   x Ruth's stash, inside the bay (18 nails, tinfoil, sweet tea)
+E.............w..x.w...#     r Ruth (talk)
+#.................r....G     G relay yard fence (opens after talking to Ruth)
+#..........d...........#     d Courier Drone (awake)   g Greeter (wakes at Signal 50)
+#......g...............#     c bus shelter, s pile of wristbands (lore)
+#..c......s............#     E » west to the city map
+########################
+```
+
+- **Signal rises** here (+0.8 per step). The drone notices you within 5 tiles. The Greeter joins if you're at Signal 50 or more. Foil before coming if you can.
+- **Ruth (18,4):** talk from (17,4).
+  - "What's the plan?" → "Cut it." cuts the fence and gives you the **Thermite Charge**.
+  - **Wits ★★★** option ("The drive mentioned the yard"): +25 XP and a note explaining the yard's overtime mechanic and the dock controller.
+- **Ruth's stash (17,3):** walk up from where you talked to her. Take it before going in.
+
+### Relay Yard (mini boss)
+
+```
+########################
+#..........RRR.........#     R relay tower   C relay cabinet (12,2)
+#..........RCR.........#     U Fulfillment Unit (12,3), parked in front of the cabinet
+#...........U..........#     1 2 Pickers, docked (wake in Overtime)
+G......................#     K dock controller (3,7): hack to deny Overtime
+#..1................2..#     x undelivered parcels (2 med-gummies)
+#.....##........##.....#     ## pallet stacks (block line of sight)
+#..K...............x...#     G gate back to Central Ave
+########################
+```
+
+- **Signal rises fast** here (+1.0 per step).
+- The Fulfillment Unit notices you within 6 tiles with line of sight. The west side is safe: you can reach the dock controller from (2,7) without starting the fight.
+
+**Before the fight (optional but strong):** hack the **dock controller (3,7)**. 6-letter words. +35 XP. Failure = +15 Signal, retry allowed. Overtime is then denied and the Pickers never activate.
+
+**Fulfillment Unit:**
+
+| Stat | Value |
+| --- | --- |
+| HP | 64 |
+| Reach | 2 tiles |
+| Attack | One heavy swing per turn: 5–8 damage, 60% to hit |
+| Evade | None. It's huge. |
+| Drops | Sweet tea, 15–25 cells, 180 XP |
+
+- **Overtime:** the first time it drops below half HP (32), it calls the two **Pickers**, unless you hacked the dock controller. Pickers: HP 9, melee, two grabs a turn for 1–3.
+- **The trick:** aim at the **Drive Track** (Lock-On, part 2). Slowed, it only has 3 AP, which is less than its swing costs, so **it can't attack at all for 2 rounds**. Do it on round 1, and again when it wears off.
+- **Optical Mast** (blind) is −40 to its hit chance for 2 rounds. Good if you can't land the track shot.
+- Pallet stacks block line of sight: break away behind one to heal.
+- Bot runs (24 seeds; the bot never aims at parts and only heals below 12 HP):
+
+| Route | Deaths | End HP |
+| --- | --- | --- |
+| Overtime on | 1 in 24 | 12–36 of 52 |
+| Overtime denied | 0 in 24 | 6–46 of 52 |
+
+**Blowing the relay:** with the Unit down, stand where it stood (12,3) and walk into the **cabinet (12,2)**. The thermite does the rest:
+- *Service Interruption* is complete. +80 XP.
+- *Pending Onboarding* moves to stage 5.
+- The **Uptown** node unlocks on the city map. It's still "not built yet": that's quest 5.
+
+**Afterwards:** Ruth on Central Avenue and Mags in NoDa both have new lines. Mags is where quest 5 will start.
+
