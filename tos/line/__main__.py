@@ -64,6 +64,23 @@ class Out:
             os.write(1, data)
 
 
+def active_sessions(sdir, mine: str) -> int:
+    """Count other callsigns currently holding their session lock."""
+    n = 0
+    for p in sdir.glob("*.lock"):
+        if str(p) == mine:
+            continue
+        try:
+            with open(p) as f:
+                try:
+                    fcntl.flock(f, fcntl.LOCK_EX | fcntl.LOCK_NB)
+                except OSError:
+                    n += 1  # held: that player is connected
+        except OSError:
+            pass
+    return n
+
+
 def lines_in(idle: float):
     """Yield input lines split on CR, LF or CRLF. Yields None on idle timeout; stops at EOF."""
     buf = b""
@@ -101,6 +118,8 @@ def main() -> None:
     ap.add_argument("--eol", choices=EOLS, default="cr", help="line ending: cr for AX.25, crlf for telnet")
     ap.add_argument("--idle", type=float, default=600, help="seconds of silence before save + disconnect")
     ap.add_argument("--allow", default=os.environ.get("QCTS_ALLOW"), help="allowlist file, one callsign per line")
+    ap.add_argument("--max-sessions", type=int, default=int(os.environ.get("QCTS_MAX_SESSIONS", "3")),
+                    help="players at once; one 1200-baud channel can't carry more")
     args = ap.parse_args()
 
     out = Out(EOLS[args.eol], args.baud)
@@ -116,6 +135,10 @@ def main() -> None:
         fcntl.flock(lock, fcntl.LOCK_EX | fcntl.LOCK_NB)
     except OSError:
         out.write(f"{call} is already connected. One session per callsign. 73.\n")
+        return
+    if active_sessions(sdir, lock.name) >= args.max_sessions:
+        out.write(f"Queen City is full ({args.max_sessions} players on the channel). Try again later. 73.\n")
+        lock.close()
         return
 
     def hangup(signum, frame):

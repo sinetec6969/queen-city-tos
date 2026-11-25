@@ -500,6 +500,47 @@ def test_item_names_players_type():
         assert p.inventory.get(iid, 0) == n - 1, cmd
 
 
+def test_control_chars_never_echo():
+    """Hack prompts echo the typed word: control chars and ESC must never reach the air."""
+    s = new_session(slot="TEST5")
+    send(s, "n")
+    send(s, "ok")
+    send(s, "x")
+    walk(s, 20, 8)
+    send(s, "s")
+    assert s.mode == "hack"
+    for evil in ("\x1b[2J\x07agree", "\x00\x08\x7f" + "A" * 5000, "\x1b]0;pwned\x07", "caf\xe9\x9b\x1b"):
+        reply = s.handle(evil)
+        assert all(" " <= ch <= "~" or ch == "\n" for ch in reply), repr(reply)
+        assert len(max(reply.split("\n"), key=len)) <= 100
+
+
+def test_session_cap():
+    import time
+    sdir = tempfile.mkdtemp()
+    env = dict(os.environ, QCTS_SAVE_DIR=sdir, QCTS_MAX_SESSIONS="2")
+    holders = [subprocess.Popen([sys.executable, "-m", "tos.line", call], cwd=ROOT, env=env,
+                                stdin=subprocess.PIPE, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+               for call in ("KN4AAA", "KN4BBB")]
+    try:
+        for _ in range(100):
+            if all((Path(sdir) / f"{c}.lock").exists() for c in ("KN4AAA", "KN4BBB")):
+                break
+            time.sleep(0.05)
+        time.sleep(0.3)
+        r = subprocess.run([sys.executable, "-m", "tos.line", "KN4CCC"], cwd=ROOT, env=env,
+                           input=b"n\r", capture_output=True, timeout=30)
+        assert b"is full" in r.stdout and b"RATING" not in r.stdout, r.stdout
+    finally:
+        for h in holders:
+            h.stdin.write(b"bye\r")
+            h.stdin.close()
+            h.wait(timeout=10)
+    r = subprocess.run([sys.executable, "-m", "tos.line", "KN4CCC"], cwd=ROOT, env=env,
+                       input=b"q\r", capture_output=True, timeout=30)
+    assert b"hello KN4CCC" in r.stdout, "room again once the others hang up"
+
+
 def test_callsigns_and_allowlist():
     assert base_call("kn4abc-7") == "KN4ABC"
     assert base_call("../etc") == "" and base_call("A") == ""

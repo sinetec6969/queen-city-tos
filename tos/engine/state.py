@@ -137,8 +137,19 @@ def save_game(state: GameState, slot: str = "save") -> Path:
     path = save_path(slot)
     path.parent.mkdir(parents=True, exist_ok=True)
     tmp = path.with_suffix(".tmp")
-    tmp.write_text(json.dumps(state.to_json(), indent=1))
+    with open(tmp, "w", encoding="utf-8") as f:
+        f.write(json.dumps(state.to_json(), indent=1))
+        f.flush()
+        os.fsync(f.fileno())  # a Pi on a power strip: survive the plug being pulled
     tmp.replace(path)
+    try:
+        dfd = os.open(path.parent, os.O_RDONLY)
+        try:
+            os.fsync(dfd)
+        finally:
+            os.close(dfd)
+    except OSError:
+        pass
     return path
 
 

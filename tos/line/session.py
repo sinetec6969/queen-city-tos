@@ -26,6 +26,12 @@ DIRS = {"n": (0, -1), "s": (0, 1), "e": (1, 0), "w": (-1, 0)}
 MOVE_RE = re.compile(r"([nsew])\s*(\d{0,2})")
 DEFAULT_STATS = {"Brawn": 3, "Grit": 3, "Aim": 3, "Wits": 2, "Charm": 2, "Luck": 2}
 MAX_REPEAT = 12
+MAX_INPUT = 80  # one line at 1200 baud; nothing in the game needs more
+
+
+def clean(line: str) -> str:
+    """Printable ASCII only, capped. Player input can be echoed back over the air."""
+    return "".join(ch for ch in line if " " <= ch <= "~")[:MAX_INPUT]
 
 
 class Session:
@@ -75,7 +81,7 @@ class Session:
         return self.flush()
 
     def handle(self, line: str) -> str:
-        getattr(self, f"in_{self.mode}")(line.strip())
+        getattr(self, f"in_{self.mode}")(clean(line).strip())
         return self.flush()
 
     def save(self) -> None:
