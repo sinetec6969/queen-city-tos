@@ -18,6 +18,22 @@ Map coordinates are `(x, y)` from the top-left corner of each map, starting at 0
 
 **Map symbols:** `@` you · `b` Biscuit · red letters are enemies (dim = asleep/docked) · `☺` people · `≡` terminal · `¤`/`▤`/`▥`/`▦` things to search · `+` locked door · `/` `▲` `▼` `»` exits.
 
+### Packet radio / line mode (`python -m tos.line`)
+
+Same game and same saves format, but typed commands instead of keys. Saves are per callsign. Everything in this guide applies; only the controls and map symbols differ.
+
+| Where | Commands |
+| --- | --- |
+| Exploring | `N` `S` `E` `W` move (`N3` = three steps, stops when something happens) · walk into things to use them · `L` what's around you and which way · `M` map · `I` items (`I 2` details) · `USE n`/`EQ n` (number or name: `EQ TIRE`) · `ST` status · `Q` quests + orientation step · `NOTES` (`NOTES 1`) · `SAVE` · `BYE` save + disconnect · `BRIEF`/`VERBOSE` · `?` |
+| Combat | `N` `S` `E` `W` move (1 AP) · `F` attack · `A` then `1`–`4`, or `A2` in one go (+2 AP) · `T` next target · `U` best heal (2 AP) · `.` end turn. The prompt shows round, AP, HP, then the target's HP, direction, hit % and AP cost. |
+| Talking | reply with the option number |
+| Hacking | type a word · `D` reprint the dump · `X` back out |
+| City map | the destination's number · `X n` about it |
+
+**Line-mode map symbols:** `@` you · `#` wall · `$` things to search · `o` objects to examine · `N` people · `T` terminal · enemy letters as above · `+` locked door · `/` `>` exits. `L` names everything with its direction from you, e.g. `Closet $ 1N 4E`.
+
+**Airtime:** ordinary replies are 50–250 bytes (1–3 s at 1200 baud). The map (~300 bytes) only appears when you arrive somewhere (off with `BRIEF`) or type `M`. First-time tips and hack dumps are the biggest sends (up to ~900 bytes, ~8 s).
+
 ---
 
 ## Quest 1 — Terms and Conditions (tutorial)

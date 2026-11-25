@@ -1,5 +1,33 @@
 # Changelog
 
+## 0.2.1 — Line mode for packet radio (2026-11-25)
+
+**Frontend**
+- New `tos/line/` frontend: plain ASCII, one line in, one reply out, built for 1200-baud AX.25. Run `python -m tos.line [CALLSIGN]` or `qcts-line`. It imports only the engine and PyYAML, never Textual.
+- `Session` (`tos/line/session.py`) mirrors the Textual flow as modes: title, profile, intro, explore, combat/lock-on, dialogue, hack, city, game over. `pump()` is a port of `LocationScreen.pump`; modal screens become modes; tips print inline.
+- Commands: `N`/`S`/`E`/`W` with counts (`E5`), `L` look, `M` map, `I`/`USE`/`EQ`/`ST`/`Q`/`NOTES`, `SAVE`, `BYE`, `BRIEF`/`VERBOSE`. Combat: `F`, `A`/`A2`, `T`, `U`, `.`. The prompt carries HP/Signal, or the full combat status. Full table in `docs/LEVEL_GUIDE.md`.
+- Built for airtime: the map only on arrival or `M`; a shop purchase sends only the options again; the hack dump drops its address column; `Beside you:` names what you just walked up to.
+- Entry point (`tos/line/__main__.py`):
+  - Input lines end in CR, LF or CRLF. Output ends lines with CR by default (`--eol crlf` for telnet).
+  - Saves per callsign, with the SSID stripped.
+  - Optional allowlist (`--allow` / `QCTS_ALLOW`); an unreadable list lets nobody in.
+  - One connection per callsign at a time (file lock).
+  - Idle timeout, 600 s by default.
+  - Saves on EOF, dropped link, SIGHUP/SIGTERM and errors. Tracebacks go to `line-errors.log`, never over the air.
+  - `--baud N` throttles output so you can feel the airtime over telnet.
+- `deploy/digipi/`: install script (`/opt/qcts`, PyYAML-only venv, `qcts` user, `/var/lib/qcts`, `/etc/qcts/allow`), wrapper, and ax25d/URONode wiring notes. Node config syntax is not yet verified on a DigiPi image.
+
+**Content**
+- `tutorial.yaml`: optional `line:` text on steps, tips and `controls`, because `text` names keys and glyphs line mode doesn't have. The Textual UI ignores it.
+
+**Tests**
+- New `tests/test_line.py`:
+  - Quests 1–2 played entirely through text commands, on the same route as `test_ui.py`.
+  - The Accept game-over plus reload; tutorial off; confirmation before a new game replaces a save.
+  - Callsign parsing and the allowlist.
+  - CLI checks: CR endings and ASCII only, allowlist refusal, SIGHUP saves an unsaved move, broken pipe stays quiet.
+- Each run prints reply sizes and an airtime estimate. Current: 154 replies, mean 178 B (~1.8 s), p95 495 B (~4.3 s), max 931 B (~8.1 s, the first combat tip plus the hack result).
+
 ## 0.2.0 — Quest 2: Last Mile (2026-11-24)
 
 **Content**

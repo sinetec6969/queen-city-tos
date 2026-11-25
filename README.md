@@ -23,6 +23,12 @@ Over SSH it's the same: SSH in, then run `python -m tos`. Saves go to `~/.qcts/s
 
 Or install it as a command: `pip install -e .` then run `qcts`.
 
+## Play over packet radio
+
+`python -m tos.line [CALLSIGN]` runs a plain-ASCII, line-at-a-time version of the game for 1200-baud AX.25 (and anything else that's just a text pipe). An AX.25 node launches it per connection. Saves are per callsign. It needs only PyYAML. Commands are in `docs/LEVEL_GUIDE.md`. Setting it up on a DigiPi node is covered in `deploy/digipi/README.md`.
+
+Try it locally: `python -m tos.line --eol lf`, or over telnet at real packet speed with `socat TCP-LISTEN:7300,reuseaddr,fork EXEC:"python -m tos.line N0CALL --eol crlf --baud 1200"` and `telnet localhost 7300`.
+
 ## Controls
 
 | Where | Keys |
@@ -39,8 +45,10 @@ Or install it as a command: `pip install -e .` then run `qcts`.
 | --- | --- |
 | `tos/engine/` | Game logic, no UI: state + saves, content loader and the condition/effect language, grid world, combat, hacking, dialogue |
 | `tos/ui/` | Textual screens and rendering |
+| `tos/line/` | Line-mode (packet radio) frontend: plain ASCII, no Textual |
+| `deploy/digipi/` | Installing line mode on an AX.25 node |
 | `tos/data/` | All story content in YAML: locations (ASCII maps), dialogue, items, enemies, quests, surprises, city map |
-| `tests/` | `test_engine.py` (logic + scripted playthrough) and `test_ui.py` (headless 80×24 UI playthrough) |
+| `tests/` | `test_engine.py` (logic + scripted playthrough), `test_ui.py` (headless 80×24 UI playthrough), `test_line.py` (line-mode playthrough + airtime report) |
 
 ## Writing content
 
@@ -51,4 +59,5 @@ Maps are plain ASCII: `#` wall (drawn with box lines automatically), `.` floor, 
 ```bash
 python tests/test_engine.py
 python tests/test_ui.py            # add --shots DIR to save SVG screenshots
+python tests/test_line.py          # line mode; prints reply sizes and airtime
 ```

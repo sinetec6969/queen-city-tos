@@ -1,0 +1,6 @@
+#!/bin/sh
+# Wrapper the AX.25 node runs per connection: qcts-line CALLSIGN [options]
+export QCTS_SAVE_DIR="${QCTS_SAVE_DIR:-/var/lib/qcts}"
+export QCTS_ALLOW="${QCTS_ALLOW-/etc/qcts/allow}"
+cd /opt/qcts/app || exit 1
+exec /opt/qcts/venv/bin/python -m tos.line "$@"

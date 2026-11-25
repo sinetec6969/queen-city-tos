@@ -1,0 +1,4 @@
+# Callsigns allowed to play Queen City over packet. One per line, no SSID
+# (KN4ABC covers KN4ABC-1 through -15). Anything after # is ignored.
+# An empty list lets nobody in; unset QCTS_ALLOW in the wrapper to allow everyone.
+N0CALL
