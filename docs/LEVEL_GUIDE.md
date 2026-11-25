@@ -25,7 +25,7 @@ Same game and same saves format, but typed commands instead of keys. Saves are p
 | Where | Commands |
 | --- | --- |
 | Exploring | `N` `S` `E` `W` move (`N3` = three steps, stops when something happens) · walk into things to use them · `L` what's around you and which way · `M` map · `I` items (`I 2` details) · `USE n`/`EQ n` (number or name: `EQ TIRE`) · `ST` status · `Q` quests + orientation step · `NOTES` (`NOTES 1`) · `PERKS` / `PERK n` · `CRAFT` / `CRAFT n` (at a workbench) · `SAVE` · `BYE` save + disconnect · `BRIEF`/`VERBOSE` · `?` |
-| Combat | `N` `S` `E` `W` move (1 AP) · `F` attack · `A` then `1`–`4`, or `A2` in one go (+2 AP) · `T` next target · `U` best heal (2 AP) · `.` end turn. The prompt shows round, AP, HP, then the target's HP, direction, hit % and AP cost. |
+| Combat | `N` `S` `E` `W` move (1 AP) · `F` attack · `A` then `1`–`4`, or `A2` in one go (+2 AP) · `T` next target · `U` best heal (2 AP) · `.` end turn. The prompt is your status, e.g. `R1 AP6 HP32 | TIDY-3 22hp 1N1E 83%/3AP`: round, AP, HP, then the target's HP, direction, hit % / AP per attack (`FAR` = out of range). Location maps are sent once per connection; `M` shows one again. |
 | Talking | reply with the option number |
 | Hacking | type a word · `D` reprint the dump · `X` back out |
 | City map | the destination's number · `X n` about it |

@@ -49,6 +49,8 @@ sudo nano /etc/qcts/allow                   # callsigns allowed to play, no SSID
    - Start at 40 (400 ms).
    - If the other side misses the start of your frames, go up in steps of 5.
    - If it's solid, try going down. The UV-5R is slow to switch from TX to RX.
+   - **It's the cheapest airtime win:** 400 → 300 ms cuts about 6% of the node's total transmit time (modelled over a full playthrough). Go as low as stays reliable.
+   - Keep **paclen 128 / maxframe 4**. Paclen 256 saves about 5% more, but stretches the longest key-down from ~4.5 s to ~7.5 s and doubles the cost of each lost frame.
 4. Play to the first save, `BYE`, reconnect, and check it resumes.
 5. Pull the other station's power mid-game, reconnect, and check progress was kept.
 6. **Kill switch:** `sudo qcts-off`. Confirm the radio cannot key.

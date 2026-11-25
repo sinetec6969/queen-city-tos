@@ -1,5 +1,41 @@
 # Changelog
 
+## 0.9.1 — Airtime audit (2026-11-25)
+
+An audit of every line-mode reply across a full playthrough (chapter one plus chapter two quests 1–2, 551 replies), with AX.25 framing simulated (paclen 128, maxframe 4, TXDELAY 400 ms, 1200 baud).
+
+**Limits: all clear**
+
+| Measure | Result | Limit |
+| --- | --- | --- |
+| Longest single key-down | 4.5 s (p95 4.0 s) | UV-5R time-out timer: 60 s by default, 15 s minimum |
+| Node transmit time per reply | 1.7 s average | — |
+| Duty cycle, one player at ~8 s per command | about 13.5% | Channel courtesy; three players approach 40% |
+
+Part 97 sets no maximum transmission length on 2 m. Every frame carries the station callsign.
+
+**Tightened (line mode only; the Textual UI is unchanged)**
+- **Combat prompt:** `R1 AP6/6 HP32/32 | TIDY-3 22/22 1N 1E 83% 3AP` became `R1 AP6 HP32 | TIDY-3 22hp 1N1E 83%/3AP`. `FAR` replaces `OUT OF RANGE`. The combat tip teaches it with an example.
+- **Maps:** a location's map is sent once per connection; revisits get the header and "(M for map, L to look around)".
+- **Hacks:** the full instructions are sent on the first hack per connection.
+- **Quest lines:** "QUEST UPDATED:" became "QUEST:", and "QUEST COMPLETE:" became "DONE:".
+- **Combat tip:** 631 → 418 B.
+
+**Results**
+
+| | Before | After |
+| --- | --- | --- |
+| Bytes per playthrough | 87,122 | 83,903 (−3.7%) |
+| Mean reply | 158 B | 152 B |
+| Largest reply | 967 B | 957 B |
+
+- Most of each reply's airtime is fixed overhead, not text: the transmit delay, frame headers and turnarounds. Station settings therefore matter more. Modelled:
+  - **TXDELAY 400 → 300 ms:** −6% node transmit time.
+  - **Paclen 256:** −5%, but 7.5 s key-downs.
+  - The station guide now says to tune TXDELAY down on the bench and keep paclen 128.
+- A new **`test_airtime_budget`** fails if the largest reply passes 1,000 B, the mean passes 170 B, or any simulated key-down passes 6 s.
+- The README's packet screenshots were regenerated with the new prompt.
+
 ## 0.9.0 — Chapter two, quest 2: Known Issues (2026-11-25)
 
 **Content**

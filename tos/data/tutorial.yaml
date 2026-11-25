@@ -141,14 +141,12 @@ tips:
   combat:
     title: COMBAT
     line: |
-      Turn-based. You get 6 AP a turn. Your prompt shows round, AP, HP, then your target: its HP, direction, hit chance and AP cost.
-
-        N/S/E/W  move 1 tile (1 AP)    F   attack your target
-        A        aim at a part (+2 AP), then 1-4 (or A2 in one go)
-        T        next target           U   best heal (2 AP)
-        .        end your turn; then the enemies move
-
-      Melee needs you right next to the target. Aimed shots: sensors blind, wheels slow, batteries can explode. SURPRISES can happen at the start of any round; Luck decides which way they break.
+      Turn-based, 6 AP a turn. Your prompt is your status:
+        R1 AP6 HP32 | TIDY-3 22hp 1N1E 83%/3AP
+      round, AP, HP | target, its HP, where, hit chance/AP cost. FAR = out of range.
+        N/S/E/W move (1 AP)   F attack   A2 aim at part 2 (+2 AP)
+        T next target   U heal (2 AP)   . end turn
+      Melee needs you adjacent. Aimed shots: sensors blind, wheels slow, batteries can blow. Surprises can hit any round; Luck decides which way.
     text: |
       Combat is turn-based. Each turn you get 6 AP (action points): the ● dots in the panel.
 

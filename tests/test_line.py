@@ -3,6 +3,7 @@ commands only, plus entry-point checks. Prints reply sizes and an airtime estima
 
 Run: python tests/test_line.py
 """
+import math
 import os
 import random
 import subprocess
@@ -727,6 +728,31 @@ def test_cli_broken_pipe_is_quiet():
                        shell=True, cwd=ROOT, capture_output=True, timeout=30,
                        env=dict(os.environ, QCTS_SAVE_DIR=tempfile.mkdtemp()))
     assert b"Traceback" not in r.stderr, r.stderr
+
+
+def keydowns(n: int, paclen: int = 128, maxframe: int = 4, txdelay: float = 0.4) -> list[float]:
+    """Seconds of each transmitter key-down for an n-byte reply: frames of `paclen`, sent `maxframe`
+    at a time, ~20 B of address/control/flags per frame, 8.25 bits/byte with bit stuffing, 1200 baud."""
+    frames, out, left = max(1, math.ceil(n / paclen)), [], n
+    while frames > 0:
+        k = min(maxframe, frames)
+        frames -= k
+        b = min(left, k * paclen)
+        left -= b
+        out.append(txdelay + (b + k * 20) * 8.25 / 1200)
+    return out
+
+
+def test_airtime_budget():
+    """Guard rails for the air: run after test_quests_1_to_6 (it fills REPLIES).
+    Limits: UV-5R time-out timer (no single key-down near it) and channel courtesy (small replies)."""
+    if not REPLIES:
+        test_quests_1_to_6()
+    sizes = [len(r) for r in REPLIES]
+    assert max(sizes) <= 1000, f"largest reply {max(sizes)} B: trim one-time text"
+    assert sum(sizes) / len(sizes) <= 170, f"mean reply {sum(sizes) / len(sizes):.0f} B"
+    longest = max(k for n in sizes for k in keydowns(n))
+    assert longest <= 6.0, f"a single key-down of {longest:.1f}s"
 
 
 def airtime(n: int) -> float:

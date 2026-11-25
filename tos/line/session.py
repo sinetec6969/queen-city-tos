@@ -57,12 +57,20 @@ class Session:
         self.confirm_new = False
         self.go_text = ""
         self.last_beside: tuple = ()
+        self.mapped: set[str] = set()  # locations whose map was already sent on this connection
+        self.hack_explained = False
         self.done = False
 
     # ---- output -----------------------------------------------------------
+    QUEST_PREFIXES = (("QUEST UPDATED: ", "QUEST: "), ("NEW QUEST: ", "NEW QUEST: "), ("QUEST COMPLETE: ", "DONE: "))
+
     def say(self, text: str, log: bool = True) -> None:
         if log and self.state is not None:
             self.state.say(text)
+        for long, short in self.QUEST_PREFIXES:
+            if text.startswith(long):
+                text = short + text[len(long):]
+                break
         self.out += R.wrap(text)
 
     def lines(self, ls) -> None:
@@ -215,7 +223,10 @@ class Session:
         self.lines([f"== {self.loc.district} - {self.loc.name} =="])
         if self.brief:
             self.lines(R.look(self.loc))
+        elif self.loc.id in self.mapped:
+            self.lines(["(M for map, L to look around)"])  # seen it this connection: save ~250 B of airtime
         else:
+            self.mapped.add(self.loc.id)
             self.show_map(header=False)
 
     def show_map(self, header: bool = True) -> None:
@@ -550,14 +561,15 @@ class Session:
 
     def combat_status(self) -> str:
         cb, p = self.combat, self.state.player
-        s = f"R{cb.round} AP{cb.ap}/{cb.max_ap} HP{p.hp}/{p.max_hp}"
+        # Sent after every combat action, so every byte counts: R1 AP6 HP32 | TIDY-3 22hp 1N1E 83%/3AP
+        s = f"R{cb.round} AP{cb.ap} HP{p.hp}"
         t = cb.target()
         if t:
             px, py = self.state.pos
-            s += (f" | {t.name} {max(0, t.hp)}/{t.max_hp} {R.direction(t.x - px, t.y - py)}"
-                  f" {cb.hit_chance(t)}% {cb.attack_cost()}AP")
+            where = R.direction(t.x - px, t.y - py).replace(" ", "")
+            s += f" | {t.name} {max(0, t.hp)}hp {where} {cb.hit_chance(t)}%/{cb.attack_cost()}AP"
             if not cb.in_range(t):
-                s += " OUT OF RANGE"
+                s += " FAR"
             if t.status:
                 s += " [" + ",".join(t.status) + "]"
             others = len(cb.enemies()) - 1
@@ -697,7 +709,11 @@ class Session:
         self.hack = for_terminal(self.state, self.c, spec, self.rng)
         self.hack_eid = eid
         self.mode = "hack"
-        self.lines(["ADMIN SHELL: type a word from the dump. Likeness = right letter, right spot. X = back out."])
+        if not self.hack_explained:
+            self.lines(["ADMIN SHELL: type a word from the dump. Likeness = right letter, right spot. X = back out."])
+            self.hack_explained = True
+        else:
+            self.lines(["ADMIN SHELL (X = back out, D = dump):"])
         self.show_dump()
 
     def show_dump(self) -> None:
