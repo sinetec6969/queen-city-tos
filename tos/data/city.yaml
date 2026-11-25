@@ -25,7 +25,7 @@ nodes:
     unlocked_if: {flag: reached_midwood}
     location: plaza_midwood
     spawn: city
-    blurb: "The Midwood Exchange at Moo & Brew. Unbanded humans. Mostly-beef burgers."
+    blurb: "The Midwood Exchange at The Unsubscribe. Unbanded humans. Mostly-beef burgers."
   central_ave:
     name: CENTRAL AVE
     x: 26

@@ -154,7 +154,7 @@ Either way **TIDY-3 wakes up** and the fight starts.
 
 **Exit (23,4)** walks you straight into Plaza Midwood.
 
-### Plaza Midwood · Moo & Brew
+### Plaza Midwood · The Unsubscribe
 
 ```
 ########################
@@ -206,7 +206,7 @@ E......D...........t...#     D brewery door (locked until Ruth lets you in)
 
 - **Signal falls here** (−0.3 per step), like Midwood.
 - **Ruth (6,5):** talk from (6,4). She opens the door if:
-  - you've met **Delia** (option "Delia at Moo & Brew sent me"), or
+  - you've met **Delia** (option "Delia at The Unsubscribe sent me"), or
   - you have **Charm ★★★** ("I declined the Terms ninety-four times...", +25 XP).
   - Otherwise she sends you to find someone to vouch for you. Go talk to Delia.
 - **Mags (11,3):** talk from (10,3). "They took my brother..." → "So how do I prove it's a miracle?" sets the job. *Analog Only* moves to stage 2 and the Blue Line node unlocks.

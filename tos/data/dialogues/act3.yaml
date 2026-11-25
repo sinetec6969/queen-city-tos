@@ -8,7 +8,7 @@ ruth:
     hello:
       text: "The woman in the welding apron doesn't come off the wall. No band. Burn scars on both forearms, old ones. \"Where'd you walk in from?\""
       options:
-        - text: "Midwood. Delia at Moo & Brew sent me."
+        - text: "Midwood. Delia at The Unsubscribe sent me."
           show_if: {flag: met_delia}
           to: delia
         - text: "I declined the Terms ninety-four times. Ask me about any of them."
@@ -20,7 +20,7 @@ ruth:
     south_end:
       text: "\"South End.\" She says it like a diagnosis. \"Last guy from South End who came through here asked us all to rate our experience. On his way out. While the drones were coming in.\" She folds her arms. \"Get somebody we know to vouch for you. Then we'll see.\""
       options:
-        - text: "Delia at Moo & Brew sent me."
+        - text: "Delia at The Unsubscribe sent me."
           show_if: {flag: met_delia}
           to: delia
         - text: "[Leave]"

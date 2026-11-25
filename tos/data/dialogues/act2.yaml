@@ -136,7 +136,7 @@ delia:
         - text: "[Back]"
           to: hello
     place:
-      text: "\"The Concierge calls us 'a future opportunity.' It means it hasn't figured out how to sell us anything yet. Power comes from a diesel generator and a guy named Pete. Hollis out front sells supplies, if you've got cells.\""
+      text: "\"It's called The Unsubscribe. We named it after the only button that still works.\" She nods at the window. \"The Concierge calls us 'a future opportunity.' It means it hasn't figured out how to sell us anything yet. Power comes from a diesel generator and a guy named Pete. Hollis out front sells supplies, if you've got cells.\""
       options:
         - text: "[Back]"
           to: again

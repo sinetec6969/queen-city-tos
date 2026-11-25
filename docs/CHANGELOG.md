@@ -1,5 +1,8 @@
 # Changelog
 
+## 0.6.1 — The Unsubscribe (2026-11-25)
+- The Plaza Midwood bar is now **The Unsubscribe**, a fictional name, everywhere in the game and docs: the location name, menu board, city blurb, quest text, and Ruth's and Delia's lines. Delia explains the name.
+
 ## 0.6.0 — Quest 6: Rate Your Experience, chapter one finale (2026-11-25)
 
 **Content**
@@ -193,7 +196,7 @@ An audit of line mode at 0.4.0, without radio hardware:
 ## 0.2.0 — Quest 2: Last Mile (2026-11-24)
 
 **Content**
-- Three new locations: South End street, Dilworth · Freedom Park, Plaza Midwood · Moo & Brew.
+- Three new locations: South End street, Dilworth · Freedom Park, Plaza Midwood · The Unsubscribe.
 - Biscuit joins as a companion. New enemies: Greeter (wakes at Signal 50) and Lawn Unit.
 - New NPCs: Kayla R., Delia, Hollis (shop), Wade.
 - Side quests *Your Order Has Shipped* and *Mow Better*. Quest 3 (*Analog Only*) gets its starting hook.

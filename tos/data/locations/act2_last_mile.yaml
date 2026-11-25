@@ -196,7 +196,7 @@ dilworth:
       to: {location: plaza_midwood, spawn: west}
 
 plaza_midwood:
-  name: "Moo & Brew · Midwood Exchange"
+  name: "The Unsubscribe · Midwood Exchange"
   district: PLAZA MIDWOOD
   signal_rate: -0.5
   tags: [street, unmanaged]
@@ -220,7 +220,7 @@ plaza_midwood:
         - {set: reached_midwood}
         - {quest: last_mile, stage: done}
         - {xp: 60}
-        - {log: "Central Avenue. People without wristbands, arguing, laughing, trading. A diesel generator thumps behind Moo & Brew. Your Signal starts to fall."}
+        - {log: "Central Avenue. People without wristbands, arguing, laughing, trading. A diesel generator thumps behind The Unsubscribe. Your Signal starts to fall."}
   legend:
     M:
       id: menu_board
@@ -228,7 +228,7 @@ plaza_midwood:
       name: Menu board
       glyph: "▤"
       color: yellow
-      text: "MOO & BREW · TODAY: The Mostly Beef Burger. Fries (real potatoes, probably). Beer (warm, honest). Sweet tea (bottomless, unfortunately)."
+      text: "THE UNSUBSCRIBE · TODAY: The Mostly Beef Burger. Fries (real potatoes, probably). Beer (warm, honest). Sweet tea (bottomless, unfortunately)."
     D:
       id: delia
       type: npc
