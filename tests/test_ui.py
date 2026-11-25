@@ -9,6 +9,7 @@ import tempfile
 from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
+sys.path.insert(0, str(Path(__file__).resolve().parent))
 os.environ["QCTS_SAVE_DIR"] = tempfile.mkdtemp()
 
 from tos.ui.app import QCApp
@@ -561,6 +562,16 @@ async def main():
             await press(pilot, app, "down")
         await press(pilot, app, "enter")
         assert app.screen.region_id == "charlotte" and app.state.location == "city:lake_norman"
+        # a travel encounter on the way to NoDa (forced; chapter two has begun)
+        from test_engine import ForcedRng
+        real_rng, app.rng = app.rng, ForcedRng(0.0, "charlotte_vending")
+        sugar = app.state.player.inventory.get("sugar", 0)
+        scr = app.screen
+        for _ in range(scr.order.index("noda") - scr.cursor):
+            await press(pilot, app, "down")
+        await press(pilot, app, "enter")
+        app.rng = real_rng
+        assert app.state.location == "noda" and app.state.player.inventory.get("sugar", 0) == sugar + 1
         print("tips shown:", TIPS_SEEN)
         print("UI playthrough OK. HP", app.state.player.hp, "/", app.state.player.max_hp,
               "LV", app.state.player.level, "signal", int(app.state.player.signal))

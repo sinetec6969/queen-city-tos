@@ -524,6 +524,31 @@ def test_item_names_players_type():
         assert p.inventory.get(iid, 0) == n - 1, cmd
 
 
+def test_travel_ambush_in_line_mode():
+    import random as _r
+    from tos.engine.game import new_game
+    sys.path.insert(0, str(ROOT / "tests"))
+    from test_engine import ForcedRng
+    s = new_session(slot="TEST6")
+    st, _ = new_game(C, {"Brawn": 3, "Grit": 3, "Aim": 3, "Wits": 2, "Charm": 2, "Luck": 2}, tutorial=False)
+    st.flags |= {"act1_done", "reached_midwood", "chapter2"}
+    st.location = "city:south_end"
+    st.player.give("tire_iron")
+    st.player.weapon = "tire_iron"
+    s.state = st
+    s.mode = "city"
+    s.rng = ForcedRng(0.0, "charlotte_wellness_check")
+    r = send(s, str(s.city_order.index("dilworth") + 1))
+    assert "On the way to Dilworth" in r and s.mode == "combat" and st.location == "roadside"
+    s.rng = _r.Random(4)
+    st.player.hp = st.player.max_hp = 200  # this tests the plumbing, not the fight
+    fight(s, limit=200)
+    assert s.mode == "explore"
+    walk(s, 22, 3)
+    send(s, "e")
+    assert st.location == "dilworth", st.location
+
+
 def test_control_chars_never_echo():
     """Hack prompts echo the typed word: control chars and ESC must never reach the air."""
     s = new_session(slot="TEST5")

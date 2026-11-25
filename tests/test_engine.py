@@ -733,6 +733,69 @@ def test_crafting_and_mods():
             assert r["output"]["item"] in C.items, rid
 
 
+class ForcedRng(random.Random):
+    """random() returns `roll`; choices() picks the encounter with id `pick`; counts draws."""
+    def __init__(self, roll=0.0, pick=None):
+        super().__init__(3)
+        self.roll, self.pick, self.draws = roll, pick, 0
+    def random(self):
+        self.draws += 1
+        return self.roll
+    def choices(self, pool, weights=None, k=1):
+        return [next(e for e in pool if e["id"] == self.pick)] if self.pick else super().choices(pool, weights, k=k)
+
+
+def test_travel_encounters():
+    from tos.engine import travel
+    st, _ = new_game(C, STATS)
+    st.flags |= {"act1_done", "reached_midwood"}
+    st.location = "city:south_end"
+    rng = ForcedRng(0.0)
+    r = travel.go(st, C, "dilworth", rng)
+    assert r["kind"] == "location" and st.location == "dilworth" and rng.draws == 0, "chapter one: no rolls at all"
+    st.flags.add("chapter2")
+    st.location = "city:dilworth"
+    assert travel.go(st, C, "dilworth", ForcedRng(0.0, "charlotte_vending"))["events"][0][1].startswith("You head"), \
+        "re-entering where you are isn't travel"
+    st.location = "city:south_end"
+    assert travel.go(st, C, "dilworth", ForcedRng(0.99))["events"][0][1].startswith("You head"), "roll missed"
+    st.location = "city:south_end"
+    r = travel.go(st, C, "dilworth", ForcedRng(0.0, "charlotte_vending"))
+    assert "On the way to Dilworth" in r["events"][0][1] and st.player.has("sugar") and st.location == "dilworth"
+    # ambush: fight on the roadside, then the exit continues to the destination
+    for attempt in range(2):
+        st.location = "city:south_end"
+        st.player.level, st.player.hp_bonus = 6, 0  # encounters happen after chapter one
+        st.player.recalc()
+        st.player.hp = st.player.max_hp
+        st.player.give("nail_gun")
+        st.player.give("nails", 40)
+        st.player.weapon = "nail_gun"
+        r = travel.go(st, C, "plaza_midwood", ForcedRng(0.0, "charlotte_wellness_check"))
+        assert ("combat",) in r["events"] and st.location == "roadside" and st.travel_dest == "plaza_midwood"
+        road = Location("roadside", st, C)
+        assert len(road.awake_enemies()) == 2, "enemies reset for every ambush"
+        assert fight(road, random.Random(attempt)) == "won", st.player.hp
+        assert exit_via(road, 22, 3, 1, 0) == "location"
+        assert st.location == "plaza_midwood" and st.travel_dest is None
+    assert travel.encounter_chance(st, C, "lake_norman") > travel.encounter_chance(st, C, "charlotte")
+    st.player.signal = 100
+    assert travel.encounter_chance(st, C, "charlotte") == 0.4
+    for e in C.encounters:
+        assert e.get("region", "charlotte") in C.city["regions"], e["id"]
+        if e.get("ambush"):
+            assert e["ambush"]["location"] in C.locations, e["id"]
+
+
+def test_every_spawn_is_walkable():
+    st, _ = new_game(C, STATS)
+    for lid, loc in C.locations.items():
+        L = Location(lid, st, C)
+        for name, (x, y) in L.spawns.items():
+            e = L.entity_at(x, y)
+            assert not L.is_wall(x, y) and (e is None or L.passable(e)), (lid, name, (x, y))
+
+
 def test_city_labels_fit_their_canvas():
     from tos.engine import travel
     for rid in C.city.get("regions", {}):

@@ -761,7 +761,7 @@ class Session:
         nodes = self.c.city["nodes"]
         order = self.city_order
         if k.isdigit() and 0 < int(k) <= len(order):
-            r = travel.go(self.state, self.c, order[int(k) - 1])
+            r = travel.go(self.state, self.c, order[int(k) - 1], self.rng)
             if r["kind"] == "location":
                 save_game(self.state, self.slot)
                 self.enter_world(r["events"])

@@ -1,0 +1,46 @@
+# Travel encounters: rolled when you travel to a different node that has a location.
+# Chance per trip = the region's `encounter_chance` + Signal/400 (capped at 0.6).
+# Each entry: region, weight, if (conditions), text, effects, and optionally
+# ambush: {location, spawn} (a small map whose exit continues to your destination).
+
+- id: charlotte_grief
+  region: charlotte
+  weight: 3
+  if: {flag: chapter2}
+  text: "A man in a grey hoodie sits on the curb holding his dead wristband, crying like he's catching up on three months at once. He waves you past. \"I'm okay. I'm not. That's okay, right? That's allowed now?\""
+  effects: []
+
+- id: charlotte_vending
+  region: charlotte
+  weight: 2
+  if: {flag: chapter2}
+  text: "A vending machine on the corner has its glass smashed out and a sign taped to it: TAKE WHAT YOU NEED, IT NEVER ASKED US EITHER. You take a bag of sugar and a roll of duct tape."
+  effects: [{give: sugar}, {give: duct_tape}]
+
+- id: charlotte_wellness_check
+  region: charlotte
+  weight: 2
+  if: {flag: chapter2}
+  text: "A Greeter steps off the sidewalk into your path, face screen blinking awake. \"Wellness check! You seem unwell.\" A drone drops in behind it."
+  ambush: {location: roadside, spawn: start}
+
+- id: lake_motor
+  region: lake_norman
+  weight: 3
+  if: {flag: chapter2}
+  text: "The motor coughs and dies halfway across. You paddle the rest of the way with a cooler lid. Out here, with nothing connected, your Signal drops."
+  effects: [{signal: -10}]
+
+- id: lake_debris
+  region: lake_norman
+  weight: 2
+  if: {flag: chapter2}
+  text: "A delivery drone floats face-down in the water, rotors folded. You fish it out and strip it for parts."
+  effects: [{give: wire}, {give: scrap}]
+
+- id: lake_shoreline
+  region: lake_norman
+  weight: 2
+  if: {flag: chapter2}
+  text: "You beach the boat to check a noise. Two lawn units come up over the bank, blades already spinning. They have been mowing this shoreline since June. You are not grass."
+  ambush: {location: lakeshore, spawn: start}

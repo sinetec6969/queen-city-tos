@@ -45,6 +45,7 @@ class Content:
         self.companions = self._load("companions.yaml")
         self.perks = self._load("perks.yaml")
         self.recipes = self._load("recipes.yaml")
+        self.encounters = self._load("encounters.yaml") or []
         self.locations = self._load_dir("locations")
         self.dialogues = self._load_dir("dialogues")
 

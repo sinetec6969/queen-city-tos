@@ -75,6 +75,7 @@ class GameState:
     steps: int = 0
     companion: str | None = None
     companion_pos: list | None = None
+    travel_dest: str | None = None  # node an interrupted trip (travel ambush) continues to
 
     # ---- helpers -------------------------------------------------------
     def say(self, text: str) -> None:

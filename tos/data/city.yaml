@@ -8,11 +8,13 @@ regions:
     name: CHARLOTTE
     width: 52
     height: 15
+    encounter_chance: 0.15
     flavor: "You're on the street. The air smells like ozone and somebody's grill."
   lake_norman:
     name: LAKE NORMAN
     width: 52
     height: 15
+    encounter_chance: 0.25
     flavor: "The lake steams in the cold. Somewhere out on the water, a boat motor coughs twice and gives up."
 nodes:
   south_end:

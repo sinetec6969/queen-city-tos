@@ -833,7 +833,7 @@ class CityScreen(Screen):
         self.draw()
 
     def action_travel(self) -> None:
-        r = travel.go(self.app.state, self.app.content, self.order[self.cursor])
+        r = travel.go(self.app.state, self.app.content, self.order[self.cursor], self.app.rng)
         if r["kind"] == "location":
             save_game(self.app.state)
             self.app.switch_screen(LocationScreen(r["events"]))

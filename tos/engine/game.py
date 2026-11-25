@@ -26,7 +26,16 @@ def place(state: GameState, content: Content, location: str, spawn: str) -> None
 
 
 def follow_exit(state: GameState, content: Content, to: dict) -> str:
-    """Apply an exit target. Returns 'city' or 'location'."""
+    """Apply an exit target. Returns 'city' or 'location'.
+    `{city: $dest}` (travel ambush maps) continues the interrupted trip to its destination."""
+    if to.get("city") == "$dest":
+        dest, state.travel_dest = state.travel_dest, None
+        n = content.city["nodes"].get(dest or "", {})
+        if n.get("location"):
+            place(state, content, n["location"], n["spawn"])
+            return "location"
+        state.location = f"city:{dest}" if dest else state.location
+        return "city"
     if "city" in to:
         state.location = f"city:{to['city']}"
         state.companion_pos = None

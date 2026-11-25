@@ -7,7 +7,9 @@ loading a location. Both frontends call `go()`, so travel rules live in one plac
 """
 from __future__ import annotations
 
-from .content import Content, check
+import random
+
+from .content import Content, apply_effects, check
 from .game import place
 from .state import GameState
 
@@ -48,10 +50,24 @@ def unlocked(content: Content, state: GameState, nid: str) -> bool:
     return check(node(content, nid).get("unlocked_if"), state)
 
 
-def go(state: GameState, content: Content, nid: str) -> dict:
+def encounter_chance(state: GameState, content: Content, rid: str) -> float:
+    return min(0.6, region(content, rid).get("encounter_chance", 0.0) + state.player.signal / 400)
+
+
+def roll_encounter(state: GameState, content: Content, rid: str, rng: random.Random) -> dict | None:
+    pool = [e for e in content.encounters if e.get("region", DEFAULT_REGION) == rid and check(e.get("if"), state)]
+    if not pool:  # check first: no eligible encounters must not consume randomness (keeps chapter one stable)
+        return None
+    if rng.random() >= encounter_chance(state, content, rid):
+        return None
+    return rng.choices(pool, weights=[e.get("weight", 1) for e in pool])[0]
+
+
+def go(state: GameState, content: Content, nid: str, rng: random.Random | None = None) -> dict:
     """Try to travel to a node. Returns {"kind": ..., "msg": str, "events": [...]}:
     locked / unbuilt (stay put), region (switched maps, still on the city screen),
-    location (placed in a location; events to queue on arrival)."""
+    location (placed in a location; events to queue on arrival). With an rng, a trip to a
+    different node may roll a travel encounter (data/encounters.yaml) first."""
     n = node(content, nid)
     name = n["name"].title()
     if not unlocked(content, state, nid):
@@ -61,5 +77,16 @@ def go(state: GameState, content: Content, nid: str) -> dict:
         return {"kind": "region", "msg": n.get("travel_text", f"You head for {name}."), "events": []}
     if not n.get("location"):
         return {"kind": "unbuilt", "msg": f"{name} isn't built yet. The Concierge apologizes for the inconvenience.", "events": []}
+    here = current_node(state)
+    enc = roll_encounter(state, content, region_of(content, nid), rng) if rng and here and here != nid else None
+    if enc and enc.get("ambush"):
+        amb = enc["ambush"]
+        state.taken = {k for k in state.taken if not k.startswith(amb["location"] + ":")}  # fresh every time
+        state.travel_dest = nid
+        place(state, content, amb["location"], amb["spawn"])
+        return {"kind": "location", "msg": "", "events": [("log", f"On the way to {name}: {enc['text']}"), ("combat",)]}
+    events = [("log", f"You head back to {name}.")]
+    if enc:
+        events = [("log", f"On the way to {name}: {enc['text']}")] + apply_effects(enc.get("effects"), state, content)
     place(state, content, n["location"], n["spawn"])
-    return {"kind": "location", "msg": "", "events": [("log", f"You head back to {name}.")]}
+    return {"kind": "location", "msg": "", "events": events}

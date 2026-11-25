@@ -1,0 +1,75 @@
+# Ambush maps for travel encounters (engine/travel.py). Their enemies reset every time.
+# The exit's `to: {city: $dest}` continues to wherever you were traveling.
+
+roadside:
+  name: "Roadside"
+  district: ON THE ROAD
+  signal_rate: 0.5
+  tags: [street]
+  spawns:
+    start: [2, 3]
+  map: |
+    ########################
+    #......................#
+    #...........g..........#
+    #......................>
+    #.........d............#
+    #......................#
+    ########################
+  legend:
+    g:
+      id: roadside_greeter
+      type: enemy
+      enemy: greeter
+      aggro: 30
+    d:
+      id: roadside_drone
+      type: enemy
+      enemy: courier_drone
+      aggro: 30
+    ">":
+      id: roadside_exit
+      type: door
+      name: The road on
+      glyph: "»"
+      to: {city: $dest}
+
+lakeshore:
+  name: "Lakeshore"
+  district: LAKE NORMAN
+  signal_rate: 0.2
+  tags: [outdoor]
+  spawns:
+    start: [5, 3]
+  map: |
+    ########################
+    #~~~~..................#
+    #~~~.........1.........#
+    #~~~...................>
+    #~~~~........2.........#
+    #~~~~~~................#
+    ########################
+  legend:
+    "~":
+      id: shallows
+      type: object
+      name: Lake Norman
+      glyph: "≈"
+      color: blue
+      text: "Warm, shallow water. Your boat is beached right there. It isn't going anywhere until this is over."
+    "1":
+      id: shore_mower1
+      type: enemy
+      enemy: lawn_unit
+      aggro: 30
+    "2":
+      id: shore_mower2
+      type: enemy
+      enemy: lawn_unit
+      aggro: 30
+    ">":
+      id: lakeshore_exit
+      type: door
+      name: Back to the boat
+      glyph: "»"
+      to: {city: $dest}
