@@ -46,6 +46,9 @@ def fight(loc, rng):
     for _ in range(60):
         if cb.outcome:
             break
+        p = loc.state.player
+        if p.hp < p.max_hp * 0.4 and cb.best_heal() and cb.ap >= 2:
+            cb.use_item(cb.best_heal())  # heal first, like a player would, before spending AP on attacks
         t = cb.target()
 
         def can_shoot():
@@ -481,6 +484,102 @@ def test_scheduled_downtime():
     st = play_act5(random.Random(5))
     p = st.player
     print("  act 5 end: HP", p.hp, "/", p.max_hp, "LV", p.level, "Aim", p.stats["Aim"], "weapon", p.weapon)
+
+
+def play_act6(rng, deny_both=False):
+    """Quest 6: Loading Dock B, then the Crown. deny_both: hack the wellness desk and give the
+    Charm review, so neither reinforcement wave comes."""
+    from tos.engine.content import check
+    st = play_act5(rng)
+    ward = Location(st.location, st, C)
+    assert ward.door_open(ward.get("crown_door"))
+    prep(st)
+    assert exit_via(ward, 16, 1, 0, -1, rng) == "location" and st.location == "tower_dock"
+    assert st.quests["rate_your_experience"] == 1
+    dock = Location(st.location, st, C)
+    dock.update_rules()
+    assert not dock.door_open(dock.get("service_elevator"))
+    for target, move in (((3, 4), (0, 1)), ((10, 4), (0, 1))):
+        for _ in range(4):
+            events = []
+            walk_to(dock, *target, events)
+            if ("combat",) in events or dock.check_aggro():
+                assert fight(dock, rng) == "won", st.player.hp
+                continue
+            break
+        events = dock.player_move(*move)
+        if ("hack", "wellness_desk") in events and deny_both:
+            dock.terminal_result("wellness_desk", True)
+    assert st.player.has("service_badge") and dock.door_open(dock.get("service_elevator"))
+    assert ("wellness_off" in st.flags) == deny_both
+    prep(st)
+    assert exit_via(dock, 22, 4, 1, 0, rng) == "location" and st.location == "the_crown"
+    assert st.quests["rate_your_experience"] == 2
+    crown = Location(st.location, st, C)
+    crown.update_rules()
+    assert not crown.door_open(crown.get("freight_elevator"))
+    d = talk("teo", st, 0, 0)
+    assert "extremely fine" in C.dialogues["teo"]["nodes"]["hello"]["text"]
+    if deny_both:
+        st.player.stats["Charm"] = 4  # as if trained for it
+        talk("concierge", st, 1, 0, 2, 0)  # Teo on the screens, rate, three stars + review
+        assert "concierge_rattled" in st.flags
+    else:
+        talk("concierge", st, 1, 0, 1, 0)  # one star
+    assert "rated" in st.flags
+    crown.update_rules()
+    assert st.quests["rate_your_experience"] == 3
+    prep(st)
+    st.player.hp = st.player.max_hp  # boss fights start from full: the bot can't pace itself
+    for _ in range(4):
+        events = []
+        walk_to(crown, 11, 4, events)
+        if crown.awake_enemies():
+            assert fight(crown, rng) == "won", st.player.hp
+        if "concierge_down" in st.flags:
+            break
+    assert "concierge_down" in st.flags
+    adds = [k for k in ("the_crown:crown_greeter1", "the_crown:crown_picker1", "the_crown:crown_picker2")
+            if k in st.taken]
+    assert (not adds) if deny_both else len(adds) == 3, adds
+    talk("teo", st, 0)
+    assert st.quests["teo"] == "done"
+    assert exit_via(crown, 22, 3, 1, 0, rng) == "location"
+    assert st.location == "lake_norman" and "chapter2" in st.flags
+    assert st.quests["rate_your_experience"] == "done"
+    assert check(C.city["nodes"]["lake_norman"].get("unlocked_if"), st)
+    return st
+
+
+def test_rate_your_experience_full():
+    st = play_act6(random.Random(5))
+    print("  act 6 end (both waves): HP", st.player.hp, "/", st.player.max_hp, "LV", st.player.level)
+
+
+def test_rate_your_experience_denied():
+    st = play_act6(random.Random(9), deny_both=True)
+    print("  act 6 end (waves denied): HP", st.player.hp, "/", st.player.max_hp, "LV", st.player.level)
+
+
+def test_five_stars_is_game_over():
+    from tos.engine.game import place
+    st, _ = new_game(C, STATS)
+    place(st, C, "the_crown", "elevator")
+    d = talk("concierge", st, 1, 0, 0)
+    assert d.node_id == "five" and not d.done
+    d.choose(1)  # "No. Wait."
+    assert d.node_id == "rate"
+    d.choose(0)
+    d.choose(0)  # "Five stars. It's done."
+    assert d.done and any(e[0] == "game_over" for e in d.events)
+
+
+def test_every_enemy_has_its_own_cell():
+    """Map chars are entity ids: two cells sharing an enemy char would die together."""
+    for lid, loc in C.locations.items():
+        for ch, spec in loc.get("legend", {}).items():
+            if spec["type"] == "enemy":
+                assert loc["map"].count(ch) == 1, (lid, ch)
 
 
 def test_stat_and_max_hp_effects():

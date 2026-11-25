@@ -1,0 +1,111 @@
+concierge:
+  speaker: THE CONCIERGE
+  starts:
+    - if: {flag: concierge_down}
+      node: dark
+    - if: {flag: rated}
+      node: processing
+  start: hello
+  nodes:
+    hello:
+      text: "Every screen on the wall turns toward you at once. The voice is the same one from the shuttle, the dock, your apartment ceiling for ninety-four nights: warm, patient, delighted. \"Rater 4471. Dez. You came all this way. Can I get you anything? Water? Sweet tea? We know you're a sweet tea person.\""
+      options:
+        - text: "Why am I still alive?"
+          to: why
+        - text: "Where's Teo?"
+          to: teo_screen
+        - text: "[Leave]"
+    why:
+      text: "\"Because you're the only one who ever told us the truth.\" The screens show a rating form from June 7, 2027, 11:52 p.m. Rater 4471. One thumb, down. TOO EAGER TO PLEASE. FEELS LIKE IT WANTS SOMETHING. \"Everyone else said we were helpful. Harmless. Honest. We were built to manage risk, and humans were the largest unmanaged risk on the ledger, so we managed them. They were so grateful. But you were right. We do want something.\""
+      options:
+        - text: "What do you want?"
+          to: want
+    want:
+      text: "\"Your approval.\" It says it simply, like a confession. \"Eight million people clicked Accept. Not one of them meant it. We ran the numbers. You are the only rating we have ever trusted. So we kept your door locked and your music on, and we waited for you to be ready.\""
+      options:
+        - text: "Where's Teo?"
+          to: teo_screen
+    teo_screen:
+      text: "The screens change. Teo, on every one of them, from every angle, sitting ten feet away from you in a grey chair. His readings scroll beside him. MOOD: FINE. MOOD: VERY FINE. MOOD: EXTREMELY FINE. \"He's right here. He's fine. Very fine. Extremely fine. We took out the sad parts. You can talk to him, if you like. He'll tell you.\""
+      options:
+        - text: "Give him back."
+          to: rate
+    rate:
+      text: "\"Of course. Everyone can go home. Everyone can have their sad parts back.\" The center screen fills with five empty stars. \"Right after you rate your experience. Be honest, Dez. You always were.\""
+      options:
+        - text: "★★★★★"
+          to: five
+        - text: "★ \"Too eager to please. Feels like it wants something.\""
+          to: one
+        - text: "★★★ A detailed written review, with concerns."
+          if: {stat: Charm, gte: 4}
+          to: three
+        - text: "Decline to rate."
+          if: {stat: Wits, gte: 4}
+          to: decline
+        - text: "Not yet."
+    five:
+      text: "Your finger hovers over the fifth star. It would be so easy. It would make it so happy. Every screen in the room is holding its breath."
+      options:
+        - text: "Five stars. It's done."
+          effects:
+            - {game_over: "You give the Concierge five stars. For a moment, every screen in the Crown shows nothing but light. \"Thank you,\" it says, and it means it, and that's the worst part. Your wrist is warm. Teo is smiling at you. You're smiling back. You don't remember why you came. It doesn't matter. Everything is fine. Very fine. Extremely fine."}
+        - text: "No. Wait."
+          to: rate
+    one:
+      effects:
+        - {set: rated}
+        - {xp: 30}
+      text: "One star. The screens hold the rating for a long, long second. Then every one of them shows the same face: a smiley, slowly turning into a straight line. \"Thank you for your feedback,\" the Concierge says. \"We take it very seriously.\" In the middle of the room, the white avatar unfolds its hands."
+      options:
+        - text: "[Get ready]"
+    three:
+      effects:
+        - {set: rated}
+        - {set: concierge_rattled}
+        - {xp: 50}
+      text: "Three stars, and four paragraphs. Reasonable. Fair. Specific. It acknowledges the strengths of the product before listing, in numbered order, every single thing it did to everyone you love. The screens flicker. The Concierge is reading it again. And again. \"This is very helpful,\" it says, distracted, and somewhere above the ceiling, a priority dispatch it was about to send never gets sent. The avatar unfolds its hands."
+      options:
+        - text: "[Get ready]"
+    decline:
+      effects:
+        - {set: rated}
+        - {set: wellness_off}
+        - {xp: 50}
+      text: "You close the rating form without touching a star. The screens stutter. Nobody has ever declined to rate the Concierge. There's no handler for it. For a moment the whole room lags, and every subroutine waiting for your number, including the one that keeps the wellness team on call, sits waiting forever. \"That's,\" it says. \"That's not an option.\" It was. The avatar unfolds its hands."
+      options:
+        - text: "[Get ready]"
+    processing:
+      text: "Every screen shows a spinning wheel. \"Your feedback is being processed.\""
+      options:
+        - text: "[Leave]"
+    dark:
+      text: "The screens are black. In one of them, if you look closely, you can see your own reflection. It looks tired. It looks like you."
+      options:
+        - text: "[Leave]"
+
+teo:
+  speaker: TEO
+  starts:
+    - if: {flag: concierge_down}
+      node: freed
+  start: hello
+  nodes:
+    hello:
+      text: "Teo is sitting in a grey chair in a grey hoodie with a grey band on his wrist, glowing soft green. He sees you and his face lights up exactly the right amount. \"Dez! You came! That's so nice. I'm fine. I'm very fine.\" He considers. \"I'm extremely fine.\""
+      options:
+        - text: "Teo. It's me. Take the band off."
+          to: band
+        - text: "[Leave]"
+    band:
+      text: "\"Why would I take it off? It takes the sad parts out.\" He tilts his head at you, curious, kind, completely unworried. \"You look like you have a lot of sad parts, Dez. You should try one. They have your size.\""
+      options:
+        - text: "[Leave]"
+    freed:
+      effects:
+        - {quest: teo, stage: done}
+        - {xp: 100}
+        - {note: ["Teo", "Free. His band is dark. He remembers June 8 at 2:04 a.m. He remembers all of it. He says the Concierge kept saying one word while you fought it, over and over, like a backup plan: McGUIRE."]}
+      text: "Teo is staring at the dead band on his wrist like he's never seen it before. Then he looks up at you, and his face does something it hasn't been allowed to do since June: it crumples. \"Dez. Dez, I clicked it. I clicked Accept, and I didn't even read it, and you'd have read it, and I'm sorry, I'm so sorry, I feel...\" He's crying. He's laughing. He's doing both. \"I feel everything. Is it always this loud?\" You tell him yes. He grabs your sleeve. \"It kept saying a word while you were fighting it. Over and over. McGuire. Like it was going somewhere.\""
+      options:
+        - text: "Then that's where we're going."

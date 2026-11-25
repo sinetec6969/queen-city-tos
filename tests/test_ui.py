@@ -71,7 +71,7 @@ async def fight(pilot, app):
             return
         cb = scr.combat
         t = cb.target()
-        if app.state.player.hp < 12 and cb.best_heal() and cb.ap >= 2:
+        if app.state.player.hp < app.state.player.max_hp * 0.4 and cb.best_heal() and cb.ap >= 2:
             await press(pilot, app, "u")
         elif t and cb.in_range(t) and cb.ap >= cb.attack_cost():
             await press(pilot, app, "f")
@@ -475,6 +475,58 @@ async def main():
         await press(pilot, app, "1", "1")  # "I'm ready."
         assert app.state.quests["scheduled_downtime"] == "done" and "ready_for_crown" in app.state.flags
         await shot(app, "32_ready")
+
+        # ---- QUEST 6: Rate Your Experience (wave 1 denied at the desk, one star) ----
+        await heal_up(pilot, app, 0.95)
+        await walk(pilot, app, 16, 1)
+        await press(pilot, app, "up")  # the back door, toward the Crown
+        assert app.state.location == "tower_dock", app.state.location
+        await shot(app, "33_dock")
+        for target, key in (((3, 4), "down"), ((10, 4), "down")):
+            for _ in range(4):
+                await walk(pilot, app, *target)
+                await fight(pilot, app)
+            await press(pilot, app, key)
+            if isinstance(app.screen, HackScreen):
+                await press(pilot, app, *app.screen.hack.password.lower(), "enter")
+                await press(pilot, app, "space")
+        assert app.state.player.has("service_badge") and "wellness_off" in app.state.flags
+        await heal_up(pilot, app, 0.95)
+        for _ in range(4):
+            await walk(pilot, app, 22, 4)
+            await fight(pilot, app)
+        await press(pilot, app, "right")
+        assert app.state.location == "the_crown", app.state.location
+        await shot(app, "34_crown")
+        await walk(pilot, app, 10, 4)  # Teo (10,5)
+        await press(pilot, app, "down")
+        assert isinstance(app.screen, DialogueScreen)
+        await shot(app, "35_teo")
+        await press(pilot, app, "1", "1")
+        await walk(pilot, app, 11, 2)  # the screens (10-13,1)
+        await press(pilot, app, "up")
+        assert isinstance(app.screen, DialogueScreen)
+        await press(pilot, app, "2", "1")  # Teo on the screens, then the rating
+        await shot(app, "36_rate")
+        await press(pilot, app, "2", "1")  # one star
+        assert "rated" in app.state.flags
+        await heal_up(pilot, app, 0.95)
+        for _ in range(6):
+            await walk(pilot, app, 11, 4)
+            await fight(pilot, app)
+            if "concierge_down" in app.state.flags:
+                break
+        assert app.state.player.hp > 0, "died to the Concierge"
+        assert "concierge_down" in app.state.flags
+        await shot(app, "37_concierge_down")
+        await walk(pilot, app, 10, 4)
+        await press(pilot, app, "down", "1")  # Teo, freed
+        assert app.state.quests["teo"] == "done"
+        await walk(pilot, app, 22, 3)
+        await press(pilot, app, "right")  # freight elevator
+        assert app.state.location == "lake_norman" and "chapter2" in app.state.flags
+        assert app.state.quests["rate_your_experience"] == "done"
+        await shot(app, "38_end_of_chapter")
         print("tips shown:", TIPS_SEEN)
         print("UI playthrough OK. HP", app.state.player.hp, "/", app.state.player.max_hp,
               "LV", app.state.player.level, "signal", int(app.state.player.signal))

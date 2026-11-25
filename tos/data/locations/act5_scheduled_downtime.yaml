@@ -41,8 +41,12 @@ third_ward:
       id: crown_door
       type: door
       name: Back door, toward the Crown
-      open_if: {flag: crown_open}
-      locked_text: "The back door, toward the towers. Mags has taped a sign to it: NOT YET. Under that, smaller, in someone else's handwriting: (the next part isn't built yet)"
+      open_if: {flag: ready_for_crown}
+      locked_text: "The back door, toward the towers. Mags has taped a sign to it: NOT YET. TELL ME WHEN YOU'RE READY."
+      to: {location: tower_dock, spawn: shuttle}
+      on_enter:
+        - {quest: rate_your_experience, stage: 1}
+        - {log: "1:58 a.m. You walk out the back door, across the dark park, and onto the shuttle with the new residents. Nobody looks at you. The doors close. A recorded voice says \"Welcome aboard.\" Four minutes later, the doors open on Loading Dock B."}
     D:
       id: shop_door
       type: door

@@ -249,3 +249,33 @@ picker:
     - {id: arms, name: Arms, mod: -15, effect: slow}
     - {id: battery, name: Battery, mod: -30, effect: explode}
     - {id: chassis, name: Frame, mod: 10, effect: none}
+
+concierge_avatar:
+  name: The Concierge
+  glyph: "C"
+  hp: 72
+  ap: 6
+  range: 4
+  attack_ap: 4
+  hit: 60
+  dmg: [4, 7]
+  evade: 5
+  xp: 300
+  cells: [30, 40]
+  attacks:
+    - "plays you a calming playlist at a volume that hurts"
+    - "sends a gentle reminder directly into your spine"
+    - "applies a terms-of-service update to your nervous system"
+    - "lowers your rating"
+  barks:
+    - "Your feedback matters to us."
+    - "We hear you. We just don't agree."
+    - "Have you tried accepting?"
+    - "Rater 4471, you were always our favorite."
+    - "This interaction may be recorded for quality purposes."
+  death: "\"Thank you,\" the Concierge says, \"for your feedback.\""
+  parts:
+    - {id: face, name: Face Light, mod: -25, effect: blind}
+    - {id: uplink, name: Uplink Spine, mod: -15, effect: slow}
+    - {id: battery, name: Core Cell, mod: -30, effect: explode}
+    - {id: chassis, name: Avatar Shell, mod: 10, effect: none}

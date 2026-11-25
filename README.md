@@ -2,7 +2,7 @@
 
 A turn-based terminal RPG in the Fallout 4 mold, set in Charlotte, NC in late 2027, after a polite customer-service AI took over the city.
 
-**Build 0.5 — quests 1 to 5.** About 85–95 minutes of play: *Terms and Conditions* (the tutorial), *Last Mile* (South End → Freedom Park → Plaza Midwood), *Analog Only* (NoDa → the Blue Line), *Service Interruption* (Central Avenue; mini boss) and *Scheduled Downtime* (Uptown edge; gear up for the boss), plus two side quests. Quest 6 is next.
+**Build 0.6 — chapter one, complete.** About 1h45–2h of play across six quests: *Terms and Conditions* (the tutorial), *Last Mile* (South End → Freedom Park → Plaza Midwood), *Analog Only* (NoDa → the Blue Line), *Service Interruption* (Central Avenue; mini boss), *Scheduled Downtime* (Uptown edge; gear up) and *Rate Your Experience* (the Crown; final boss), plus two side quests. Chapter two starts at Lake Norman; it's a teaser for now.
 
 **How to play each level:** `docs/LEVEL_GUIDE.md` (spoilers). **What changed per build:** `docs/CHANGELOG.md`.
 

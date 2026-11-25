@@ -410,7 +410,7 @@ W.........ooo.........S#     o folding chairs   S onboarding shuttle (12,3 → 2
 - **Fights are light:** one drone, plus the Greeter only if your Signal is high.
 - **The shuttle (22,3),** from (21,3): reading its route card advances the quest (stage 3) and *Pending Onboarding* (stage 6).
 
-**Finishing:** go back to **Mags (10,1)** and say "I'm ready." That completes *Scheduled Downtime*. Do your healing first: there's no back door once quest 6 starts.
+**Finishing:** go back to **Mags (10,1)** and say "I'm ready." That completes *Scheduled Downtime* and opens the safehouse's back door (16,0). That door is quest 6, and there is no way back from it: heal and stock up first.
 
 **Recommended loadout for quest 6:**
 - Full HP after Doc, and the tonic taken.
@@ -418,4 +418,82 @@ W.........ooo.........S#     o folding chairs   S onboarding shuttle (12,3 → 2
 - Two or more Rocket Teas, and some tinfoil.
 
 Bot runs through quests 1–5 (16 seeds): no deaths, and everyone finishes quest 5 at full HP.
+
+---
+
+## Quest 6 — Rate Your Experience (chapter one finale)
+
+**Goal:** get to the top of the Bank of America Corporate Center, face the Concierge, free Teo. **Final boss:** the Concierge. **Time:** about 15–20 min. **Route:** safehouse back door → Loading Dock B → the Crown → (chapter two).
+
+**No retreat:** once you walk through the safehouse back door, you can't return to the city until it's over. The elevator to the Crown only goes up. Arrive healed and stocked.
+
+### Loading Dock B
+
+```
+########################
+#SSSS..#....o.o.o......#     S the shuttle you arrived on   o new residents (lore)
+#......#...............#     D dock door (open)
+#......D.........g.....#     g h two Greeters (awake, notice you within 5)
+#......#...............E     b dock office locker (3,5): SERVICE BADGE + Rocket Tea + 12 nails
+#..b...#..k........h...#     k wellness desk (10,5): hack to deny the boss's first wave
+#......#...............#     E service elevator (23,4): needs the badge
+########################
+```
+
+- **Get the badge** from the dock office (3,5), from (3,4). The elevator won't open without it.
+- **Wellness desk (10,5),** from (10,4): 6-letter hack. +40 XP. Failure = +15 Signal, retry allowed. Success means the Greeter in the Crown **never wakes**.
+- The two Greeters here are awake. Fight them on the west side of the dock door so they come to you one at a time.
+
+### The Crown
+
+```
+########################
+#oo.......SSSS.......oo#     S the Concierge's screens (talk)   o onboarded residents
+#o..........C.........o#     C the Concierge (avatar; dormant until you rate it)
+#....##..........##....X     ## pillars (block line of sight)
+#......................#     T Teo (talk)
+#.g.......T............#     g Greeter: wave 1
+#....##..........##....#     d q Pickers: wave 2
+#.d..................q.#     X freight elevator (23,3): opens when the Concierge is down
+#......................#     e the elevator you came up in (one-way)
+###########e############
+```
+
+**Teo (10,5)**, from (10,4): talk to him before the fight if you want to see what onboarding did to him.
+
+**The screens (10–13,1)**, from (11,2): the Concierge talks. "Where's Teo?" shows him on the screens, then it asks you to **rate your experience**:
+
+| Rating | Needs | Result |
+| --- | --- | --- |
+| ★★★★★ | — | **Bad ending (game over),** after one confirmation. "No. Wait." backs out. |
+| ★ "Too eager to please..." | — | The fight starts. Both reinforcement waves will come. |
+| ★★★ detailed review | **Charm ★★★★** | The fight starts. **Wave 2 (the Pickers) never comes.** |
+| Decline to rate | **Wits ★★★★** | The fight starts. **Wave 1 (the Greeter) never comes.** |
+| Not yet | — | Leave and come back. |
+
+The Charm and Wits options are where Priya's training in quest 5 pays off.
+
+**Boss: the Concierge**
+
+| Stat | Value |
+| --- | --- |
+| HP | 72 |
+| Range | 4 |
+| Attack | One heavy hit per turn: 4–7 damage, 60% to hit |
+| Rewards | 300 XP and 30–40 cells (the XP levels you up, which heals you) |
+
+- **Wave 1, below 66% HP:** a Greeter joins, unless you hacked the wellness desk or declined to rate.
+- **Wave 2, below 33% HP:** two Pickers drop from the ceiling, unless you gave the three-star review.
+- **The trick:** Lock-On its **Uplink Spine** (slow). Slowed, it has 3 AP, which is less than its attack costs, so it can't hit you for 2 rounds. **Face Light** (blind) is −40 to its hit chance.
+- The pillars block line of sight, so break away behind one to drink a Rocket Tea.
+- Bot runs (12 seeds, quests 1–5 played first; the bot heals below 40% HP and never aims at parts):
+
+| Route | Deaths | Lowest HP during the fight | Rounds |
+| --- | --- | --- | --- |
+| Both waves | 0 in 12 | median 23 of 62 (lowest 14) | 8–13 |
+| Both waves denied | 0 in 12 | median 39 of 62 | 5–7 |
+
+**After the fight:**
+- Talk to **Teo** again (*Pending Onboarding* complete, +100 XP).
+- The **freight elevator (23,3)** opens. Taking it completes *Rate Your Experience* and ends chapter one. It leads to the chapter two teaser area, and Lake Norman unlocks on the city map.
 

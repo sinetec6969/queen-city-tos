@@ -91,3 +91,8 @@ rocket_tea:
   heal: 25
   use_text: "Sweet tea, reduced on a camp stove to something closer to syrup, with three espresso shots. Your heart files a formal objection. You feel invincible."
   desc: "Heals 25 HP. Doc says one a day. Doc says a lot of things."
+
+service_badge:
+  name: Service Badge
+  type: key
+  desc: "A driver's badge on a lanyard: CONCIERGE LOGISTICS, ALL FLOORS. The photo is of a man who was never required."

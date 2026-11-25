@@ -1,5 +1,34 @@
 # Changelog
 
+## 0.6.0 — Quest 6: Rate Your Experience, chapter one finale (2026-11-25)
+
+**Content**
+- Two new locations in `locations/act6_rate_your_experience.yaml`: Loading Dock B, and the Crown (the boss arena).
+- The safehouse back door now opens after "I'm ready." It's one-way into quest 6.
+- **Final boss: the Concierge** (`concierge_avatar`). One heavy ranged hit per turn. It has two `phases`: a Greeter at 66% HP, then two Pickers at 33%. Each wave can be denied ahead of time:
+  - Wave 1: hack the wellness desk at the dock, or decline to rate (**Wits ★★★★**).
+  - Wave 2: give the three-star written review (**Charm ★★★★**).
+- **The rating scene** (`dialogues/act6.yaml`): the Concierge speaks directly, shows Teo on its screens ("fine, very fine, extremely fine"), and asks Rater 4471 for a star rating. Five stars is the bad ending (game over, after a confirmation).
+- Teo can be talked to before and after the fight. Freeing him completes *Pending Onboarding*.
+- **Ending:** the freight elevator sets `chapter2`, completes the quest, and goes to the chapter two teaser area (`locations/ch2_lake_norman.yaml`). The Lake Norman city node now has a location.
+- New `key` item: the Service Badge (opens the elevator to the Crown).
+
+**Tests**
+- `test_engine.py`:
+  - Quest 6 with both waves, and with both denied.
+  - The five-star bad ending (including the "No. Wait." back-out).
+  - A guard that every enemy uses exactly one map cell. Two cells sharing an enemy character share one entity id and die together; this happened while building quest 6.
+- `test_ui.py`: the headless run now plays all six quests to the chapter two area, denying wave 1 at the desk.
+- `test_line.py`: line mode plays all six quests with both waves. 510 replies, mean 161 B.
+- **Test bots now heal before attacking** when below 40% HP. Before this, they only checked after spending their AP, so with a 3-AP weapon they never healed. Quest 6 exposed it: the bot died with three Rocket Teas unused. Balance numbers for quests 2–5 were measured with the old bot, so they're conservative.
+
+**Balance**
+- Quest 6, 12 seeds per route: no deaths. Both waves: median lowest HP 23 of 62 over 8–13 rounds. Waves denied: median 39 over 5–7.
+- Tuned from a first pass that killed the bot 12 times in 12:
+  - Concierge HP 90 → 72.
+  - One attack per turn (attack cost 3 → 4 AP), damage 3–6 → 4–7.
+  - Wave 1 cut from two Greeters to one, and wave 2 changed from two drones to two Pickers.
+
 ## 0.5.0 — Quest 5: Scheduled Downtime (2026-11-25)
 
 **Content**

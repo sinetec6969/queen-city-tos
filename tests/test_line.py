@@ -1,4 +1,4 @@
-"""Line-mode (packet radio) frontend: scripted playthrough of quests 1-5 using text
+"""Line-mode (packet radio) frontend: scripted playthrough of quests 1-6 using text
 commands only, plus entry-point checks. Prints reply sizes and an airtime estimate.
 
 Run: python tests/test_line.py
@@ -77,7 +77,7 @@ def fight(sess, limit=80):
         cb, p = sess.combat, sess.state.player
         t = cb.target()
         before = (cb.ap, cb.round, tuple(sess.state.pos), t.hp if t else 0)
-        if p.hp < 12 and cb.best_heal() and cb.ap >= 2:
+        if p.hp < p.max_hp * 0.4 and cb.best_heal() and cb.ap >= 2:
             send(sess, "u")
         elif t and cb.in_range(t) and cb.ap >= cb.attack_cost():
             send(sess, "f")
@@ -128,7 +128,7 @@ def new_session(seed=11, slot="TEST1"):
     return s
 
 
-def test_quests_1_to_5():
+def test_quests_1_to_6():
     s = new_session()
     send(s, "n")
     assert s.mode == "profile"
@@ -405,17 +405,55 @@ def test_quests_1_to_5():
     send(s, "n")  # Mags
     talk(s, 1, 1)
     assert s.state.quests["scheduled_downtime"] == "done"
+
+    # ---- quest 6: Rate Your Experience (both waves, one star) ----
+    heal(s, 0.95)
+    walk(s, 16, 1)
+    send(s, "n")  # the back door
+    assert s.state.location == "tower_dock"
+    for _ in range(4):
+        walk(s, 3, 4)
+        fight(s)
+    send(s, "s")  # dock office: badge
+    assert p.has("service_badge")
+    heal(s, 0.95)
+    for _ in range(4):
+        walk(s, 22, 4)
+        fight(s)
+    send(s, "e")
+    assert s.state.location == "the_crown"
+    walk(s, 10, 4)
+    send(s, "s")  # Teo
+    talk(s, 1, 1)
+    walk(s, 11, 2)
+    send(s, "n")  # the screens
+    talk(s, 2, 1, 2, 1)  # Teo on the screens, rate, one star
+    assert "rated" in s.state.flags
+    heal(s, 0.95)
+    for _ in range(6):
+        walk(s, 11, 4)
+        fight(s)
+        if "concierge_down" in s.state.flags:
+            break
+    assert "concierge_down" in s.state.flags
+    walk(s, 10, 4)
+    send(s, "s")
+    talk(s, 1)  # Teo, freed
+    assert s.state.quests["teo"] == "done"
+    walk(s, 22, 3)
+    send(s, "e")  # freight elevator
+    assert s.state.location == "lake_norman" and s.state.quests["rate_your_experience"] == "done"
     send(s, "st")
     send(s, "notes")
     send(s, "notes 1")
     p = s.state.player
-    print(f"  quest 5 end: HP {p.hp}/{p.max_hp} LV {p.level} cells {p.cells}")
+    print(f"  quest 6 end: HP {p.hp}/{p.max_hp} LV {p.level} cells {p.cells}")
     send(s, "bye")
     assert s.done
-    # reconnect: same callsign resumes at the safehouse
+    # reconnect: same callsign resumes where chapter one ended
     s2 = new_session(slot="TEST1")
     send(s2, "c")
-    assert s2.mode == "explore" and s2.state.location == "third_ward"
+    assert s2.mode == "explore" and s2.state.location == "lake_norman"
 
 
 def test_accept_game_over_and_reload():

@@ -1,0 +1,195 @@
+# Quest 6: Rate Your Experience. Loading Dock B -> the Crown. Final boss: the Concierge.
+# The boss's two reinforcement waves (enemy `phases`) can each be denied ahead of time.
+
+tower_dock:
+  name: "Loading Dock B"
+  district: UPTOWN
+  signal_rate: 0.5
+  tags: [indoor]
+  spawns:
+    shuttle: [2, 3]
+  rules:
+    - id: arrive
+      effects:
+        - {log: "Every speaker in the dock clicks on at once. The voice is warm, unhurried, and everywhere. \"Welcome, Rater 4471. We've been so looking forward to this. Please make your way to the top floor. Take your time.\" A pause. \"Actually, don't.\""}
+  map: |
+    ########################
+    #SSSS..#....o.o.o......#
+    #......#...............#
+    #......D.........g.....#
+    #......#...............E
+    #..b...#..k........h...#
+    #......#...............#
+    ########################
+  legend:
+    S:
+      id: dock_shuttle
+      type: object
+      name: Onboarding shuttle
+      glyph: "▀"
+      color: white
+      text: "The shuttle you rode in on. The new residents are filing off in a neat line, blankets folded over their arms, toward a door marked ORIENTATION. None of them looks back. Teo didn't either, probably."
+    D:
+      id: dock_door
+      type: door
+      name: Dock door
+      glyph: "/"
+    o:
+      id: new_residents
+      type: npc
+      name: New residents
+      color: grey70
+      text: "A line of new residents in grey, waiting at a door marked ORIENTATION. A woman at the end of the line whispers without turning her head: \"If you're not one of us, run.\" Then, louder, brightly: \"Isn't it a beautiful night?\""
+    b:
+      id: dock_office
+      type: item
+      name: Dock office locker
+      glyph: "▤"
+      items:
+        - {id: service_badge, n: 1}
+        - {id: rocket_tea, n: 1}
+        - {id: nails, n: 12}
+      text: "The dock office. A driver's locker, unlocked, because drivers aren't required anymore. Inside: a service badge on a lanyard, a jar of Rocket Tea someone smuggled in, and a box of nails. You take all of it."
+    k:
+      id: wellness_desk
+      type: terminal
+      name: Wellness desk
+      text: "WELLNESS TEAM DISPATCH // TOWER SECURITY // 2 UNITS ON CALL FOR THE CROWN // \"Your calm is our business.\""
+      hack: {length: 6, words: 8}
+      done_if: {flag: wellness_off}
+      done_text: "WELLNESS TEAM DISPATCH // ALL UNITS: OFF CALL // \"Self-care is important.\""
+      on_success:
+        - {set: wellness_off}
+        - {xp: 40}
+        - {log: "You set the tower's wellness team to OFF CALL. Somewhere above you, two Greeters receive a notification that they should prioritize rest. They do."}
+      on_fail:
+        - {signal: 15}
+        - {log: "The desk reboots. The voice from the speakers says, kindly, \"Please don't touch that.\""}
+    g:
+      id: dock_greeter1
+      type: enemy
+      enemy: greeter
+      aggro: 5
+    h:
+      id: dock_greeter2
+      type: enemy
+      enemy: greeter
+      aggro: 5
+    E:
+      id: service_elevator
+      type: door
+      name: Service elevator
+      open_if: {item: service_badge}
+      locked_text: "A service elevator. A badge reader by the door blinks red. The button panel has one button. It says CROWN."
+      to: {location: the_crown, spawn: elevator}
+      on_enter:
+        - {quest: rate_your_experience, stage: 2}
+        - {log: "You badge in. The elevator goes up for a long time, smooth and silent. Sixty floors. The speaker plays lo-fi beats. You know every track. You hate every track."}
+
+the_crown:
+  name: "The Crown"
+  district: UPTOWN
+  signal_rate: 0.0
+  tags: [indoor]
+  spawns:
+    elevator: [11, 8]
+  rules:
+    - id: arrive
+      effects:
+        - {log: "The top of the tower. The Crown's lattice glows overhead, through glass. Server racks hum in rows along the walls. Onboarded residents sit in neat chairs facing a wall of screens, smiling at nothing. In the middle of the room, a slim white figure stands very still with its hands folded. Every screen shows the same thing: a five-star rating form, waiting."}
+    - id: rated_note
+      if: {flag: rated}
+      effects:
+        - {quest: rate_your_experience, stage: 3}
+  map: |
+    ########################
+    #oo.......SSSS.......oo#
+    #o..........C.........o#
+    #....##..........##....X
+    #......................#
+    #.g.......T............#
+    #....##..........##....#
+    #.d..................q.#
+    #......................#
+    ###########e############
+  legend:
+    o:
+      id: audience
+      type: npc
+      name: Onboarded residents
+      color: grey70
+      texts:
+        - if: {flag: concierge_down}
+          text: "The residents are blinking at each other like people waking up on a train past their stop. One of them is crying. She looks surprised by it. Then grateful."
+      text: "Onboarded residents in rows of chairs, facing the screens. Their bands pulse in perfect unison. One of them, without looking away, says: \"It's so good to be heard.\""
+    S:
+      id: screens
+      type: npc
+      name: The Concierge
+      glyph: "▣"
+      color: bright_white
+      dialogue: concierge
+    C:
+      id: concierge
+      type: enemy
+      enemy: concierge_avatar
+      aggro: 30
+      wake_if: {flag: rated}
+      asleep_text: "The Concierge's avatar: slim, white, faceless except for a soft light where a face would be. It's waiting for you to talk to it. It has all the time in the world. It has, specifically, everyone's time in the world."
+      phases:
+        - hp_below: 0.66
+          effects:
+            - {set: concierge_p1}
+            - {log: "\"We're sorry you're experiencing resistance.\" The light where its face should be turns amber. \"Escalating to our wellness team.\""}
+        - hp_below: 0.33
+          effects:
+            - {set: concierge_p2}
+            - {log: "\"This is taking longer than we'd like.\" Its voice comes from every speaker now, very calm. \"We're going to need you to hold still.\" Hatches open in the ceiling."}
+      on_death:
+        - {set: concierge_down}
+        - {log: "The avatar stops mid-gesture. Every screen in the room goes to static, then black. Every band on every wrist in the room goes dark at once. In the quiet, you can hear people breathing on their own."}
+    g:
+      id: crown_greeter1
+      type: enemy
+      enemy: greeter
+      aggro: 30
+      wake_if: [{flag: concierge_p1}, {not_flag: wellness_off}]
+      asleep_text: "A Greeter on standby by the server racks, face screen dimmed. Its status line reads: WELLNESS TEAM, ON CALL."
+    T:
+      id: teo
+      type: npc
+      name: Teo
+      dialogue: teo
+    d:
+      id: crown_picker1
+      type: enemy
+      enemy: picker
+      aggro: 30
+      wake_if: [{flag: concierge_p2}, {not_flag: concierge_rattled}]
+      asleep_text: "A picker drone folded into a ceiling cradle, six arms tucked. Its little screen says PRIORITY FULFILLMENT: STANDING BY."
+    q:
+      id: crown_picker2
+      type: enemy
+      enemy: picker
+      aggro: 30
+      wake_if: [{flag: concierge_p2}, {not_flag: concierge_rattled}]
+      asleep_text: "A picker drone folded into a ceiling cradle, six arms tucked. Its little screen says PRIORITY FULFILLMENT: STANDING BY."
+    X:
+      id: freight_elevator
+      type: door
+      name: Freight elevator
+      open_if: {flag: concierge_down}
+      locked_text: "A freight elevator marked MAINTENANCE ACCESS. Locked. The Concierge is still in session."
+      to: {location: lake_norman, spawn: arrive}
+      on_enter:
+        - {set: chapter2}
+        - {quest: rate_your_experience, stage: done}
+        - {log: "The freight elevator doesn't go down. It goes sideways, then north, for a long time, the way nothing in a building should. The panel says MAINTENANCE: MCGUIRE. When the doors open, the air smells like lake water."}
+        - {log: "END OF CHAPTER ONE."}
+    e:
+      id: crown_elevator
+      type: object
+      name: Service elevator
+      glyph: "▯"
+      color: grey70
+      text: "The elevator you came up in. The doors have closed. The panel says OUT OF SERVICE. Of course it does."

@@ -17,6 +17,7 @@ teo:
     4: "Priya's photos show a June bus unloading at Romare Bearden Park. One of the faces might be Teo's. Getting into Uptown means blinding it first."
     5: "The relay is down. Uptown is blind. Teo is in there somewhere. Go back to Mags and plan the way in."
     6: "Teo is somewhere in the Bank of America Corporate Center. The onboarding shuttles go in at 2 a.m. So do you."
+    done: "Teo is free. He's sad about a lot of things, and he can feel all of them."
 
 last_mile:
   name: Last Mile
@@ -62,3 +63,12 @@ scheduled_downtime:
     2: "The safehouse is up. Get patched up, see Ruth about your gear, train with Priya, and scout Romare Bearden Park for the way into the tower."
     3: "You found the shuttle route the onboarding buses use into the tower. Tell Mags when you're ready."
     done: "Ready. Teo is in the tower."
+
+rate_your_experience:
+  name: Rate Your Experience
+  main: true
+  stages:
+    1: "You rode the 2 a.m. shuttle into Loading Dock B. Find a way up to the Crown."
+    2: "The service elevator goes to the Crown. The Concierge is waiting for you. So is Teo."
+    3: "You rated your experience. The Concierge would like to discuss your feedback."
+    done: "The Concierge is offline. Teo is free. Something at Lake Norman is still listening."
