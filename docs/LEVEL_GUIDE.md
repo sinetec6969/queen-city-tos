@@ -620,3 +620,48 @@ E......#.....R.....=~~~#     R Ray (13,4): mechanic, hints
 - **Bot runs** (24 seeds, level 6): no deaths, ending at 34–57 of 57 HP.
 - **Lake travel encounters** start once you have the boat.
 
+## Quest 2 — Known Issues
+
+**Goal:** stop QA's van from "improving" the Albright family. **Time:** about 15 min. **Route:** the lake map (needs the boat) → **Davidson** → back to Prix.
+
+### Davidson · Main Street
+
+```
+########################
+#......#.P..o..#.......#     P Prix (9,1): net control (talk from (10,1))
+#......#..k....#...n...#     o net operator   k radio bench   n KNOWN ISSUES board (lore)
+#......####D####.......#     D bookstore door (11,3)
+W......................#     W « the SECOND CHAPTER, back to the lake map
+#......................#
+#..#####...............#     f the Albrights (5,7), inside the house; door (7,7)
+#..#.f.D!...q.x..a.A...#     ! (8,7) the gate: stepping here with the van due brings it in
+#..#####.........V.....#     q rating post (12,7): hack   x QA Assessor (14,7): talk
+#......................#     V Service Van (17,8), a A Attendants: parked, dormant
+########################
+```
+
+- **Signal rises** here (+0.4 per step).
+- **Prix (9,1):** "Odette says you keep a list." → "I'll go." Tonight's job is the Albrights. Her opening line depends on your chapter one rating.
+
+**Stopping the van (three ways):**
+
+| Route | How | Result |
+| --- | --- | --- |
+| Hack | **Rating post (12,7)**, from (12,6). 6-letter words. +40 XP. Failure = +15 Signal, retry allowed. | The house is re-rated 5.0 and the van leaves. No fight. |
+| Talk | **QA Assessor (14,7)**, from (14,6). Needs **Charm ★★★★** ("Request a re-review..."). +40 XP. | Same: re-rated, no fight. |
+| Fight | Walk onto the gate (8,7) without re-rating the house. | The van and both attendants wake. |
+
+- **Do the hack or the talk *before* stepping on (8,7).** Once the van arrives, it's a fight.
+- **The fight:**
+
+| Enemy | HP | Attack |
+| --- | --- | --- |
+| Service Van | 34 | Melee, one hit a turn for 3–6 |
+| Attendant ×2 | 14 each | Melee, one grab a turn for 2–4 |
+
+  Take the attendants first; **Tires** (slow) stops the van in its tracks. Bot runs (24 seeds, level 6): no deaths, ending at 14–44 of 57 HP.
+- **Finishing:**
+  - Once the Albrights are safe (+60 XP), go back to **Prix**.
+  - She completes *Known Issues* (+80 XP) and gives you **QA's patch notes**: the "improved" go to **McGuire through the cooling-water intake**, and only boats with a service transponder get near it.
+  - Next: **Feature Request** (Mooresville).
+

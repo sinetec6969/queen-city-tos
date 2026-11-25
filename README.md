@@ -157,7 +157,7 @@ python tests/test_line.py
 
 ## Status
 
-Chapter one is complete. v0.7 adds the systems chapter two is built on: perks, crafting with weapon mods, travel encounters, and a second map for Lake Norman, where the water runs warm in November. Chapter two has begun: quest 1 is playable. Line mode works over a real AX.25 stack. It hasn't been on the air yet.
+Chapter one is complete. v0.7 adds the systems chapter two is built on: perks, crafting with weapon mods, travel encounters, and a second map for Lake Norman, where the water runs warm in November. Chapter two has begun: quests 1 and 2 are playable. Line mode works over a real AX.25 stack. It hasn't been on the air yet.
 
 ---
 

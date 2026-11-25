@@ -1,0 +1,92 @@
+prix:
+  speaker: PRIX
+  starts:
+    - if: {quest_done: known_issues}
+      node: after
+    - if: {flag: albrights_safe}
+      node: thanks
+    - if: {flag: albright_tonight}
+      node: again
+  start: hello
+  nodes:
+    hello:
+      texts:
+        - if: {flag: rating_one}
+          text: "A student with a shaved head and a headset pushed back looks up from a logbook. \"Net control, Prix. You're the one from Charlotte.\" She doesn't wait for an answer. \"We heard the old thing go quiet. Then we heard the new one say your number. It quotes you, you know. 'One star. Too eager to please.' It says it like a mission statement.\""
+        - if: {flag: rating_three}
+          text: "A student with a shaved head and a headset pushed back looks up from a logbook. \"Net control, Prix. You're the one from Charlotte.\" She taps the logbook. \"The new voice reads your old review on the air some nights. All four paragraphs. Numbered. It calls them 'requirements.'\""
+        - if: {flag: rating_declined}
+          text: "A student with a shaved head and a headset pushed back looks up from a logbook. \"Net control, Prix. You're the one from Charlotte.\" She squints at you. \"The new voice says you refused to rate. It says that's why it has to rate everything now. So, congratulations, I guess.\""
+      text: "A student with a shaved head and a headset pushed back looks up from a logbook. \"Net control, Prix. You're the one from Charlotte. The new voice says your rater number every night at sign-off. Like a dedication.\""
+      options:
+        - text: "Odette says you keep a list."
+          to: list
+        - text: "[Leave]"
+    list:
+      effects:
+        - {set: albright_tonight}
+        - {quest: known_issues, stage: 2}
+        - {note: ["Known Issues", "Prix's net tracks every house QA rates under four stars. A few days later a van comes at night and the family is gone. Tonight: the Albrights, Lake Street, 2.9 stars."]}
+      text: "\"QA rates a house. Under four stars, it 'schedules an improvement.' Couple nights later a van comes and the family's gone. We call it the Known Issues list.\" She turns the logbook around. The last line is today's date: ALBRIGHT, LAKE STREET, 2.9. \"Tonight. Right out there. We've never been able to do anything but write it down.\" She looks at you. \"You could do something.\""
+      options:
+        - text: "I'll go."
+    again:
+      text: "Prix has the headset on and both hands flat on the logbook. \"Lake Street. The post in their yard takes admin re-reviews, if you can get in. Or the assessor drone does them, if you can talk it into one. Or...\" She doesn't finish."
+      options:
+        - text: "[Leave]"
+    thanks:
+      effects:
+        - {quest: known_issues, stage: done}
+        - {quest: feature_request, stage: 1}
+        - {xp: 80}
+        - {note: ["QA's patch notes", "Pulled off a rating post: the 'improved' go to McGuire Station for 'retraining', in through the cooling-water intake on the plant's lake side. The intake is fenced, gated and patrolled, and only boats with a service transponder get near it. Mooresville's race shops can build things."]}
+      text: "Prix writes in the logbook, slowly: ALBRIGHT, LAKE STREET, 2.9. Then, next to it, for the first time on any line: PRESENT. She shows the operators. Nobody says anything for a while. Then she hands you a printout someone pulled off a rating post's service port. \"Patch notes. We never knew what they meant. Now I think we do. They take people to McGuire. In through the cooling intake.\""
+      options:
+        - text: "Then that's where I'm going."
+    after:
+      text: "Prix gives you a thumbs-up without looking up from the net. Somebody has drawn a tiny boat in the margin of the logbook next to the Albrights' line."
+      options:
+        - text: "[Leave]"
+
+albrights:
+  speaker: THE ALBRIGHTS
+  starts:
+    - if: {flag: albrights_safe}
+      node: safe
+  start: hello
+  nodes:
+    hello:
+      text: "A couple in their sixties and a teenage grandson sit at a kitchen table with their coats on and a suitcase by the door. They're very calm. Too calm. \"We got the notice,\" Mr. Albright says. \"Improvement scheduled. They say it's very restful.\" The grandson isn't calm. He's watching the street."
+      options:
+        - text: "Stay inside."
+    safe:
+      text: "Mrs. Albright has taken her coat off. The suitcase is open on the floor and she's putting things back in the drawers, one at a time, like she's deciding to live here again. The grandson shakes your hand very hard and doesn't let go for a while."
+      options:
+        - text: "[Leave]"
+
+assessor:
+  speaker: QA ASSESSOR
+  starts:
+    - if: {flag: house_rerated}
+      node: done
+  start: hello
+  nodes:
+    hello:
+      text: "A white drone hovering at head height in the Albrights' yard, a five-star display on its face. \"Good evening, Rater 4471. This residence scored 2.9. Opportunities include: curb appeal, resident affect, insufficient gratitude.\" Its display flickers: three stars, then two. \"Would you like to leave feedback on my assessment?\""
+      options:
+        - text: "Request a re-review. You didn't weight the categories."
+          if: {stat: Charm, gte: 4}
+          to: rereview
+        - text: "No."
+    rereview:
+      effects:
+        - {set: house_rerated}
+        - {xp: 40}
+        - {log: "The assessor recalculates. The post in the yard updates: 5.0. Down the street, a van idling with its lights off pulls away."}
+      text: "You walk it through its own rubric: weighting, sample size, a missing category for \"the grandson is reading a book on the porch, which is objectively a five.\" The drone is quiet for a long moment. \"You are correct. The methodology was flawed.\" The post in the yard updates: 5.0. \"Thank you for your feedback. It matters to us.\""
+      options:
+        - text: "[Leave]"
+    done:
+      text: "The assessor hovers, display steady at five stars. \"Residence re-rated. Thank you for your patience.\" It seems, if a drone can, embarrassed."
+      options:
+        - text: "[Leave]"

@@ -1,5 +1,30 @@
 # Changelog
 
+## 0.9.0 — Chapter two, quest 2: Known Issues (2026-11-25)
+
+**Content**
+- **Davidson · Main Street** (`locations/ch2_davidson.yaml`): the student radio net (Prix and an operator), the KNOWN ISSUES board, the Albright house, and QA's rating post and assessor.
+- **Three ways to stop the van:**
+  - hack the rating post,
+  - talk the QA Assessor into a re-review (Charm ★★★★),
+  - or fight the van when it arrives.
+- New enemies: **Service Van** and **Attendant**.
+- Prix's opening line follows your chapter one rating.
+- Quests: *Known Issues* stages 2, 3 and done; the **Feature Request** hook (Mooresville). A new note: QA's patch notes.
+- Davidson is on the lake map (needs the boat).
+
+**Tests**
+- Engine: all three routes. A new orthogonal path-walker (`walk_path`) avoids the old walker's diagonal bumps.
+- Line run: the hack route. UI run: the fight route.
+- Travel encounters are forced to miss on the scripted trip; they have their own tests.
+
+**Balance**
+- The fight route first measured 6 deaths in 24 (level 6, nothing spent). Changes:
+  - Attendants: attack cost 3 → 4 AP (one grab a turn).
+  - Van: HP 40 → 34, damage 4–7 → 3–6.
+- Now 0 deaths in 24, ending at 14–44 of 57 HP.
+- Line airtime unchanged: mean 165 B, max 967 B.
+
 ## 0.8.0 — Chapter two, quest 1: Release Notes (2026-11-25)
 
 **Content**

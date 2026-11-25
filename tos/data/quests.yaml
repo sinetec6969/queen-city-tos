@@ -88,3 +88,12 @@ known_issues:
   main: true
   stages:
     1: "Odette says the Davidson radio net has been talking about people going missing after their houses were rated below four stars. Go to Davidson."
+    2: "Prix's net keeps a list of everyone QA 'improves'. Tonight a van is coming for the Albrights on Lake Street. Stop it: re-rate the house, talk the assessor around, or meet the van."
+    3: "The Albrights are safe. Tell Prix."
+    done: "The Albrights stayed. The net handed over QA's patch notes: McGuire, through the cooling intake."
+
+feature_request:
+  name: Feature Request
+  main: true
+  stages:
+    1: "QA takes people into McGuire through the cooling-water intake, and only boats with a service transponder get near it. Mooresville's race shops can build things."

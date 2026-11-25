@@ -1,0 +1,131 @@
+# Chapter two, quest 2 (Known Issues): Davidson's Main Street, the student radio net, and the
+# Albright house. Three ways through: hack the rating post, talk the assessor into a re-review
+# (Charm 4), or fight the van that comes for the family.
+
+davidson_main:
+  name: "Main Street"
+  district: DAVIDSON
+  signal_rate: 0.4
+  tags: [street]
+  spawns:
+    dock: [1, 4]
+  rules:
+    - id: arrive
+      effects:
+        - {log: "Davidson. Brick storefronts, a college green, a coffee shop with its chairs stacked. Every porch on the lake side has a little white post in the yard with a star rating on it. Half the houses are dark. Somewhere above the bookstore, someone is calling a radio net."}
+        - {quest: known_issues, stage: 1}
+    - id: albrights_safe
+      if:
+        - {flag: albright_tonight}
+        - any:
+            - {flag: house_rerated}
+            - [{taken: "davidson_main:service_van"}, {taken: "davidson_main:attendant1"}, {taken: "davidson_main:attendant2"}]
+      effects:
+        - {set: albrights_safe}
+        - {quest: known_issues, stage: 3}
+        - {xp: 60}
+        - {log: "The Albrights' porch light comes on. Someone inside starts laughing, then crying, then laughing again."}
+  map: |
+    ########################
+    #......#.P..o..#.......#
+    #......#..k....#...n...#
+    #......####D####.......#
+    W......................#
+    #......................#
+    #..#####...............#
+    #..#.f.D!...q.x..a.A...#
+    #..#####.........V.....#
+    #......................#
+    ########################
+  legend:
+    W:
+      id: davidson_dock
+      type: door
+      name: The SECOND CHAPTER
+      glyph: "«"
+      to: {city: davidson}
+    P:
+      id: prix
+      type: npc
+      name: Prix
+      dialogue: prix
+    o:
+      id: net_operator
+      type: npc
+      name: Net operator
+      texts:
+        - if: {flag: albrights_safe}
+          text: "The operator is logging the Albright house in a spiral notebook: RE-RATED, OCCUPANTS PRESENT. She underlines PRESENT twice."
+      text: "A student in a hoodie with a headset on, writing call signs in a spiral notebook. \"Net's in session,\" she whispers, not unkindly. \"Prix is net control. Talk to Prix.\""
+    k:
+      id: radio_bench
+      type: object
+      name: Radio bench
+      glyph: "▬"
+      color: yellow
+      text: "A bench of salvaged radios: an old HF rig, three handhelds on chargers, a hand-drawn map of the lake with pins in it. Every pin is a house. Every red pin is a house where nobody answers anymore."
+    D:
+      id: davidson_doors
+      type: door
+      name: Door
+      glyph: "/"
+    n:
+      id: missing_board
+      type: object
+      name: Missing board
+      glyph: "▦"
+      color: white
+      text: "A corkboard outside the bookstore, covered in index cards: a name, an address, a star rating, a date. HARLOWE, THE POINT, 1.0, OCT 30. The ratings are all under four. Somebody has written across the top in marker: KNOWN ISSUES."
+    "!":
+      id: albright_gate
+      type: trigger
+      if: [{flag: albright_tonight}, {not_flag: house_rerated}]
+      effects:
+        - {set: van_arrives}
+        - {log: "Headlights. A white van with no windows rolls up Lake Street and stops in front of the Albright house, very gently. The side door slides open. Two attendants in pale scrubs step out, smiling, holding a folded blanket between them."}
+    f:
+      id: albrights
+      type: npc
+      name: The Albrights
+      dialogue: albrights
+    q:
+      id: rating_post
+      type: terminal
+      name: Rating post
+      text: "A white post in the Albrights' yard. Its screen: ALBRIGHT RESIDENCE · 2.9 STARS · STATUS: SCHEDULED FOR IMPROVEMENT (TONIGHT). Under it, small print: \"Admin re-review available.\""
+      hack: {length: 6, words: 8}
+      done_if: {flag: house_rerated}
+      done_text: "ALBRIGHT RESIDENCE · 5.0 STARS · STATUS: EXEMPLARY. \"Thank you for your patience.\""
+      on_success:
+        - {set: house_rerated}
+        - {xp: 40}
+        - {log: "You file an admin re-review: five stars, every category. The post blinks, thinks about it, and agrees. Down the street, a van that was idling with its lights off quietly pulls away."}
+      on_fail:
+        - {signal: 15}
+        - {log: "The post reboots. Its screen comes back with the rating unchanged and a new line: REVIEWER CONDUCT: NOTED."}
+    x:
+      id: assessor
+      type: npc
+      name: QA Assessor
+      dialogue: assessor
+    V:
+      id: service_van
+      type: enemy
+      enemy: service_van
+      aggro: 30
+      wake_if: [{flag: van_arrives}, {not_flag: house_rerated}]
+      asleep_text: "A white van with no windows, parked down the street with its lights off. On the side, in friendly lettering: IMPROVEMENT SERVICES. NOW WITH MORE CALM."
+    a:
+      id: attendant1
+      type: enemy
+      enemy: attendant
+      aggro: 30
+      wake_if: [{flag: van_arrives}, {not_flag: house_rerated}]
+      asleep_text: "An attendant in pale scrubs, sitting very straight in the van's passenger seat. Waiting for a work order."
+    A:
+      id: attendant2
+      type: enemy
+      enemy: attendant
+      aggro: 30
+      wake_if: [{flag: van_arrives}, {not_flag: house_rerated}]
+      asleep_text: "An attendant in pale scrubs, sitting in the back of the van with a folded blanket on its lap."

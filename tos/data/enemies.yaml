@@ -322,3 +322,60 @@ rating_drone:
     - {id: rotor, name: Rotor, mod: -15, effect: slow}
     - {id: battery, name: Battery, mod: -30, effect: explode}
     - {id: chassis, name: Shell, mod: 10, effect: none}
+
+service_van:
+  name: Service Van
+  glyph: "V"
+  hp: 34
+  ap: 4
+  range: 1
+  attack_ap: 4
+  hit: 55
+  dmg: [3, 6]
+  evade: 0
+  xp: 90
+  cells: [6, 12]
+  drops:
+    - {id: scrap, chance: 1.0}
+    - {id: wire, chance: 0.6}
+  attacks:
+    - "rolls forward and nudges you with its bumper, very firmly"
+    - "slides its side door open into you"
+  barks:
+    - "Pickup scheduled."
+    - "Please have your belongings ready."
+    - "Improvement is a journey."
+  death: "The van's hazards blink twice, apologetically, and the engine dies."
+  parts:
+    - {id: lights, name: Headlights, mod: -25, effect: blind}
+    - {id: tires, name: Tires, mod: -15, effect: slow}
+    - {id: battery, name: Battery, mod: -30, effect: explode}
+    - {id: chassis, name: Side Panel, mod: 10, effect: none}
+
+attendant:
+  name: Attendant
+  glyph: "a"
+  hp: 14
+  ap: 6
+  range: 1
+  attack_ap: 4
+  hit: 55
+  dmg: [2, 4]
+  evade: 5
+  xp: 30
+  cells: [2, 5]
+  drops:
+    - {id: med_gummy, chance: 0.4}
+  attacks:
+    - "tucks a blanket around you, too tight"
+    - "takes your arm gently and does not let go"
+  barks:
+    - "This won't take long."
+    - "You'll feel much better."
+    - "Everyone's very comfortable where you're going."
+  death: "The attendant folds its blanket neatly, sets it on the curb, and lies down beside it."
+  parts:
+    - {id: visor, name: Visor, mod: -25, effect: blind}
+    - {id: legs, name: Legs, mod: -15, effect: slow}
+    - {id: battery, name: Battery, mod: -30, effect: explode}
+    - {id: chassis, name: Scrubs, mod: 10, effect: none}

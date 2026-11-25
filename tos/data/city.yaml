@@ -111,6 +111,8 @@ nodes:
     x: 42
     y: 13
     unlocked_if: {flag: has_boat}
+    location: davidson_main
+    spawn: dock
     blurb: "A college town that kept its library open, mostly out of spite."
   mooresville:
     name: MOORESVILLE

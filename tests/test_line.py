@@ -13,6 +13,7 @@ from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT))
+sys.path.insert(0, str(ROOT / "tests"))
 os.environ["QCTS_SAVE_DIR"] = tempfile.mkdtemp()
 
 from tos.engine.content import get_content
@@ -497,6 +498,28 @@ def test_quests_1_to_6():
         if "lake_norman:shore_rater" in s.state.taken:
             break
     assert s.state.quests["release_notes"] == "done" and s.state.quests["known_issues"] == 1
+
+    # ---- chapter two, quest 2: Known Issues (hack route) ----
+    from test_engine import ForcedRng
+    walk(s, 1, 2)
+    send(s, "w")
+    real_rng, s.rng = s.rng, ForcedRng(0.99)  # no travel encounter on this trip
+    send(s, str(s.city_order.index("davidson") + 1))
+    s.rng = real_rng
+    assert s.state.location == "davidson_main"
+    walk(s, 10, 1)
+    send(s, "w")  # Prix
+    talk(s, 1, 1)
+    assert "albright_tonight" in s.state.flags
+    walk(s, 12, 6)
+    send(s, "s")  # the rating post
+    assert s.mode == "hack"
+    send(s, s.hack.password)
+    assert "house_rerated" in s.state.flags and s.state.quests["known_issues"] == 3
+    walk(s, 10, 1)
+    send(s, "w")
+    talk(s, 1)
+    assert s.state.quests["known_issues"] == "done" and s.state.quests["feature_request"] == 1
     send(s, "st")
     send(s, "notes")
     send(s, "notes 1")
@@ -504,10 +527,10 @@ def test_quests_1_to_6():
     print(f"  quest 6 end: HP {p.hp}/{p.max_hp} LV {p.level} cells {p.cells}")
     send(s, "bye")
     assert s.done
-    # reconnect: same callsign resumes where chapter one ended
+    # reconnect: same callsign resumes in Davidson
     s2 = new_session(slot="TEST1")
     send(s2, "c")
-    assert s2.mode == "explore" and s2.state.location == "lake_norman"
+    assert s2.mode == "explore" and s2.state.location == "davidson_main"
 
 
 def test_accept_game_over_and_reload():

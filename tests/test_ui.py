@@ -16,6 +16,8 @@ from tos.ui.app import QCApp
 from tos.ui.screens import (CityScreen, DialogueScreen, HackScreen, LocationScreen,
                             ProfileScreen, TipScreen, WristLinkScreen)
 
+from test_engine import ForcedRng  # noqa: E402
+
 TIPS_SEEN = []
 
 SHOTS = None
@@ -563,7 +565,6 @@ async def main():
         await press(pilot, app, "enter")
         assert app.screen.region_id == "charlotte" and app.state.location == "city:lake_norman"
         # a travel encounter on the way to NoDa (forced; chapter two has begun)
-        from test_engine import ForcedRng
         real_rng, app.rng = app.rng, ForcedRng(0.0, "charlotte_vending")
         sugar = app.state.player.inventory.get("sugar", 0)
         scr = app.screen
@@ -622,6 +623,37 @@ async def main():
                 break
         assert app.state.quests["release_notes"] == "done", app.state.quests.get("release_notes")
         await shot(app, "41_release_notes_done")
+
+        # ---- CHAPTER TWO, QUEST 2: Known Issues (fight route) ----
+        await walk(pilot, app, 1, 2)
+        await press(pilot, app, "left")
+        scr = app.screen
+        for _ in range(scr.order.index("davidson") - scr.cursor):
+            await press(pilot, app, "down")
+        real_rng, app.rng = app.rng, ForcedRng(0.99)  # no travel encounter on this trip
+        await press(pilot, app, "enter")
+        app.rng = real_rng
+        assert app.state.location == "davidson_main", app.state.location
+        await shot(app, "42_davidson")
+        await walk(pilot, app, 10, 1)
+        await press(pilot, app, "left")  # Prix
+        assert isinstance(app.screen, DialogueScreen)
+        await press(pilot, app, "1", "1")
+        assert "albright_tonight" in app.state.flags
+        await heal_up(pilot, app, 0.95)
+        await walk(pilot, app, 8, 6)
+        await press(pilot, app, "down")  # the gate: the van arrives
+        assert "van_arrives" in app.state.flags
+        for _ in range(6):
+            await fight(pilot, app)
+            if "albrights_safe" in app.state.flags or not app.screen.combat:
+                break
+        assert app.state.player.hp > 0, "died to the van"
+        assert "albrights_safe" in app.state.flags, app.state.quests.get("known_issues")
+        await shot(app, "43_albrights_safe")
+        await walk(pilot, app, 10, 1)
+        await press(pilot, app, "left", "1")
+        assert app.state.quests["known_issues"] == "done"
         print("tips shown:", TIPS_SEEN)
         print("UI playthrough OK. HP", app.state.player.hp, "/", app.state.player.max_hp,
               "LV", app.state.player.level, "signal", int(app.state.player.signal))

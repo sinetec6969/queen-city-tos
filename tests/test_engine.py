@@ -41,6 +41,32 @@ def walk_to(loc, tx, ty, events):
             return
 
 
+def walk_path(loc, tx, ty, events):
+    """Orthogonal BFS walk (no diagonal shortcuts that bump into things). Stops on combat or exit."""
+    from collections import deque
+    for _ in range(80):
+        start = tuple(loc.state.pos)
+        if start == (tx, ty):
+            return
+        prev, q = {start: None}, deque([start])
+        while q:
+            cur = q.popleft()
+            if cur == (tx, ty):
+                break
+            for d in ((1, 0), (-1, 0), (0, 1), (0, -1)):
+                nxt = (cur[0] + d[0], cur[1] + d[1])
+                if nxt not in prev and not loc.blocked(*nxt):
+                    prev[nxt] = cur
+                    q.append(nxt)
+        assert (tx, ty) in prev, f"no path to {tx},{ty} from {start}"
+        step = (tx, ty)
+        while prev[step] != start:
+            step = prev[step]
+        events += loc.player_move(step[0] - start[0], step[1] - start[1])
+        if any(e[0] in ("combat", "exit") for e in events):
+            return
+
+
 def fight(loc, rng):
     cb = Combat(loc, rng)
     for _ in range(60):
@@ -868,7 +894,7 @@ def play_release_notes(rng, st=None):
     assert st.quests["release_notes"] == "done" and st.quests["known_issues"] == 1
     assert talk("odette", st).node_id == "davidson"
     st.location = "city:ln_shore"
-    assert travel.go(st, C, "davidson")["kind"] == "unbuilt", "the boat opens the lake"
+    assert travel.go(st, C, "mooresville")["kind"] == "unbuilt", "the boat opens the lake"
     return st
 
 
@@ -882,6 +908,63 @@ def test_release_notes_after_chapter_one():
     assert "rating_one" in st.flags and st.location == "lake_norman"
     st = play_release_notes(random.Random(5), st)
     print("  ch2 q1 end: HP", st.player.hp, "/", st.player.max_hp, "LV", st.player.level, "perk points", st.player.perk_points)
+
+
+def play_known_issues(rng, route="hack", st=None):
+    """Chapter two, quest 2. route: hack (rating post) / charm (assessor, Charm 4) / fight (the van)."""
+    from tos.engine import travel
+    st = st or play_release_notes(rng)
+    st.location = "city:ln_shore"
+    assert travel.go(st, C, "davidson")["kind"] == "location" and st.location == "davidson_main"
+    town = Location("davidson_main", st, C)
+    town.update_rules()
+    events = []
+    walk_path(town, 10, 1, events)  # Prix (9,1) is talked to from the open side
+    assert ("dialogue", "prix") in town.player_move(-1, 0)
+    talk("prix", st, 0, 0)  # "Odette says you keep a list." / "I'll go."
+    assert "albright_tonight" in st.flags and st.quests["known_issues"] == 2
+    if route == "hack":
+        walk_path(town, 12, 6, events)
+        assert ("hack", "rating_post") in town.player_move(0, 1)
+        town.terminal_result("rating_post", True)
+    elif route == "charm":
+        st.player.stats["Charm"] = max(4, st.player.stats["Charm"])
+        walk_path(town, 14, 6, events)
+        assert ("dialogue", "assessor") in town.player_move(0, 1)
+        talk("assessor", st, 0, 0)
+    else:
+        prep(st)
+        walk_path(town, 8, 6, events)
+        events = town.player_move(0, 1)  # onto the gate: the van arrives
+        assert "van_arrives" in st.flags and ("combat",) in events
+        for _ in range(4):
+            if not town.awake_enemies():
+                break
+            assert fight(town, rng) == "won", st.player.hp
+    if route != "fight":
+        assert "house_rerated" in st.flags and not town.awake_enemies()
+        walk_path(town, 8, 6, events)
+        town.player_move(0, 1)
+        assert "van_arrives" not in st.flags, "re-rated: the van never comes"
+    town.update_rules()
+    assert "albrights_safe" in st.flags and st.quests["known_issues"] == 3
+    talk("prix", st, 0)
+    assert st.quests["known_issues"] == "done" and st.quests["feature_request"] == 1
+    assert any(n[0] == "QA's patch notes" for n in st.notes)
+    return st
+
+
+def test_known_issues_hack():
+    play_known_issues(random.Random(4), "hack")
+
+
+def test_known_issues_charm():
+    play_known_issues(random.Random(6), "charm")
+
+
+def test_known_issues_fight():
+    st = play_known_issues(random.Random(8), "fight")
+    print("  ch2 q2 end (fight): HP", st.player.hp, "/", st.player.max_hp, "LV", st.player.level)
 
 
 def test_city_labels_fit_their_canvas():
