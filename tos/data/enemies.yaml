@@ -293,3 +293,32 @@ concierge_avatar:
     - {id: uplink, name: Uplink Spine, mod: -15, effect: slow}
     - {id: battery, name: Core Cell, mod: -30, effect: explode}
     - {id: chassis, name: Avatar Shell, mod: 10, effect: none}
+
+rating_drone:
+  name: Rating Drone
+  glyph: "r"
+  hp: 18
+  ap: 6
+  range: 4
+  attack_ap: 3
+  hit: 55
+  dmg: [2, 5]
+  evade: 15
+  xp: 60
+  cells: [3, 7]
+  drops:
+    - {id: wire, chance: 0.8}
+  attacks:
+    - "flashes a one-star rating directly into your eyes"
+    - "fires an inspection laser that is, technically, a laser"
+  barks:
+    - "Rating your boat: two stars."
+    - "Please hold for inspection."
+    - "Your conduct has been noted, Rater 4471."
+    - "Opportunities for improvement: several."
+  death: "The drone rates itself one star, spins once, and drops into the lake."
+  parts:
+    - {id: display, name: Star Display, mod: -25, effect: blind}
+    - {id: rotor, name: Rotor, mod: -15, effect: slow}
+    - {id: battery, name: Battery, mod: -30, effect: explode}
+    - {id: chassis, name: Shell, mod: 10, effect: none}

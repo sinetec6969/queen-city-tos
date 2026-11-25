@@ -595,6 +595,8 @@ def test_regions_and_gateways():
     r = travel.go(st, C, "lake_norman")
     assert r["kind"] == "region" and st.location == "city:ln_shore"
     assert travel.region_of(C, travel.current_node(st)) == "lake_norman"
+    assert travel.go(st, C, "mcguire")["kind"] == "locked", "the rest of the lake needs the boat"
+    st.flags.add("has_boat")
     assert travel.go(st, C, "mcguire")["kind"] == "unbuilt"
     r = travel.go(st, C, "ln_shore")
     assert r["kind"] == "location" and st.location == "lake_norman"
@@ -809,6 +811,77 @@ def test_v06_save_loads():
     p = st2.player
     assert p.perks == [] and p.mods == {} and p.hp_bonus == 0 and st2.travel_dest is None
     assert p.perk_points == p.level - 1 and st2.location == st.location and st2.flags == st.flags
+
+
+def play_release_notes(rng, st=None):
+    """Chapter two, quest 1. With no state: a minimal chapter-two save (robustness)."""
+    from tos.engine import crafting, travel
+    from tos.engine.game import place
+    if st is None:
+        st, _ = new_game(C, STATS, tutorial=False)
+        st.flags.add("chapter2")
+        st.player.level = 6
+        st.player.recalc()
+        st.player.hp = st.player.max_hp
+        st.player.give("tire_iron")
+        st.player.weapon = "tire_iron"
+        place(st, C, "lake_norman", "arrive")
+    shore = Location("lake_norman", st, C)
+    logs = [e[1] for e in shore.update_rules()]
+    assert st.quests["release_notes"] == 1 and any("rater number" in m for m in logs)
+    buoy = shore.get("buoy")
+    rated = next((f for f in ("rating_one", "rating_three", "rating_declined") if f in st.flags), None)
+    assert "Rater 4471" in shore.text_for(buoy)
+    assert ("single star" in shore.text_for(buoy)) == (rated == "rating_one"), "QA's greeting follows your rating"
+    events = []
+    walk_to(shore, 5, 2, events)
+    assert "fuel line" in shore.player_move(1, 0)[0][1].lower(), "no patch yet"
+    assert exit_via(shore, 1, 2, -1, 0, rng) == "city" and st.location == "city:ln_shore"
+    assert travel.go(st, C, "mcguire")["kind"] == "locked"
+    assert travel.go(st, C, "cornelius", rng)["kind"] == "location" and st.location == "cornelius_marina"
+    marina = Location("cornelius_marina", st, C)
+    marina.update_rules()
+    walk_to(marina, 2, 3, events)
+    assert ("dialogue", "odette") in marina.player_move(0, -1)
+    talk("odette", st, 1, 0)  # "I need a boat." / "Deal."
+    assert "boat_job" in st.flags and st.quests["release_notes"] == 2
+    walk_to(marina, 10, 5, events)
+    marina.player_move(0, 1)  # parts crate
+    assert crafting.check_recipe(st, C, "fuel_patch") is None
+    assert crafting.craft(st, C, "fuel_patch")[0]
+    marina.update_rules()
+    assert st.quests["release_notes"] == 3
+    assert exit_via(marina, 1, 4, -1, 0, rng) == "city"
+    assert travel.go(st, C, "ln_shore", rng)["kind"] == "location" and st.location == "lake_norman"
+    shore = Location("lake_norman", st, C)
+    walk_to(shore, 5, 2, events)
+    shore.player_move(1, 0)  # fit the patch
+    assert "has_boat" in st.flags and st.quests["release_notes"] == 4 and not st.player.has("fuel_patch")
+    prep(st)
+    for _ in range(4):
+        if "lake_norman:shore_rater" in st.taken:
+            break
+        events = []
+        walk_to(shore, 7, 4, events)
+        if shore.awake_enemies():
+            assert fight(shore, rng) == "won", st.player.hp
+    assert st.quests["release_notes"] == "done" and st.quests["known_issues"] == 1
+    assert talk("odette", st).node_id == "davidson"
+    st.location = "city:ln_shore"
+    assert travel.go(st, C, "davidson")["kind"] == "unbuilt", "the boat opens the lake"
+    return st
+
+
+def test_release_notes_minimal_save():
+    st = play_release_notes(random.Random(3))
+    assert not st.flags & {"rating_one", "rating_three", "rating_declined"}
+
+
+def test_release_notes_after_chapter_one():
+    st = play_act6(random.Random(5))
+    assert "rating_one" in st.flags and st.location == "lake_norman"
+    st = play_release_notes(random.Random(5), st)
+    print("  ch2 q1 end: HP", st.player.hp, "/", st.player.max_hp, "LV", st.player.level, "perk points", st.player.perk_points)
 
 
 def test_city_labels_fit_their_canvas():

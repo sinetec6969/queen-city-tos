@@ -1,0 +1,105 @@
+# Chapter two hub: Cornelius marina. Odette runs it; Ray's workbench is the lake's crafting bench.
+
+cornelius_marina:
+  name: "Cornelius Marina"
+  district: CORNELIUS
+  signal_rate: -0.2
+  tags: [outdoor, unmanaged, workbench]
+  spawns:
+    road: [1, 4]
+  rules:
+    - id: arrive
+      effects:
+        - {log: "Cornelius Marina. A generator thumps behind the bait shop. Boat lights on the water, a grill going, people who unplugged everything in June and stayed unplugged. Somebody is playing a guitar badly and nobody is rating it."}
+    - id: patch_made
+      if: {item: fuel_patch}
+      effects:
+        - {quest: release_notes, stage: 3}
+  map: |
+    ########################
+    #......#...........~~~~#
+    #.O..s.#...w.......~~~~#
+    #......D...........=~~~#
+    E......#.....R.....=~~~#
+    #.n....#...........=~~~#
+    #......#..c........=~~~#
+    #......#.......q...~~~~#
+    ########################
+  legend:
+    E:
+      id: marina_road
+      type: door
+      name: Road to the lake map
+      glyph: "»"
+      to: {city: cornelius}
+    D:
+      id: marina_door
+      type: door
+      name: Bait shop door
+      glyph: "/"
+    O:
+      id: odette
+      type: npc
+      name: Odette
+      dialogue: odette
+    s:
+      id: dewey
+      type: npc
+      name: Dewey
+      dialogue: dewey
+    n:
+      id: marina_board
+      type: object
+      name: Notice board
+      glyph: "▦"
+      color: white
+      texts:
+        - if: {flag: has_boat}
+          text: "Notices: \"BOAT FOR TRADE (it floats).\" \"DAVIDSON RADIO NET 7PM NIGHTLY, 146.52 (ask Odette).\" \"IF A WHITE DRONE RATES YOUR HOUSE, LEAVE.\""
+      text: "Notices: \"BAIT, BATTERIES, BEER (DEWEY).\" \"LOST: one cat, answers to nothing, extremely fine.\" \"IF A WHITE DRONE RATES YOUR HOUSE, LEAVE.\""
+    w:
+      id: marina_bench
+      type: object
+      name: Ray's workbench
+      glyph: "▬"
+      color: yellow
+      text: "Ray's workbench: a vise, a drill press older than you, coffee cans of sorted screws. Anyone can use it. (You can craft here: WristLink CRAFT, or CRAFT in line mode.)"
+    R:
+      id: ray
+      type: npc
+      name: Ray
+      dialogue: ray
+    c:
+      id: marina_crate
+      type: item
+      name: Parts crate
+      glyph: "▤"
+      items:
+        - {id: scrap, n: 2}
+        - {id: duct_tape, n: 1}
+        - {id: wire, n: 1}
+      text: "A milk crate of parts labeled TAKE WHAT YOU NEED, RAY SAYS. Scrap, a roll of duct tape, a coil of wire."
+    "=":
+      id: marina_dock
+      type: object
+      name: Dock
+      glyph: "═"
+      color: yellow
+      text: "Wooden docks, boats tied up three deep. Every boat has its electronics pulled out and piled in a bucket at the end of the dock. The bucket has a sign: NO."
+    "~":
+      id: marina_water
+      type: object
+      name: Lake Norman
+      glyph: "≈"
+      color: blue
+      text: "Warm water slapping the pilings. A heron stands on one leg, unrated."
+    q:
+      id: qa_post
+      type: object
+      name: Rating post
+      glyph: "▣"
+      color: magenta
+      texts:
+        - if: {flag: has_boat}
+          text: "The rating post's screen shows the marina at two stars now. Under it, a new line: GUEST: RATER 4471. CONDUCT: UNDER REVIEW."
+      text: "A white post somebody bolted to the end of the dock in July. Nobody here put it up. Its screen shows the marina, rated three stars, and a list of \"opportunities\": music quality, grill hygiene, residents' tone. Somebody has hung a life jacket over half of it."

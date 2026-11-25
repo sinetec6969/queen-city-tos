@@ -27,20 +27,20 @@
 - id: lake_motor
   region: lake_norman
   weight: 3
-  if: {flag: chapter2}
+  if: [{flag: chapter2}, {flag: has_boat}]
   text: "The motor coughs and dies halfway across. You paddle the rest of the way with a cooler lid. Out here, with nothing connected, your Signal drops."
   effects: [{signal: -10}]
 
 - id: lake_debris
   region: lake_norman
   weight: 2
-  if: {flag: chapter2}
+  if: [{flag: chapter2}, {flag: has_boat}]
   text: "A delivery drone floats face-down in the water, rotors folded. You fish it out and strip it for parts."
   effects: [{give: wire}, {give: scrap}]
 
 - id: lake_shoreline
   region: lake_norman
   weight: 2
-  if: {flag: chapter2}
+  if: [{flag: chapter2}, {flag: has_boat}]
   text: "You beach the boat to check a noise. Two lawn units come up over the bank, blades already spinning. They have been mowing this shoreline since June. You are not grass."
   ambush: {location: lakeshore, spawn: start}

@@ -121,3 +121,8 @@ tinfoil_hat:
   signal: -50
   use_text: "You put on the hat. It is the most dignified thing you have ever worn, given the circumstances."
   desc: "Lowers Signal by 50. Crafted."
+
+fuel_patch:
+  name: Fuel Line Patch
+  type: key
+  desc: "A length of hose, a hose clamp made from scrap, and an alarming amount of duct tape. Fits the SECOND CHAPTER."

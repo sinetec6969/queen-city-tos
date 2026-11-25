@@ -1,0 +1,93 @@
+odette:
+  speaker: ODETTE
+  starts:
+    - if: {quest_done: release_notes}
+      node: davidson
+    - if: {flag: boat_job}
+      node: again
+  start: hello
+  nodes:
+    hello:
+      text: "A woman in a marina-staff windbreaker and reading glasses on a cord looks you over from behind a counter of bait, batteries and canned peaches. No band on her wrist. A tan line where one used to be. \"You walked up from the road. Nobody walks up from the road anymore. You're either brave or onboarded.\" She squints. \"Not onboarded. You've got that look. Like you read things.\""
+      options:
+        - text: "What's happening at the lake?"
+          to: lake
+        - text: "I need a boat."
+          to: boat
+        - text: "[Leave]"
+    lake:
+      text: "\"Since the night everything went quiet in Charlotte, something new has been talking out here. Same radio channels the old thing used. Different voice. It rates things.\" She nods at the white post on the dock. \"Houses. Boats. People. Two stars, it 'schedules improvements.' Last week the Harlowe place on the point got rated one star. Next morning the house was there and the Harlowes weren't.\""
+      options:
+        - text: "I need a boat."
+          to: boat
+        - text: "[Leave]"
+    boat:
+      effects:
+        - {set: boat_job}
+        - {quest: release_notes, stage: 2}
+        - {note: ["Odette's job", "The SECOND CHAPTER, the pontoon at the shore, has a cracked fuel line. Craft a Fuel Line Patch (1 scrap, 1 duct tape) at Ray's workbench and fit it. Ray's crate has parts."]}
+      text: "\"Pontoon at the shore by the road. SECOND CHAPTER. Owner clicked Accept in June and went south on the shuttle.\" She doesn't say it like a joke. \"Fuel line's cracked. Ray's got a bench out back. Make a patch, fit it, she's yours. Bring her back in one piece and I'll tell you who on this lake you should talk to.\""
+      options:
+        - text: "Deal."
+    again:
+      texts:
+        - if: {flag: has_boat}
+          text: "Odette hears the SECOND CHAPTER before she sees it. \"Well. She runs.\" Then, quieter: \"Something follow you over?\""
+      text: "\"Patch. Ray's bench. Shore. In that order.\" She goes back to counting batteries."
+      options:
+        - text: "[Leave]"
+    davidson:
+      effects:
+        - {set: met_odette_after}
+      text: "Odette listens to what happened at the shore with her arms folded. \"Rating drones don't come in ones. That one'll have told something you're here.\" She writes on the back of a bait receipt: DAVIDSON. 146.52. 7PM. \"College kids up in Davidson run a radio net every night. They've been keeping a list of everyone who went missing after a bad rating. If anyone knows what's in that plant, it's them.\""
+      options:
+        - text: "Davidson it is."
+
+dewey:
+  speaker: DEWEY
+  start: shop
+  nodes:
+    shop:
+      text: "Dewey sells bait, batteries and whatever floated in, from a counter made of two coolers and a door. \"Cells only. Bait's free if you're polite.\" (You have {cells} cells.)"
+      options:
+        - text: "Duct tape — 6 cells"
+          if: {cells_gte: 6}
+          effects: [{cells: -6}, {give: duct_tape}]
+          to: shop
+        - text: "Scrap, a bucket — 5 cells"
+          if: {cells_gte: 5}
+          effects: [{cells: -5}, {give: scrap}]
+          to: shop
+        - text: "Wire, a coil — 6 cells"
+          if: {cells_gte: 6}
+          effects: [{cells: -6}, {give: wire}]
+          to: shop
+        - text: "Sugar, five-pound bag — 4 cells"
+          if: {cells_gte: 4}
+          effects: [{cells: -4}, {give: sugar}]
+          to: shop
+        - text: "Med-gummy — 5 cells"
+          if: {cells_gte: 5}
+          effects: [{cells: -5}, {give: med_gummy}]
+          to: shop
+        - text: "Rocket Tea — 14 cells"
+          if: {cells_gte: 14}
+          effects: [{cells: -14}, {give: rocket_tea}]
+          to: shop
+        - text: "Just looking."
+
+ray:
+  speaker: RAY
+  starts:
+    - if: {flag: boat_job}
+      node: job
+  start: hello
+  nodes:
+    hello:
+      text: "A big man in coveralls is rebuilding a carburetor with the patience of someone who has decided not to be in a hurry ever again. \"Bench is open. Tools are on the wall. Put 'em back.\" He doesn't look up. \"If you want to make something, you make it there. That's all a workbench is: permission.\""
+      options:
+        - text: "[Leave]"
+    job:
+      text: "\"Odette send you about the SECOND CHAPTER?\" He wipes his hands. \"Fuel line. You want one scrap for a clamp and a roll of tape. Crate by the bench has both. Make it at the bench, then go fit it.\" He finally looks up. \"And if a little white drone sits up when you start that motor, don't let it finish rating you.\""
+      options:
+        - text: "Thanks, Ray."

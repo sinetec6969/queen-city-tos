@@ -72,3 +72,19 @@ rate_your_experience:
     2: "The service elevator goes to the Crown. The Concierge is waiting for you. So is Teo."
     3: "You rated your experience. The Concierge would like to discuss your feedback."
     done: "The Concierge is offline. Teo is free. Something at Lake Norman is still listening."
+
+release_notes:
+  name: Release Notes
+  main: true
+  stages:
+    1: "You're at Lake Norman, and something new is rating everything. Find people who live here. The sign says Cornelius Marina has gas, food and opinions."
+    2: "Odette at the marina says the SECOND CHAPTER at the shore just needs a new fuel line. Craft a Fuel Line Patch at Ray's workbench."
+    3: "You have a Fuel Line Patch. Fit it to the SECOND CHAPTER at the shore."
+    4: "The SECOND CHAPTER runs. Something on the water heard it start."
+    done: "You have a boat. QA knows you're here."
+
+known_issues:
+  name: Known Issues
+  main: true
+  stages:
+    1: "Odette says the Davidson radio net has been talking about people going missing after their houses were rated below four stars. Go to Davidson."

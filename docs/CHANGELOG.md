@@ -1,5 +1,31 @@
 # Changelog
 
+## 0.8.0 — Chapter two, quest 1: Release Notes (2026-11-25)
+
+**Content**
+- **The shore** (`locations/ch2_lake_norman.yaml`, formerly a teaser) is now chapter two's start.
+  - *Release Notes* begins on arrival.
+  - The radio buoy carries **QA's first message, which depends on your chapter one rating** (one star, three stars, declined, or none on file).
+  - The boat *SECOND CHAPTER* is a repair job.
+  - A dormant **Rating Drone** (new enemy) wakes when the motor starts.
+- **Cornelius Marina** (`locations/ch2_cornelius.yaml`), the chapter two hub:
+  - Odette (quest giver), Dewey's shop, Ray (mechanic), a parts crate.
+  - The whole marina counts as a workbench.
+- New `key` item and recipe: the **Fuel Line Patch** (1 scrap + 1 duct tape; recipe unlocked by Odette's job).
+- Quests: *Release Notes* (4 stages + done) and the *Known Issues* hook.
+- **Map:**
+  - Cornelius is reachable from the shore by road.
+  - Every other lake place needs the boat (`has_boat`).
+  - Lake travel encounters also need the boat, since they're about boats.
+- Recipes whose only requirement is a story flag now say "You don't know what this is for yet."
+
+**Tests**
+- Engine: quest 1 from a full chapter-one playthrough, and from a minimal chapter-two save.
+- Both check QA's rating-specific greeting.
+- The UI and line runs play quest 1 after chapter one (Odette, crate, crafting the patch, the boat, the drone).
+- **Balance:** 24 seeds from a minimal level-6 save: 0 deaths, ending at 34–57 of 57 HP.
+- **Airtime:** the chapter one→two arrival was 1,085 B. QA's message moved from the arrival onto the buoy, bringing it to 967 B, in line with chapter one's largest scene changes. Mean is unchanged (164 B).
+
 ## 0.7.0 — Chapter two systems (2026-11-25)
 
 No new quests. This build adds the systems chapter two (*Quality Assurance*, Lake Norman / McGuire Station) is built on. Every system works in both the Textual UI and line mode, and chapter one plays exactly as before.

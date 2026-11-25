@@ -461,12 +461,42 @@ def test_quests_1_to_6():
     r = send(s, "w")
     assert s.mode == "city" and "LAKE NORMAN - MAP" in r
     r = send(s, str(s.city_order.index("mcguire") + 1))
-    assert "isn't built yet" in r
+    assert "SERVICE UNAVAILABLE" in r, "the rest of the lake needs the boat"
     r = send(s, str(s.city_order.index("ln_charlotte") + 1))
     assert "CHARLOTTE - MAP" in r and s.state.location == "city:lake_norman"
     send(s, str(s.city_order.index("lake_norman") + 1))
     send(s, str(s.city_order.index("ln_shore") + 1))
     assert s.state.location == "lake_norman"
+
+    # ---- chapter two, quest 1: Release Notes ----
+    assert s.state.quests["release_notes"] == 1
+    walk(s, 5, 2)
+    assert "fuel line" in send(s, "e").lower()
+    walk(s, 1, 2)
+    send(s, "w")
+    send(s, str(s.city_order.index("cornelius") + 1))
+    assert s.state.location == "cornelius_marina"
+    walk(s, 2, 3)
+    send(s, "n")  # Odette
+    talk(s, 2, 1)
+    assert "boat_job" in s.state.flags
+    walk(s, 10, 5)
+    send(s, "s")  # parts crate
+    send(s, "craft fuel")
+    assert p.has("fuel_patch") and s.state.quests["release_notes"] == 3
+    walk(s, 1, 4)
+    send(s, "w")
+    send(s, str(s.city_order.index("ln_shore") + 1))
+    heal(s, 0.9)
+    walk(s, 5, 2)
+    send(s, "e")  # fit it: the drone wakes
+    assert "has_boat" in s.state.flags
+    for _ in range(5):
+        walk(s, 7, 4)
+        fight(s)
+        if "lake_norman:shore_rater" in s.state.taken:
+            break
+    assert s.state.quests["release_notes"] == "done" and s.state.quests["known_issues"] == 1
     send(s, "st")
     send(s, "notes")
     send(s, "notes 1")

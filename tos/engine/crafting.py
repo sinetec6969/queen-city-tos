@@ -48,7 +48,8 @@ def check_recipe(state: GameState, content: Content, rid: str) -> str | None:
     if missing:
         return "Missing " + ", ".join(missing) + "."
     if not check(r.get("requires"), state):
-        return f"Needs {describe_check(r.get('requires'))}."
+        need = describe_check(r.get("requires"))
+        return f"Needs {need}." if need else "You don't know what this is for yet."
     if "mod" in r:
         w = content.item(p.weapon)
         if p.weapon == "fists" or w.get("type") != "weapon":

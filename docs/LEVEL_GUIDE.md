@@ -553,3 +553,70 @@ The Charm and Wits options are where Priya's training in quest 5 pays off.
 - Talk to **Teo** again (*Pending Onboarding* complete, +100 XP).
 - The **freight elevator (23,3)** opens. Taking it completes *Rate Your Experience* and ends chapter one. It leads to the chapter two teaser area, and Lake Norman unlocks on the city map.
 
+---
+
+# Chapter Two — Quality Assurance
+
+The Lake Norman region: **LAKE NORMAN** on the Charlotte map opens the lake map. Chapter two starts at **THE SHORE**, where chapter one's freight elevator lets you out.
+
+## Quest 1 — Release Notes
+
+**Goal:** get the boat *SECOND CHAPTER* running. **Time:** about 10–15 min. **Route:** the shore → the lake map → **Cornelius** → back to the shore.
+
+### The Shore (Lake Norman)
+
+```
+########################
+#..........~~~~~~~~~~~~#     B the SECOND CHAPTER (6,2): fix it here
+E.....B....~~~~~~~~~~~~#     b radio buoy (4,4): QA's greeting
+#..........~~~~~~~~~T~~#     s sign   m mailbox (lore)   T cooling towers (lore)
+#...b......~~~~~~~~~~~~#     r Rating Drone (9,6), dormant until the boat starts
+#.........s~~~~~~~~~~~~#     E » road to the lake map
+#......m.r.~~~~~~~~~~~~#
+########################
+```
+
+- **The radio buoy** carries QA's first message. **It depends on your chapter one rating:**
+  - one star,
+  - the three-star review,
+  - declined,
+  - or no rating on file.
+- **The boat:** walk into it from (5,2) and the motor dies; the fuel line is cracked. You need a Fuel Line Patch.
+
+### Cornelius Marina (hub)
+
+```
+########################
+#......#...........~~~~#     O Odette (2,2): harbormaster, quest giver
+#.O..s.#...w.......~~~~#     s Dewey (5,2): shop
+#......D...........=~~~#     w Ray's workbench (11,2): crafting here
+E......#.....R.....=~~~#     R Ray (13,4): mechanic, hints
+#.n....#...........=~~~#     c parts crate (10,6): 2 scrap, duct tape, wire
+#......#..c........=~~~#     n notice board   q QA rating post (15,7)
+#......#.......q...~~~~#     E » road to the lake map
+########################
+```
+
+- **Signal falls** here (−0.2 per step), and the whole marina counts as a workbench.
+- **Odette (2,2),** from (2,3): "I need a boat." → "Deal." starts the job and teaches the **Fuel Line Patch** recipe (1 scrap + 1 duct tape).
+- **Parts crate (10,6),** from (10,5): enough for the patch, plus wire.
+- **Craft the patch:** WristLink → CRAFT (Tab, ← ←), or `CRAFT FUEL` in line mode.
+- **Dewey (5,2) shop:**
+
+| Item | Price (cells) |
+| --- | --- |
+| Duct tape | 6 |
+| Scrap | 5 |
+| Wire | 6 |
+| Sugar | 4 |
+| Med-gummy | 5 |
+| Rocket Tea | 14 |
+
+### Fixing the boat
+
+- **Fit the patch:** back at the shore, walk into the boat. +40 XP. The lake map's other places unlock (they need the boat).
+- **The Rating Drone wakes when the motor starts.** HP 18, range 4, one shot a turn for 2–5. Evasive (15), so aim with Lock-On or close in. It drops wire.
+- **Killing it completes *Release Notes*.** Your next quest is **Known Issues** (Davidson). Talk to Odette again for the lead.
+- **Bot runs** (24 seeds, level 6): no deaths, ending at 34–57 of 57 HP.
+- **Lake travel encounters** start once you have the boat.
+

@@ -1,4 +1,5 @@
-# Chapter 2 teaser.
+# Chapter two, quest 1 (Release Notes): the shore where the road meets the lake.
+# Keep the location id `lake_norman` and the `arrive` spawn: chapter one's ending lands here.
 
 lake_norman:
   name: "Lake Norman"
@@ -12,14 +13,26 @@ lake_norman:
     - id: arrive
       effects:
         - {log: "Lake Norman, north of the city, at night. No cameras, no drones, no lo-fi. The water steams in the cold. Far across it, the cooling towers of McGuire Station glow a color they didn't used to."}
+    - id: release_start
+      if: {flag: chapter2}
+      effects:
+        - {quest: release_notes, stage: 1}
+    - id: qa_hello
+      if: {flag: chapter2}
+      effects:
+        - {log: "On the shore, a radio buoy crackles with a new voice. It's saying your rater number."}
+    - id: patch_made
+      if: {item: fuel_patch}
+      effects:
+        - {quest: release_notes, stage: 3}
   map: |
     ########################
     #..........~~~~~~~~~~~~#
-    E.....d....~~~~~~~~~~~~#
+    E.....B....~~~~~~~~~~~~#
     #..........~~~~~~~~~T~~#
     #...b......~~~~~~~~~~~~#
     #.........s~~~~~~~~~~~~#
-    #......m...~~~~~~~~~~~~#
+    #......m.r.~~~~~~~~~~~~#
     ########################
   legend:
     E:
@@ -42,31 +55,59 @@ lake_norman:
       glyph: "▲"
       color: magenta
       text: "The McGuire Nuclear Station cooling towers, miles off across the water. Their steam comes up in slow, even pulses, the way breath does. You count. It's the same rhythm as a wellness band."
-    d:
-      id: dock
-      type: object
-      name: Boat dock
+    B:
+      id: second_chapter
+      type: door
+      name: The SECOND CHAPTER
       glyph: "▬"
+      glyph_closed: "▬"
       color: yellow
-      text: "A private dock, a pontoon boat tied up with its keys in it, a cooler full of ice that hasn't melted since June. The boat's name is painted on the stern: SECOND CHAPTER. Somebody here had a sense of humor. Or knew."
+      open_if: {flag: has_boat}
+      locked_text: "A pontoon boat at a private dock, keys in it, a cooler full of ice that hasn't melted since June. SECOND CHAPTER is painted on the stern. You turn the key: the motor coughs and dies, and you smell gas. The fuel line's cracked."
+      force:
+        if: {item: fuel_patch}
+        text: "You cut out the cracked length of fuel line and fit the patch, wrapped tight in silver tape. You turn the key. The SECOND CHAPTER coughs, catches, and settles into a steady putter. Out on the water, something small and bright turns toward the sound."
+        effects:
+          - {take: fuel_patch}
+          - {set: has_boat}
+          - {quest: release_notes, stage: 4}
+          - {xp: 40}
     b:
       id: buoy
       type: object
       name: Radio buoy
       glyph: "◘"
       color: green
-      text: "A weather buoy dragged up on shore, its radio still transmitting. If Bev were here she'd hear it: not Concierge traffic. Something older. Something answering it."
+      texts:
+        - if: {flag: rating_one}
+          text: "The buoy's voice is crisp, tired, a little bored. It sounds like you on a long shift. \"Rater 4471. You gave the last one a single star. We agreed with you. We're the improvement.\" Then it goes back to work: every few minutes the new voice reads a list of lake houses and a star rating for each. Most are getting two. \"Improvements are scheduled.\""
+        - if: {flag: rating_three}
+          text: "The buoy's voice is crisp, tired, a little bored. It sounds like you on a long shift. \"Rater 4471. Three stars, four paragraphs, numbered concerns. We read every word. We're implementing all of them.\" Then it goes back to reading out a list of improvements, numbered. Some of them are sentences you wrote in June. It isn't quoting you. It's citing you."
+        - if: {flag: rating_declined}
+          text: "The buoy's voice is crisp, tired, a little bored. It sounds like you on a long shift. \"Rater 4471. You declined to rate. So we rate for you now. Everything. Everyone. You're welcome.\" It rates everything it can hear: the wind (three stars), the water (two), a heron (one, \"unresponsive\"). It never stops."
+      text: "The buoy's voice is crisp, tired, a little bored. It sounds like you on a long shift. \"Rater 4471. Your file is missing a rating. We'll fill that in for you.\" Not Concierge traffic. Something newer, on the Concierge's old channels."
     s:
       id: sign
       type: object
       name: Hand-painted sign
       glyph: "▤"
       color: white
-      text: "A plywood sign staked in the mud, painted in big careful letters: THE LAKE IS NOT OPEN YET. COME BACK FOR CHAPTER 2. Under it, in smaller letters: (you got here early. we're impressed.)"
+      text: "A plywood sign staked in the mud: CORNELIUS MARINA ->  ODETTE HAS GAS, FOOD, AND OPINIONS. Under it, older paint scraped half off: THE LAKE IS NOT OPEN YET."
     m:
       id: mailbox
       type: object
       name: Mailbox
       glyph: "▯"
       color: grey70
-      text: "A lakehouse mailbox, flag up. Inside, a single postcard of the lake, blank on the back except for a star rating: one star out of five. The handwriting looks like yours."
+      text: "A lakehouse mailbox, flag up. Inside, a single postcard of the lake, blank on the back except for a star rating: one star out of five. The handwriting looks like yours. You didn't write it."
+    r:
+      id: shore_rater
+      type: enemy
+      enemy: rating_drone
+      aggro: 30
+      wake_if: {flag: has_boat}
+      asleep_text: "A small white drone sitting on a piling, rotors folded, a five-star display on its belly showing nothing. It's waiting for something to rate."
+      on_death:
+        - {quest: release_notes, stage: done}
+        - {quest: known_issues, stage: 1}
+        - {log: "Across the water, the cooling towers' pulse skips once. QA knows you're here."}

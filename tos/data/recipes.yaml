@@ -49,3 +49,10 @@ overcharged_coil:
   inputs: {wire: 2, scrap: 2}
   requires: {stat: Wits, gte: 3}
   mod: {applies: ranged, dmg: 2}
+
+fuel_patch:
+  name: Fuel Line Patch
+  desc: "For the SECOND CHAPTER's cracked fuel line."
+  inputs: {scrap: 1, duct_tape: 1}
+  requires: {flag: boat_job}
+  output: {item: fuel_patch}

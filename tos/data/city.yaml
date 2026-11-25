@@ -102,41 +102,43 @@ nodes:
     x: 38
     y: 10
     unlocked_if: {flag: chapter2}
+    location: cornelius_marina
+    spawn: road
     blurb: "Marinas and lake houses. Somebody's generator is running."
   davidson:
     name: DAVIDSON
     region: lake_norman
     x: 42
     y: 13
-    unlocked_if: {flag: chapter2}
+    unlocked_if: {flag: has_boat}
     blurb: "A college town that kept its library open, mostly out of spite."
   mooresville:
     name: MOORESVILLE
     region: lake_norman
     x: 36
     y: 3
-    unlocked_if: {flag: chapter2}
+    unlocked_if: {flag: has_boat}
     blurb: "Race shops. Every garage door is open and every engine is cold."
   state_park:
     name: STATE PARK
     region: lake_norman
     x: 20
     y: 1
-    unlocked_if: {flag: chapter2}
+    unlocked_if: {flag: has_boat}
     blurb: "Trails, campsites, and a ranger station with its lights on."
   the_islands:
     name: THE ISLANDS
     region: lake_norman
     x: 26
     y: 7
-    unlocked_if: {flag: chapter2}
+    unlocked_if: {flag: has_boat}
     blurb: "Little islands in the middle of the lake. Boats only."
   mcguire:
     name: MCGUIRE STATION
     region: lake_norman
     x: 10
     y: 12
-    unlocked_if: {flag: chapter2}
+    unlocked_if: {flag: has_boat}
     blurb: "The cooling towers breathe in slow, even pulses. Something in there is listening."
   ln_charlotte:
     name: CHARLOTTE (I-77)

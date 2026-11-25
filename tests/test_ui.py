@@ -572,6 +572,56 @@ async def main():
         await press(pilot, app, "enter")
         app.rng = real_rng
         assert app.state.location == "noda" and app.state.player.inventory.get("sugar", 0) == sugar + 1
+
+        # ---- CHAPTER TWO, QUEST 1: Release Notes ----
+        await walk(pilot, app, 1, 4)
+        await press(pilot, app, "left")
+        scr = app.screen
+        for _ in range(scr.cursor - scr.order.index("lake_norman")):
+            await press(pilot, app, "up")
+        await press(pilot, app, "enter")  # gateway to the lake map
+        scr = app.screen
+        assert scr.region_id == "lake_norman"
+        for _ in range(scr.order.index("cornelius") - scr.cursor):
+            await press(pilot, app, "down")
+        for _ in range(scr.cursor - scr.order.index("cornelius")):
+            await press(pilot, app, "up")
+        await press(pilot, app, "enter")
+        assert app.state.location == "cornelius_marina", app.state.location
+        await shot(app, "40_marina")
+        await walk(pilot, app, 2, 3)  # Odette (2,2)
+        await press(pilot, app, "up")
+        assert isinstance(app.screen, DialogueScreen)
+        await press(pilot, app, "2", "1")  # "I need a boat." / "Deal."
+        assert "boat_job" in app.state.flags
+        await walk(pilot, app, 10, 5)
+        await press(pilot, app, "down")  # parts crate
+        await press(pilot, app, "tab", "left", "left")  # CRAFT
+        scr = app.screen
+        for _ in range(list(app.content.recipes).index("fuel_patch")):
+            await press(pilot, app, "down")
+        await press(pilot, app, "enter")
+        assert app.state.player.has("fuel_patch"), scr.flash
+        await press(pilot, app, "tab")
+        assert app.state.quests["release_notes"] == 3
+        await walk(pilot, app, 1, 4)
+        await press(pilot, app, "left")
+        scr = app.screen
+        for _ in range(scr.order.index("ln_shore") - scr.cursor):
+            await press(pilot, app, "down")
+        await press(pilot, app, "enter")
+        assert app.state.location == "lake_norman"
+        await heal_up(pilot, app, 0.9)
+        await walk(pilot, app, 5, 2)
+        await press(pilot, app, "right")  # fit the patch: the drone wakes
+        assert "has_boat" in app.state.flags
+        for _ in range(5):
+            await walk(pilot, app, 7, 4)
+            await fight(pilot, app)
+            if "lake_norman:shore_rater" in app.state.taken:
+                break
+        assert app.state.quests["release_notes"] == "done", app.state.quests.get("release_notes")
+        await shot(app, "41_release_notes_done")
         print("tips shown:", TIPS_SEEN)
         print("UI playthrough OK. HP", app.state.player.hp, "/", app.state.player.max_hp,
               "LV", app.state.player.level, "signal", int(app.state.player.signal))
