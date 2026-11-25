@@ -16,6 +16,7 @@ teo:
     3: "Delia says the Opt-Outs in NoDa have been watching Uptown since June. They might know where Teo is."
     4: "Priya's photos show a June bus unloading at Romare Bearden Park. One of the faces might be Teo's. Getting into Uptown means blinding it first."
     5: "The relay is down. Uptown is blind. Teo is in there somewhere. Go back to Mags and plan the way in."
+    6: "Teo is somewhere in the Bank of America Corporate Center. The onboarding shuttles go in at 2 a.m. So do you."
 
 last_mile:
   name: Last Mile
@@ -52,3 +53,12 @@ service_interruption:
     2: "Ruth is waiting on Central Avenue, by the old car wash. The relay yard is behind the fence."
     3: "Ruth cut the fence. Get into the relay yard, get past whatever is guarding it, and blow the relay cabinet."
     done: "The relay is down. Uptown is blind."
+
+scheduled_downtime:
+  name: Scheduled Downtime
+  main: true
+  stages:
+    1: "The Opt-Outs are moving to a forward base in Third Ward, an old print shop on the edge of Uptown. Get there while the cameras are down."
+    2: "The safehouse is up. Get patched up, see Ruth about your gear, train with Priya, and scout Romare Bearden Park for the way into the tower."
+    3: "You found the shuttle route the onboarding buses use into the tower. Tell Mags when you're ready."
+    done: "Ready. Teo is in the tower."

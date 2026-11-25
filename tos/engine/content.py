@@ -10,6 +10,8 @@ Content files never touch Python. Conditions and effects are small dicts:
               {cells: n} {xp: n} {quest: id, stage: 2|done} {note: [title, body]}
               {log: text} {signal: n} {heal: n} {game_over: text}
               {companion: id} {take_entity: "loc:entity"} (removes it from the world)
+              {stat_up: Aim, n: 1} (permanent, capped at STAT_CAP)
+              {max_hp: n} (permanent max-HP bonus; also heals that much)
 
 Enemy entities may also carry `on_death: [effects]` and
 `phases: [{hp_below: 0.5, effects: [...]}]` (each phase runs once, the first time
@@ -22,7 +24,7 @@ from pathlib import Path
 
 import yaml
 
-from .state import GameState
+from .state import STAT_CAP, GameState
 
 DATA = Path(__file__).resolve().parent.parent / "data"
 # libyaml's loader is ~10x faster; it matters on a Pi, where every packet connection starts a new process
@@ -164,6 +166,19 @@ def apply_effects(effects, state: GameState, content: Content) -> list[tuple]:
             state.flags.add(e["companion"])
         elif "take_entity" in e:
             state.taken.add(e["take_entity"])
+        elif "stat_up" in e:
+            st_name, n = e["stat_up"], e.get("n", 1)
+            before = p.stats[st_name]
+            p.stats[st_name] = min(STAT_CAP, before + n)
+            p.recalc()
+            gained = p.stats[st_name] - before
+            events.append(("log", f"{st_name} +{gained} (now {p.stats[st_name]})" if gained
+                           else f"{st_name} is already as high as it goes."))
+        elif "max_hp" in e:
+            p.hp_bonus += e["max_hp"]
+            p.recalc()
+            p.hp = min(p.max_hp, p.hp + e["max_hp"])
+            events.append(("log", f"Max HP +{e['max_hp']} (now {p.max_hp})"))
         else:
             raise ValueError(f"unknown effect {e!r}")
     return events

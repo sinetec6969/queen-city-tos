@@ -63,3 +63,31 @@ thermite:
   name: Thermite Charge
   type: key
   desc: "A taped brick with a pull tab and SORRY written on it in marker. Tape it to the relay's main bus bar, pull, walk away. Don't run."
+
+breaker_bar:
+  name: Breaker Bar
+  type: weapon
+  melee: true
+  ap: 3
+  dmg: [6, 9]
+  acc: 5
+  range: 1
+  desc: "Two feet of chrome-moly steel for loosening lug nuts that don't want to move. Neither does anything you hit with it."
+
+nailer_mk2:
+  name: Ruth's Nailer
+  type: weapon
+  melee: false
+  ap: 3
+  dmg: [5, 8]
+  acc: 10
+  range: 6
+  ammo: nails
+  desc: "Ruth rebuilt it with a lighter trigger and a longer barrel and scratched SORRY into the grip. Fires faster than the stock nail gun and hits what you point it at."
+
+rocket_tea:
+  name: Rocket Tea
+  type: aid
+  heal: 25
+  use_text: "Sweet tea, reduced on a camp stove to something closer to syrup, with three espresso shots. Your heart files a formal objection. You feel invincible."
+  desc: "Heals 25 HP. Doc says one a day. Doc says a lot of things."

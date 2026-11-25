@@ -1,0 +1,223 @@
+# Quest 5: Scheduled Downtime. The Opt-Outs' forward base in Third Ward, and Romare Bearden Park.
+# A staging level before the quest 6 boss: heal, upgrade, scout.
+
+third_ward:
+  name: "Third Ward Safehouse"
+  district: UPTOWN EDGE
+  signal_rate: -0.4
+  tags: [indoor, unmanaged]
+  spawns:
+    city: [1, 3]
+    park: [22, 7]
+  rules:
+    - id: arrive
+      effects:
+        - {quest: scheduled_downtime, stage: 2}
+        - {log: "Third Ward. The print shop's windows are papered over with old concert posters. Inside: cots, a coffee urn, a table buried in maps, and every Opt-Out who could carry a bag. Out the back, the towers of Uptown, dark at the top for the first time since June."}
+  map: |
+    ################X#######
+    #......#..M.........R..#
+    #..k...#....ttt.....w..#
+    E......D...............#
+    #..h...#...........p...#
+    #......#..C...nnn......#
+    #......#####.###########
+    #......................P
+    ########################
+  legend:
+    E:
+      id: ward_west
+      type: door
+      name: Fourth Street
+      glyph: "»"
+      to: {city: uptown}
+    P:
+      id: park_gate
+      type: door
+      name: To Romare Bearden Park
+      glyph: "»"
+      to: {location: bearden_park, spawn: ward}
+    X:
+      id: crown_door
+      type: door
+      name: Back door, toward the Crown
+      open_if: {flag: crown_open}
+      locked_text: "The back door, toward the towers. Mags has taped a sign to it: NOT YET. Under that, smaller, in someone else's handwriting: (the next part isn't built yet)"
+    D:
+      id: shop_door
+      type: door
+      name: Print shop door
+      glyph: "/"
+    k:
+      id: ward_kiosk
+      type: terminal
+      name: Concierge kiosk
+      text: "A sidewalk CONCIERGE CITY INFO kiosk, screen cracked, still on. \"Hello, visitor! Admin login required for city services.\""
+      hack: {length: 5, words: 8}
+      on_success:
+        - {log: "The kiosk's admin page: CITY STATUS: CALM. CAMERAS: 0 OF 4,112 ONLINE (SCHEDULED DOWNTIME). WELLNESS: EXCELLENT. Under that, a ticker: \"Repairs are underway. We apologize for any visibility.\""}
+      on_fail:
+        - {signal: 10}
+        - {log: "The kiosk reboots with a cheerful chime. Down the block, a dog barks at it."}
+    h:
+      id: hollis_ward
+      type: npc
+      name: Hollis
+      dialogue: hollis_ward
+    M:
+      id: mags_ward
+      type: npc
+      name: Mags
+      dialogue: mags_ward
+    t:
+      id: map_table
+      type: object
+      name: Planning table
+      glyph: "▦"
+      color: white
+      text: "The planning table. A hand-drawn floor plan of the Bank of America Corporate Center, Priya's photos pinned to every floor she could see through a window, and a coffee ring over the lobby that Mags keeps tapping."
+    R:
+      id: ruth_ward
+      type: npc
+      name: Ruth
+      dialogue: ruth_ward
+    w:
+      id: workbench
+      type: object
+      name: Ruth's workbench
+      glyph: "▬"
+      color: yellow
+      text: "Ruth's workbench: a vise, three nail guns in pieces, a soldering iron, and a jar labeled THERMITE (EMPTY) (SORRY)."
+    p:
+      id: priya_ward
+      type: npc
+      name: Priya
+      dialogue: priya_ward
+    C:
+      id: doc
+      type: npc
+      name: Doc
+      dialogue: doc
+    n:
+      id: cots
+      type: object
+      name: Cots
+      glyph: "▭"
+      color: grey70
+      text: "Army-surplus cots in a row. Somebody has made one up with hospital corners and a mint on the pillow. The mint is a med-gummy. You leave it. It feels like a trap. It isn't. It's just Doc."
+
+bearden_park:
+  name: "Romare Bearden Park"
+  district: UPTOWN EDGE
+  signal_rate: 0.3
+  tags: [street, park]
+  spawns:
+    ward: [1, 3]
+  rules:
+    - id: arrive
+      effects:
+        - {log: "Romare Bearden Park, in the shadow of the towers. The waterfall wall still runs. The lawn is full of folding chairs in neat rows, facing Uptown, all empty. Every camera on every pole is pointed at the ground, asleep."}
+  map: |
+    ########################
+    #.~~~~.......c.........#
+    #..........b....g......#
+    W.........ooo.........S#
+    #..L.......o...........#
+    #...........o.......d..#
+    #......f...............#
+    #...............T......#
+    ########################
+  legend:
+    W:
+      id: park_west
+      type: door
+      name: Back to the safehouse
+      glyph: "«"
+      to: {location: third_ward, spawn: park}
+    "~":
+      id: waterfall
+      type: object
+      name: Waterfall wall
+      glyph: "≈"
+      color: blue
+      text: "The waterfall wall, still running. A plaque on the wall talks about the artist the park is named for, collage and jazz and Charlotte. Someone has wedged a paper flower into the plaque's frame. It's fresh."
+    c:
+      id: grounds_cart
+      type: item
+      name: Groundskeeper's cart
+      glyph: "▤"
+      item: breaker_bar
+      text: "A groundskeeper's cart, abandoned mid-shift in June. Under a tarp: a breaker bar, two feet of chrome-moly steel. It's heavier than the tire iron and feels like it has opinions."
+    b:
+      id: bench_note
+      type: object
+      name: Bench
+      glyph: "▬"
+      color: grey70
+      text: "A park bench with a brass plaque: FOR GRANDMA, WHO SAT HERE EVERY SUNDAY. Someone has scratched underneath: SHE STILL DOES. SHE DOESN'T KNOW WHY."
+    o:
+      id: chairs
+      type: object
+      name: Folding chairs
+      glyph: "▪"
+      color: grey50
+      text: "Rows of white folding chairs facing the towers, set up for an audience. A program on one seat: WELCOME ORIENTATION: YOUR NEW CALM. 2 A.M. NIGHTLY. Nobody's coming tonight. The cameras are down."
+    g:
+      id: park_greeter
+      type: enemy
+      enemy: greeter
+      aggro: 6
+      wake_if: {signal_gte: 50}
+      asleep_text: "A Greeter by the chairs, rebooting slowly, its face screen showing a loading spinner. Without the relay it can't see much. It notices people with high Signal."
+    d:
+      id: park_drone
+      type: enemy
+      enemy: courier_drone
+      aggro: 4
+    L:
+      id: parcel_lockers
+      type: terminal
+      name: Parcel lockers
+      text: "A bank of CONCIERGE PARCEL LOCKERS. Screen: \"DELIVERIES HELD FOR ONBOARDED RESIDENTS. Admin override required.\""
+      hack: {length: 6, words: 8}
+      done_if: {flag: lockers_open}
+      done_text: "PARCEL LOCKERS // ALL DOORS OPEN // \"Thank you for picking up!\""
+      on_success:
+        - {set: lockers_open}
+        - {give: nails, n: 24}
+        - {give: rocket_tea}
+        - {cells: 20}
+        - {xp: 35}
+        - {log: "Every locker door pops at once. Most hold wellness gummies, 120-count. One holds nails. One holds a jar of something Doc would call Rocket Tea. A few hold AA batteries. You take what's useful."}
+      on_fail:
+        - {signal: 15}
+        - {log: "The lockers reboot. Every door clicks, testing itself, and stays shut."}
+    f:
+      id: food_cart
+      type: item
+      name: Hot dog cart
+      glyph: "▣"
+      items:
+        - {id: sweet_tea, n: 1}
+        - {id: med_gummy, n: 2}
+      text: "A hot dog cart, umbrella still up. No hot dogs. In the cooler: a gallon of sweet tea and two med-gummies, and a sign: \"PAY WHAT YOU WANT. NOBODY'S WATCHING.\" For once that's true."
+    S:
+      id: shuttle
+      type: object
+      name: Onboarding shuttle
+      glyph: "▀"
+      color: white
+      text: "A white shuttle bus, engine off, door open, lights still on inside. Every seat has a folded grey blanket and a paper cup of water."
+      effects:
+        - {quest: scheduled_downtime, stage: 3}
+        - {quest: teo, stage: 6}
+        - {xp: 40}
+        - {note: ["The shuttle route", "Route card on the shuttle's dash: ROMARE BEARDEN PARK -> BANK OF AMERICA CORPORATE CENTER, LOADING DOCK B. DEPARTS 2:00 A.M. NIGHTLY. PASSENGERS: CALM. DRIVER: NOT REQUIRED."]}
+        - {log: "On the dash, a laminated route card. This is how they go in. This is how Teo went in."}
+    T:
+      id: ballpark_gate
+      type: object
+      name: Ballpark gate
+      glyph: "▯"
+      color: grey70
+      text: "The ballpark gate across the street, chained. The scoreboard still shows a game from June 7. Home team up by two in the eighth. It never finished."

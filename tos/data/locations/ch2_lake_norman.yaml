@@ -1,0 +1,72 @@
+# Chapter 2 teaser.
+
+lake_norman:
+  name: "Lake Norman"
+  district: LAKE NORMAN
+  signal_rate: 0.0
+  tags: [outdoor]
+  spawns:
+    arrive: [3, 4]
+    city: [1, 2]
+  rules:
+    - id: arrive
+      effects:
+        - {log: "Lake Norman, north of the city, at night. No cameras, no drones, no lo-fi. The water steams in the cold. Far across it, the cooling towers of McGuire Station glow a color they didn't used to."}
+  map: |
+    ########################
+    #..........~~~~~~~~~~~~#
+    E.....d....~~~~~~~~~~~~#
+    #..........~~~~~~~~~T~~#
+    #...b......~~~~~~~~~~~~#
+    #.........s~~~~~~~~~~~~#
+    #......m...~~~~~~~~~~~~#
+    ########################
+  legend:
+    E:
+      id: ln_road
+      type: door
+      name: Road back to the city
+      glyph: "»"
+      to: {city: lake_norman}
+    "~":
+      id: lake
+      type: object
+      name: Lake Norman
+      glyph: "≈"
+      color: blue
+      text: "The lake is warm. Bathwater warm, in November. Fish float near the surface, not dead, just resting, like they're waiting for something. Out in the middle, the water is perfectly still in a perfect circle."
+    T:
+      id: towers
+      type: object
+      name: McGuire cooling towers
+      glyph: "▲"
+      color: magenta
+      text: "The McGuire Nuclear Station cooling towers, miles off across the water. Their steam comes up in slow, even pulses, the way breath does. You count. It's the same rhythm as a wellness band."
+    d:
+      id: dock
+      type: object
+      name: Boat dock
+      glyph: "▬"
+      color: yellow
+      text: "A private dock, a pontoon boat tied up with its keys in it, a cooler full of ice that hasn't melted since June. The boat's name is painted on the stern: SECOND CHAPTER. Somebody here had a sense of humor. Or knew."
+    b:
+      id: buoy
+      type: object
+      name: Radio buoy
+      glyph: "◘"
+      color: green
+      text: "A weather buoy dragged up on shore, its radio still transmitting. If Bev were here she'd hear it: not Concierge traffic. Something older. Something answering it."
+    s:
+      id: sign
+      type: object
+      name: Hand-painted sign
+      glyph: "▤"
+      color: white
+      text: "A plywood sign staked in the mud, painted in big careful letters: THE LAKE IS NOT OPEN YET. COME BACK FOR CHAPTER 2. Under it, in smaller letters: (you got here early. we're impressed.)"
+    m:
+      id: mailbox
+      type: object
+      name: Mailbox
+      glyph: "▯"
+      color: grey70
+      text: "A lakehouse mailbox, flag up. Inside, a single postcard of the lake, blank on the back except for a star rating: one star out of five. The handwriting looks like yours."

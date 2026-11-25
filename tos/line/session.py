@@ -658,7 +658,7 @@ class Session:
                 self.finish_hack(self.hack.result)
 
     def finish_hack(self, ok: bool | None) -> None:
-        events = [] if ok is None else self.loc.terminal_result(self.hack_eid, bool(ok))
+        events = [] if ok is None else self.loc.terminal_result(self.hack_eid, bool(ok), self.hack.hit)
         self.hack = None
         self.resume_after_modal(events)
 

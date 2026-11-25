@@ -1,4 +1,4 @@
-"""Line-mode (packet radio) frontend: scripted playthrough of quests 1-4 using text
+"""Line-mode (packet radio) frontend: scripted playthrough of quests 1-5 using text
 commands only, plus entry-point checks. Prints reply sizes and an airtime estimate.
 
 Run: python tests/test_line.py
@@ -128,7 +128,7 @@ def new_session(seed=11, slot="TEST1"):
     return s
 
 
-def test_quests_1_to_4():
+def test_quests_1_to_5():
     s = new_session()
     send(s, "n")
     assert s.mode == "profile"
@@ -360,18 +360,62 @@ def test_quests_1_to_4():
     walk(s, 10, 3)
     send(s, "e")
     assert s.mode == "dialogue" and s.dlg.node_id == "blind"
-    talk(s, 1)
+
+    # ---- quest 5: Scheduled Downtime (prep level) ----
+    talk(s, 1, 1)  # "Where do we go in from?"
+    assert s.state.quests["scheduled_downtime"] == 1
+    walk(s, 1, 4)
+    send(s, "w")
+    send(s, str(s.city_order.index("uptown") + 1))
+    assert s.state.location == "third_ward" and s.state.quests["scheduled_downtime"] == 2
+    p = s.state.player
+    hp_max = p.max_hp
+    walk(s, 10, 4)
+    send(s, "s")  # Doc
+    talk(s, 2, 1, 1, 1, 2)
+    assert p.max_hp == hp_max + 5 and p.hp == p.max_hp
+    walk(s, 18, 4)
+    send(s, "e")  # Priya
+    talk(s, 2, 1)  # listening: Wits +1
+    assert "trained" in s.state.flags
+    walk(s, 19, 1)
+    send(s, "e")  # Ruth
+    talk(s, 1 if p.has("nail_gun") else 2, 1)
+    assert p.has("nailer_mk2")
+    send(s, "eq ruth")
+    assert p.weapon == "nailer_mk2"
+    walk(s, 3, 3)
+    send(s, "s")  # Hollis
+    talk(s, 1, 1, 6)  # two Rocket Teas, leave
+    walk(s, 22, 7)
+    send(s, "e")
+    assert s.state.location == "bearden_park"
+    for target, cmd in (((13, 2), "n"), ((2, 4), "e"), ((21, 3), "e")):
+        for _ in range(4):
+            walk(s, *target)
+            fight(s)
+        send(s, cmd)
+        if s.mode == "hack":
+            send(s, s.hack.password)
+    assert p.has("breaker_bar") and "lockers_open" in s.state.flags
+    assert s.state.quests["scheduled_downtime"] == 3
+    walk(s, 1, 3)
+    send(s, "w")
+    walk(s, 10, 2)
+    send(s, "n")  # Mags
+    talk(s, 1, 1)
+    assert s.state.quests["scheduled_downtime"] == "done"
     send(s, "st")
     send(s, "notes")
     send(s, "notes 1")
     p = s.state.player
-    print(f"  quest 4 end: HP {p.hp}/{p.max_hp} LV {p.level} cells {p.cells}")
+    print(f"  quest 5 end: HP {p.hp}/{p.max_hp} LV {p.level} cells {p.cells}")
     send(s, "bye")
     assert s.done
-    # reconnect: same callsign resumes in NoDa
+    # reconnect: same callsign resumes at the safehouse
     s2 = new_session(slot="TEST1")
     send(s2, "c")
-    assert s2.mode == "explore" and s2.state.location == "noda"
+    assert s2.mode == "explore" and s2.state.location == "third_ward"
 
 
 def test_accept_game_over_and_reload():

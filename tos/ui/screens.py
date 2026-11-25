@@ -331,7 +331,7 @@ class LocationScreen(Screen):
                 self.busy = True
                 eid = ev[1]
                 spec = self.loc.get(eid).data["hack"]
-                self.app.push_screen(HackScreen(spec), lambda ok, eid=eid: self._hack_done(eid, ok))
+                self.app.push_screen(HackScreen(spec), lambda hack, eid=eid: self._hack_done(eid, hack))
             elif kind == "combat":
                 if not self.combat:
                     self.start_combat()
@@ -350,8 +350,8 @@ class LocationScreen(Screen):
         self.queue.extendleft(reversed(events or []))
         self.pump()
 
-    def _hack_done(self, eid: str, ok) -> None:
-        events = [] if ok is None else self.loc.terminal_result(eid, bool(ok))
+    def _hack_done(self, eid: str, hack) -> None:
+        events = [] if hack is None else self.loc.terminal_result(eid, bool(hack.result), hack.hit)
         self._modal_done(events)
 
     def do_exit(self, to: dict) -> None:
@@ -568,7 +568,7 @@ class HackScreen(ModalScreen):
     def on_key(self, event) -> None:
         if self.hack.result is not None:
             event.stop()
-            self.dismiss(self.hack.result)
+            self.dismiss(self.hack)
 
     def action_abort(self) -> None:
         if self.hack.result is None:

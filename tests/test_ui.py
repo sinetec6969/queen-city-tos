@@ -407,6 +407,74 @@ async def main():
         assert "relay_down" in app.state.flags, app.state.pos
         assert app.state.quests["service_interruption"] == "done" and app.state.quests["teo"] == 5
         await shot(app, "28_relay_down")
+
+        # ---- QUEST 5: Scheduled Downtime (prep level) ----
+        for _ in range(3):
+            await walk(pilot, app, 1, 4)
+            await fight(pilot, app)
+        await press(pilot, app, "left")
+        assert app.state.location == "central_ave"
+        for _ in range(4):
+            await walk(pilot, app, 1, 3)
+            await fight(pilot, app)
+        await press(pilot, app, "left")
+        assert isinstance(app.screen, CityScreen)
+        await press(pilot, app, "up", "up")  # Central Ave -> NoDa
+        await press(pilot, app, "enter")
+        await walk(pilot, app, 10, 3)
+        await press(pilot, app, "right")  # Mags: "Where do we go in from?"
+        await press(pilot, app, "1", "1")
+        assert app.state.quests["scheduled_downtime"] == 1
+        await walk(pilot, app, 1, 4)
+        await press(pilot, app, "left")
+        await press(pilot, app, "down", "down", "down")  # NoDa -> Uptown
+        await press(pilot, app, "enter")
+        assert app.state.location == "third_ward", app.state.location
+        assert app.state.quests["scheduled_downtime"] == 2
+        await shot(app, "29_safehouse")
+        p = app.state.player
+        hp_max = p.max_hp
+        await walk(pilot, app, 10, 4)  # Doc (10,5)
+        await press(pilot, app, "down")
+        await press(pilot, app, "2", "1", "1", "1", "2")  # tonic, patch up, leave
+        assert p.max_hp == hp_max + 5 and p.hp == p.max_hp
+        await walk(pilot, app, 18, 4)  # Priya (19,4)
+        await press(pilot, app, "right")
+        await press(pilot, app, "1", "1")  # steady hands
+        assert "trained" in app.state.flags
+        await walk(pilot, app, 19, 1)  # Ruth (20,1)
+        await press(pilot, app, "right")
+        await shot(app, "30_ruth_ward")
+        await press(pilot, app, "1" if p.has("nail_gun") else "2", "1")
+        assert p.has("nailer_mk2")
+        await walk(pilot, app, 3, 3)  # Hollis (3,4)
+        await press(pilot, app, "down")
+        await press(pilot, app, "1", "6")  # Rocket Tea, then leave
+        assert p.has("rocket_tea")
+        await walk(pilot, app, 22, 7)
+        await press(pilot, app, "right")
+        assert app.state.location == "bearden_park", app.state.location
+        await shot(app, "31_park")
+        for target, key in (((13, 2), "up"), ((2, 4), "right"), ((21, 3), "right")):
+            for _ in range(4):
+                await walk(pilot, app, *target)
+                await fight(pilot, app)
+            await press(pilot, app, key)
+            if isinstance(app.screen, HackScreen):
+                await press(pilot, app, *app.screen.hack.password.lower(), "enter")
+                await press(pilot, app, "space")
+        assert p.has("breaker_bar") and "lockers_open" in app.state.flags
+        assert app.state.quests["scheduled_downtime"] == 3
+        for _ in range(3):
+            await walk(pilot, app, 1, 3)
+            await fight(pilot, app)
+        await press(pilot, app, "left")
+        assert app.state.location == "third_ward"
+        await walk(pilot, app, 10, 2)  # Mags (10,1)
+        await press(pilot, app, "up")
+        await press(pilot, app, "1", "1")  # "I'm ready."
+        assert app.state.quests["scheduled_downtime"] == "done" and "ready_for_crown" in app.state.flags
+        await shot(app, "32_ready")
         print("tips shown:", TIPS_SEEN)
         print("UI playthrough OK. HP", app.state.player.hp, "/", app.state.player.max_hp,
               "LV", app.state.player.level, "signal", int(app.state.player.signal))

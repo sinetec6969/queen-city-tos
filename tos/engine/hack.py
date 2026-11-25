@@ -3,6 +3,8 @@ from __future__ import annotations
 
 import random
 
+from . import noise
+
 JUNK = "!@#$%^&*()[]{}<>/\\|;:'\",.?=+-_~"
 
 
@@ -20,6 +22,7 @@ class Hack:
         self.attempts = self.max_attempts = attempts
         self.history: list[tuple[str, int]] = []
         self.result: bool | None = None
+        self.hit: dict | None = None
         self.dump = self._make_dump()
 
     def _make_dump(self, rows: int = 11, width: int = 22) -> list[str]:
@@ -41,6 +44,10 @@ class Hack:
         word = word.strip().upper()
         if self.result is not None:
             return "Session closed."
+        hit = noise.heard(word)
+        if hit is not None:
+            self.result, self.hit = True, hit
+            return hit["say"]
         if word not in self.words:
             return f">{word}\n>Not in prompt buffer."
         self.attempts -= 1

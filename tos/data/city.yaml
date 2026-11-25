@@ -55,6 +55,8 @@ nodes:
     x: 17
     y: 8
     unlocked_if: {flag: relay_down}
+    location: third_ward
+    spawn: city
     blurb: "The Concierge's campus. You can see the Crown from anywhere."
   speedway:
     name: SPEEDWAY
@@ -67,6 +69,8 @@ nodes:
     x: 3
     y: 1
     unlocked_if: {flag: chapter2}
+    location: lake_norman
+    spawn: city
     blurb: "Chapter 2. The lake runs warm near McGuire now."
 links:
   - [south_end, uptown]

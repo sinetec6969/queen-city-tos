@@ -349,5 +349,73 @@ G......................#     K dock controller (3,7): hack to deny Overtime
 - *Pending Onboarding* moves to stage 5.
 - The **Uptown** node unlocks on the city map. It's still "not built yet": that's quest 5.
 
-**Afterwards:** Ruth on Central Avenue and Mags in NoDa both have new lines. Mags is where quest 5 will start.
+**Afterwards:** Ruth on Central Avenue and Mags in NoDa both have new lines. Mags is where quest 5 starts.
+
+---
+
+## Quest 5 — Scheduled Downtime
+
+**Goal:** get ready for the tower. This is a staging level: heal, upgrade, scout. **Time:** about 15 min. **Route:** NoDa (Mags) → city map → **Uptown** (Third Ward safehouse) → Romare Bearden Park → back to the safehouse.
+
+**Starting it:** talk to Mags in NoDa after the relay is down and pick "Where do we go in from?" Mags leaves NoDa for the safehouse, and **Uptown** on the city map takes you there.
+
+### Third Ward Safehouse
+
+```
+################X#######
+#......#..M.........R..#     M Mags (planning; ends the quest)   R Ruth (gear)
+#..k...#....ttt.....w..#     k Concierge kiosk (hack; flavour only)   t planning table   w workbench
+E......D...............#     D print shop door (open)   E » west to the city map
+#..h...#...........p...#     h Hollis (shop, on the sidewalk)   p Priya (training)
+#......#..C...nnn......#     C Doc (healing)   n cots
+#......#####.###########     X back door toward the Crown: locked (quest 6 isn't built yet)
+#......................P     P » east to Romare Bearden Park
+########################
+```
+
+- **Signal falls here** (−0.4 per step).
+- **Doc (10,5), from (10,4):**
+  - "Patch me up": full heal. **Repeatable, free.**
+  - "Got anything stronger?": **+5 max HP, permanently.** One time.
+- **Priya (19,4), from (18,4):** one lesson, **+1 to one stat, permanently**. Pick one: Aim (steady hands), Wits (listening), Brawn (lifting), or Grit (breathing; also raises max HP). Training can take a stat to 6.
+- **Ruth (20,1), from (19,1):** **Ruth's Nailer**: ranged, range 6, 3 AP per shot (the stock nail gun is 4), 5–8 damage, +10 accuracy, uses nails.
+  - Free if you hand over your nail gun.
+  - 25 cells if you never found one.
+- **Hollis (3,4), from (3,3):**
+
+| Item | Price (cells) |
+| --- | --- |
+| Rocket Tea (heals 25) | 14 |
+| Sweet tea | 8 |
+| Med-gummy | 5 |
+| Nails ×12 | 6 |
+| Tinfoil | 10 |
+
+### Romare Bearden Park
+
+```
+########################
+#.~~~~.......c.........#     ~ waterfall wall   c groundskeeper's cart (Breaker Bar)
+#..........b....g......#     b bench   g Greeter (asleep unless Signal 50+)
+W.........ooo.........S#     o folding chairs   S onboarding shuttle (12,3 → 22,3)
+#..L.......o...........#     L parcel lockers (hack)
+#...........o.......d..#     d Courier Drone (awake)
+#......f...............#     f hot dog cart (sweet tea + 2 med-gummies)
+#...............T......#     T ballpark gate (lore)   W « back to the safehouse
+########################
+```
+
+- **Breaker Bar** in the cart (13,1), from (13,2): melee, 6–9 damage, +5 accuracy. The best close-range weapon so far.
+- **Parcel lockers (3,4),** from (2,4): 6-letter hack. +24 nails, a Rocket Tea, 20 cells, 35 XP. Failure = +15 Signal, retry allowed.
+- **Fights are light:** one drone, plus the Greeter only if your Signal is high.
+- **The shuttle (22,3),** from (21,3): reading its route card advances the quest (stage 3) and *Pending Onboarding* (stage 6).
+
+**Finishing:** go back to **Mags (10,1)** and say "I'm ready." That completes *Scheduled Downtime*. Do your healing first: there's no back door once quest 6 starts.
+
+**Recommended loadout for quest 6:**
+- Full HP after Doc, and the tonic taken.
+- Ruth's Nailer with 30+ nails, or the Breaker Bar.
+- Two or more Rocket Teas, and some tinfoil.
+
+Bot runs through quests 1–5 (16 seeds): no deaths, and everyone finishes quest 5 at full HP.
 

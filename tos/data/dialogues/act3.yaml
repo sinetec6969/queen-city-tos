@@ -132,7 +132,18 @@ mags:
     blind:
       text: "The brewery is loud for once. Ossie is typing in all caps. Bev has the headphones off and is grinning at the static. Mags looks up from the photo wall. \"Every camera between here and the Crown, Harlan. Snow. Beautiful snow.\" Then, quieter: \"Now we figure out how to get you inside before they fix it. Sit down. This part we plan.\""
       options:
+        - text: "Where do we go in from?"
+          show_if: {not_flag: ward_go}
+          to: ward_go
         - text: "[Leave]"
+    ward_go:
+      effects:
+        - {set: ward_go}
+        - {quest: scheduled_downtime, stage: 1}
+        - {take_entity: "noda:mags"}
+      text: "\"Third Ward. There's an old print shop on Fourth Street, back door practically on Bearden Park. We're moving everyone tonight.\" She's already rolling up the photo wall. \"Uptown's on the map now, Harlan. Meet us there. Bring everything you own.\""
+      options:
+        - text: "See you there."
     relay:
       text: "\"Central Avenue, past the old car wash. It talks to every camera between here and the Crown. Take it down and Uptown goes blind long enough for someone to walk in.\" She taps the log. \"It won't be unguarded. Nothing the Concierge loves is unguarded.\""
       options:

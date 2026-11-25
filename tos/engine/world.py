@@ -3,6 +3,7 @@ from __future__ import annotations
 
 from collections import deque
 
+from . import noise
 from .content import Content, apply_effects, check
 from .state import GameState
 
@@ -180,6 +181,7 @@ class Location:
             events.append(("exit", ent.data["to"]))
             return events
         events += [("log", m) for m in self.state.add_signal(self.signal_rate)]
+        events += noise.at(self, nx, ny)
         events += self.check_aggro()
         return events
 
@@ -244,7 +246,9 @@ class Location:
         events += self.check_aggro() if not any(ev[0] == "combat" for ev in events) else []
         return events
 
-    def terminal_result(self, eid: str, success: bool) -> list[tuple]:
+    def terminal_result(self, eid: str, success: bool, hit: dict | None = None) -> list[tuple]:
+        if hit:
+            return noise.follow(self.state, self.content, hit)
         e = self.get(eid)
         key = "on_success" if success else "on_fail"
         events = apply_effects(e.data.get(key), self.state, self.content) if e else []

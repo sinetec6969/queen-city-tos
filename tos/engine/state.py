@@ -16,6 +16,7 @@ STAT_BLURBS = {
     "Luck": "Crits, and which way surprises break.",
 }
 STAT_MIN, STAT_MAX, STAT_BUDGET = 1, 5, 15
+STAT_CAP = 6  # training can push one past character creation's max
 SAVE_VERSION = 1
 
 
@@ -31,9 +32,10 @@ class Player:
     cells: int = 12
     inventory: dict = field(default_factory=dict)
     weapon: str = "fists"
+    hp_bonus: int = 0  # permanent max-HP upgrades (the `max_hp` effect)
 
     def recalc(self) -> None:
-        self.max_hp = 20 + 4 * self.stats["Grit"] + 5 * (self.level - 1)
+        self.max_hp = 20 + 4 * self.stats["Grit"] + 5 * (self.level - 1) + self.hp_bonus
         self.hp = min(self.hp, self.max_hp)
 
     def xp_to_next(self) -> int:

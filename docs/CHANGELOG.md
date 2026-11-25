@@ -1,5 +1,36 @@
 # Changelog
 
+## 0.5.0 — Quest 5: Scheduled Downtime (2026-11-25)
+
+**Content**
+- Two new locations in `locations/act5_scheduled_downtime.yaml`:
+  - Third Ward Safehouse: the Opt-Outs' forward base on the Uptown edge. The **Uptown** city node now leads here.
+  - Romare Bearden Park.
+- A staging level before the quest 6 boss. New dialogue in `dialogues/act5.yaml`:
+  - **Doc:** repeatable full heal, plus a one-time permanent +5 max HP.
+  - **Priya:** one-time training, +1 to Aim, Wits, Brawn or Grit (can reach 6).
+  - **Ruth:** builds Ruth's Nailer.
+  - **Hollis:** a shop with Rocket Tea.
+  - **Mags:** planning, and the end of the quest.
+- Mags's NoDa `blind` node starts quest 5 and moves her to the safehouse.
+- New items: Breaker Bar (melee), Ruth's Nailer (ranged, 3 AP), Rocket Tea (heals 25).
+- Quests:
+  - *Scheduled Downtime* is new.
+  - *Pending Onboarding* gets stage 6.
+  - The safehouse's back door toward the Crown stays locked until quest 6 is built.
+
+**Engine**
+- New effects:
+  - `stat_up: <Stat>` (+`n`): permanent, capped at `STAT_CAP` = 6.
+  - `max_hp: n`: a permanent bonus that survives level-ups. Stored as `Player.hp_bonus`; older saves load with 0.
+- Both are documented in `content.py`.
+
+**Tests**
+- `test_engine.py`: the quest 5 playthrough (heal, tonic, training, upgrade, shop, park, ready), plus a test that the new effects cap, survive level-ups, and still load old saves.
+- `test_ui.py`: the headless run continues through quest 5.
+- `test_line.py`: the line run continues through quest 5. 429 replies, mean 158 B.
+- Bot pass through quests 1–5: 0 deaths in 16. Quest 5 ends at full HP every time (Doc).
+
 ## 0.4.1 — AX.25 playability audit (2026-11-25)
 
 An audit of line mode at 0.4.0, without radio hardware:

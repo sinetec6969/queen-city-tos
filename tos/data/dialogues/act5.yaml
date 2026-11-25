@@ -1,0 +1,187 @@
+mags_ward:
+  speaker: MAGS
+  starts:
+    - if: {quest_done: scheduled_downtime}
+      node: after
+    - if: {quest: scheduled_downtime, gte: 3}
+      node: ready
+  start: hello
+  nodes:
+    hello:
+      text: "Mags is bent over the planning table with a grease pencil behind each ear. \"Cameras are down, but they won't stay down. Concierge is already rerouting.\" She doesn't look up. \"Get patched up. Doc's by the cots. Ruth has opinions about your gear. Priya wants to teach you something. Then go look at Bearden Park. Every night at two, a shuttle full of new residents goes from that park into the tower. I want to know how.\""
+      options:
+        - text: "What's in the tower?"
+          to: tower
+        - text: "[Leave]"
+    tower:
+      text: "\"The Bank of America Corporate Center. Sixty floors. The Crown on top. That's where the Concierge started, in a server room on a floor the elevators don't admit exists.\" She taps a photo: a window high up, a faint shape behind it. \"Priya says something up there moves when the lights go out. Big. Patient. I'd like you to be at full health when you meet it.\""
+      options:
+        - text: "Noted."
+          to: hello
+    ready:
+      text: "Mags looks at the route card you brought back for a long time. \"Loading dock B. Two in the morning. They take people in like groceries.\" She folds the card into her pocket. \"Are you ready, Harlan? Healed, armed, rested? Because once you're on that shuttle, there's no back door.\""
+      options:
+        - text: "I'm ready."
+          to: go
+        - text: "Not yet."
+    go:
+      effects:
+        - {set: ready_for_crown}
+        - {quest: scheduled_downtime, stage: done}
+        - {xp: 50}
+      text: "\"Then sleep. Doc will wake you at one-thirty.\" She puts a hand on your shoulder, briefly, like she's checking you're solid. \"Bring him home. And if the thing at the top asks you to rate it...\" She almost smiles. \"Be honest.\""
+      options:
+        - text: "[Leave]"
+    after:
+      text: "Mags is asleep sitting up at the planning table, pencil still in hand. The clock over the door says 11:52."
+      options:
+        - text: "[Leave]"
+
+doc:
+  speaker: DOC
+  start: hello
+  nodes:
+    hello:
+      text: "Doc is a retired school nurse in a cardigan with forty pockets, every one full. She looks you over the way she looked over a thousand kids who said they were fine. \"Sit. You're not fine.\""
+      options:
+        - text: "Patch me up."
+          to: heal
+        - text: "Got anything stronger?"
+          show_if: {not_flag: doc_tonic}
+          to: tonic
+        - text: "[Leave]"
+    heal:
+      effects:
+        - {heal: 999}
+        - {log: "Doc cleans, stitches, tapes and lectures. You're at full health. You're also eleven years old again."}
+      text: "\"There. Drink water. Not tea. Water.\" She knows you won't."
+      options:
+        - text: "Thanks, Doc."
+          to: hello
+    tonic:
+      effects:
+        - {set: doc_tonic}
+        - {max_hp: 5}
+      text: "Doc unlocks a tackle box and pours something brown into a paper cup. \"Iron, B12, electrolytes, and a recipe from my grandmother I'm not going to explain.\" It tastes like a penny that's been to church. Your heart settles into a slower, bigger rhythm. \"That'll keep you on your feet a little longer than you'd like.\""
+      options:
+        - text: "Thanks, Doc."
+          to: hello
+
+ruth_ward:
+  speaker: RUTH
+  starts:
+    - if: {flag: got_nailer}
+      node: after
+  start: hello
+  nodes:
+    hello:
+      text: "Ruth has a nail gun in the vise and a soldering iron in her teeth. She takes the iron out to talk. \"Whatever's at the top of that tower, it isn't going to stand still while you hit it with a tire iron. Let me build you something with reach.\""
+      options:
+        - text: "Here, upgrade my nail gun."
+          if: {item: nail_gun}
+          to: swap
+        - text: "Build me one from scratch. (25 cells)"
+          if: {cells_gte: 25}
+          to: build
+        - text: "[Leave]"
+    swap:
+      effects:
+        - {take: nail_gun}
+        - {give: nailer_mk2}
+        - {set: got_nailer}
+      text: "She takes your nail gun apart in about ninety seconds, swears at it twice, and puts it back together longer, lighter, and meaner. She scratches SORRY into the grip with a nail. \"Faster trigger. Better aim. Same nails. Don't shoot Biscuit.\""
+      options:
+        - text: "Thanks, Ruth."
+    build:
+      effects:
+        - {cells: -25}
+        - {give: nailer_mk2}
+        - {set: got_nailer}
+      text: "She digs through three milk crates of parts and builds you one from a compressor, a drill and spite. She scratches SORRY into the grip. \"Faster trigger. Better aim. Takes nails. Don't shoot Biscuit.\""
+      options:
+        - text: "Thanks, Ruth."
+    after:
+      text: "Ruth doesn't look up from the vise. \"Groundskeepers in that park kept good tools. If you want something heavier for close work, look in their cart.\""
+      options:
+        - text: "[Leave]"
+
+priya_ward:
+  speaker: PRIYA
+  starts:
+    - if: {flag: trained}
+      node: after
+  start: hello
+  nodes:
+    hello:
+      text: "Priya is loading film in the dark of a closet with the door cracked. \"Everyone here is good at one thing. You get one lesson before tomorrow, so pick.\" She counts on her fingers. \"Me: steady hands. Bev: listening. Ruth: lifting heavy things. Doc: breathing through it.\""
+      options:
+        - text: "Steady hands. (Aim +1)"
+          to: aim
+        - text: "Listening. (Wits +1)"
+          to: wits
+        - text: "Lifting heavy things. (Brawn +1)"
+          to: brawn
+        - text: "Breathing through it. (Grit +1)"
+          to: grit
+        - text: "[Leave]"
+    aim:
+      effects:
+        - {set: trained}
+        - {stat_up: Aim}
+      text: "Priya puts her camera in your hands. \"Breathe out. Halfway. Stop. Now.\" Click. You do it forty times. By the end, your hands stop shaking when you stop breathing. \"Same with anything you point,\" she says."
+      options:
+        - text: "Thanks, Priya."
+    wits:
+      effects:
+        - {set: trained}
+        - {stat_up: Wits}
+      text: "Bev puts the headphones on you and plays an hour of static. Somewhere in the second half you start hearing it: rhythms under the noise, patterns that repeat. \"Machines are habits,\" Bev says. \"Learn the habit, beat the machine.\""
+      options:
+        - text: "Thanks, Bev."
+    brawn:
+      effects:
+        - {set: trained}
+        - {stat_up: Brawn}
+      text: "Ruth has you carry engine blocks across the shop. Then back. Then across again. \"It's not about strong,\" she says. \"It's about not stopping.\" You stop. She waits. You don't stop again."
+      options:
+        - text: "Thanks, Ruth."
+    grit:
+      effects:
+        - {set: trained}
+        - {stat_up: Grit}
+      text: "Doc sits you on a cot and has you breathe in for four, hold for four, out for four, while she describes, in detail, every injury she treated in thirty years of middle school. By the end, nothing scares you. \"Exactly,\" Doc says."
+      options:
+        - text: "Thanks, Doc."
+    after:
+      text: "Priya raises her camera, then lowers it. \"Not yet. I'll take your picture when you get back. With him.\""
+      options:
+        - text: "[Leave]"
+
+hollis_ward:
+  speaker: HOLLIS
+  start: shop
+  nodes:
+    shop:
+      text: "Hollis has moved the shopping-cart stall to the sidewalk outside the print shop. \"Followed the customers. Prices went up. War economy.\" (You have {cells} cells.)"
+      options:
+        - text: "Rocket Tea (heals 25) — 14 cells"
+          if: {cells_gte: 14}
+          effects: [{cells: -14}, {give: rocket_tea}]
+          to: shop
+        - text: "Sweet tea, a gallon — 8 cells"
+          if: {cells_gte: 8}
+          effects: [{cells: -8}, {give: sweet_tea}]
+          to: shop
+        - text: "Med-gummy — 5 cells"
+          if: {cells_gte: 5}
+          effects: [{cells: -5}, {give: med_gummy}]
+          to: shop
+        - text: "Nails, box of 12 — 6 cells"
+          if: {cells_gte: 6}
+          effects: [{cells: -6}, {give: nails, n: 12}]
+          to: shop
+        - text: "Tinfoil — 10 cells"
+          if: {cells_gte: 10}
+          effects: [{cells: -10}, {give: tinfoil}]
+          to: shop
+        - text: "Just looking."

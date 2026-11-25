@@ -423,6 +423,81 @@ def play_act4(rng, deny_overtime=False, prep_between=True):
     return st
 
 
+def play_act5(rng):
+    """Quest 5: the safehouse (heal, train, upgrade, shop), then scout Bearden Park."""
+    from tos.engine.content import check
+    from tos.engine.game import place
+    st = play_act4(rng)
+    talk("mags", st, 0, 0)  # "Where do we go in from?"
+    assert st.quests["scheduled_downtime"] == 1 and "noda:mags" in st.taken
+    node = C.city["nodes"]["uptown"]
+    assert check(node.get("unlocked_if"), st)
+    place(st, C, node["location"], node["spawn"])
+    ward = Location(st.location, st, C)
+    ward.update_rules()
+    assert st.quests["scheduled_downtime"] == 2
+    assert not ward.door_open(ward.get("crown_door"))
+    p = st.player
+    hp_max = p.max_hp
+    talk("doc", st, 1, 0, 0, 0, 1)  # tonic, then patch up, then leave
+    assert p.max_hp == hp_max + 5 and p.hp == p.max_hp and "doc_tonic" in st.flags
+    aim = p.stats["Aim"]
+    talk("priya_ward", st, 0, 0)
+    assert p.stats["Aim"] == aim + 1 and "trained" in st.flags
+    d = talk("priya_ward", st)
+    assert d.node_id == "after", "one lesson only"
+    talk("ruth_ward", st, 0 if p.has("nail_gun") else 1, 0)
+    assert p.has("nailer_mk2") and not p.has("nail_gun")
+    tea = p.inventory.get("rocket_tea", 0)
+    talk("hollis_ward", st, 0, 5)
+    assert p.inventory.get("rocket_tea", 0) == tea + 1
+    p.weapon = "nailer_mk2"
+    exit_via(ward, 22, 7, 1, 0, rng)
+    assert st.location == "bearden_park"
+    park = Location(st.location, st, C)
+    park.update_rules()
+    for target, move in (((13, 2), (0, -1)), ((2, 4), (1, 0)), ((21, 3), (1, 0))):
+        for _ in range(4):
+            events = []
+            walk_to(park, *target, events)
+            if ("combat",) in events or park.awake_enemies() and park.check_aggro():
+                assert fight(park, rng) == "won", p.hp
+                continue
+            break
+        events = park.player_move(*move)
+        if ("hack", "parcel_lockers") in events:
+            park.terminal_result("parcel_lockers", True)
+    assert p.has("breaker_bar") and "lockers_open" in st.flags and p.has("rocket_tea")
+    assert st.quests["scheduled_downtime"] == 3 and st.quests["teo"] == 6
+    assert any(n[0] == "The shuttle route" for n in st.notes)
+    place(st, C, "third_ward", "park")
+    talk("mags_ward", st, 0, 0)  # "I'm ready."
+    assert st.quests["scheduled_downtime"] == "done" and "ready_for_crown" in st.flags
+    assert talk("mags_ward", st).node_id == "after"
+    return st
+
+
+def test_scheduled_downtime():
+    st = play_act5(random.Random(5))
+    p = st.player
+    print("  act 5 end: HP", p.hp, "/", p.max_hp, "LV", p.level, "Aim", p.stats["Aim"], "weapon", p.weapon)
+
+
+def test_stat_and_max_hp_effects():
+    from tos.engine.content import apply_effects
+    from tos.engine.state import STAT_CAP, GameState
+    st, _ = new_game(C, {**STATS, "Grit": 5})
+    hp = st.player.max_hp
+    apply_effects([{"stat_up": "Grit"}, {"stat_up": "Grit"}, {"max_hp": 5}], st, C)
+    assert st.player.stats["Grit"] == STAT_CAP and st.player.max_hp == hp + 4 + 5
+    st.player.level += 1
+    st.player.recalc()
+    assert st.player.max_hp == hp + 4 + 5 + 5, "bonus survives level-ups"
+    d = st.to_json()
+    d["player"].pop("hp_bonus")
+    assert GameState.from_json(d).player.hp_bonus == 0, "pre-0.5 saves still load"
+
+
 def test_service_interruption_overtime():
     st = play_act4(random.Random(5))
     print("  act 4 end (overtime): HP", st.player.hp, "/", st.player.max_hp, "LV", st.player.level)
