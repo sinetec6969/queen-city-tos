@@ -523,9 +523,10 @@ def play_act6(rng, deny_both=False):
     if deny_both:
         st.player.stats["Charm"] = 4  # as if trained for it
         talk("concierge", st, 1, 0, 2, 0)  # Teo on the screens, rate, three stars + review
-        assert "concierge_rattled" in st.flags
+        assert "concierge_rattled" in st.flags and "rating_three" in st.flags
     else:
         talk("concierge", st, 1, 0, 1, 0)  # one star
+        assert "rating_one" in st.flags
     assert "rated" in st.flags
     crown.update_rules()
     assert st.quests["rate_your_experience"] == 3
@@ -601,6 +602,22 @@ def test_regions_and_gateways():
     assert travel.go(st, C, "ln_charlotte")["kind"] == "region" and st.location == "city:lake_norman"
     for a, b in C.city["links"]:
         assert travel.region_of(C, a) == travel.region_of(C, b), ("links stay inside a region", a, b)
+
+
+def test_rating_flags_and_save_migration():
+    from tos.engine.game import place
+    from tos.engine.state import RATING_FLAGS, GameState
+    st, _ = new_game(C, {**STATS, "Wits": 4})
+    place(st, C, "the_crown", "elevator")
+    talk("concierge", st, 1, 0, 3, 0)  # decline to rate
+    assert "rating_declined" in st.flags and "wellness_off" in st.flags
+    old = st.to_json()
+    old["version"] = 1
+    for flags, expect in ((["rated", "concierge_rattled"], "rating_three"), (["rated"], "rating_one"), ([], None)):
+        old["flags"] = flags
+        got = set(GameState.from_json(old).flags) & set(RATING_FLAGS)
+        assert got == ({expect} if expect else set()), (flags, got)
+    assert GameState.from_json(st.to_json()).flags == st.flags, "v2 saves round-trip untouched"
 
 
 def test_city_labels_fit_their_canvas():

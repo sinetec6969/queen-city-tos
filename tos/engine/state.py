@@ -17,7 +17,8 @@ STAT_BLURBS = {
 }
 STAT_MIN, STAT_MAX, STAT_BUDGET = 1, 5, 15
 STAT_CAP = 6  # training can push one past character creation's max
-SAVE_VERSION = 1
+SAVE_VERSION = 2
+RATING_FLAGS = ("rating_one", "rating_three", "rating_declined")
 
 
 @dataclass
@@ -117,12 +118,20 @@ class GameState:
     @classmethod
     def from_json(cls, d: dict) -> "GameState":
         d = dict(d)
-        d.pop("version", None)
+        version = d.pop("version", 1)
         player = Player(**d.pop("player"))
         gs = cls(player=player, **d)
         gs.flags = set(gs.flags)
         gs.taken = set(gs.taken)
+        gs.migrate(version)
         return gs
+
+    def migrate(self, version: int) -> None:
+        """Bring an older save up to date. Each step is safe to run on any save."""
+        if version < 2 and "rated" in self.flags and not self.flags & set(RATING_FLAGS):
+            # v1 recorded the Crown rating only through side effects. The three-star review
+            # is unambiguous; "declined" and "one star + desk hack" look the same, so one star.
+            self.flags.add("rating_three" if "concierge_rattled" in self.flags else "rating_one")
 
 
 def save_dir() -> Path:

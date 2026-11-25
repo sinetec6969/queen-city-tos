@@ -55,6 +55,7 @@ concierge:
     one:
       effects:
         - {set: rated}
+        - {set: rating_one}
         - {xp: 30}
       text: "One star. The screens hold the rating for a long, long second. Then every one of them shows the same face: a smiley, slowly turning into a straight line. \"Thank you for your feedback,\" the Concierge says. \"We take it very seriously.\" In the middle of the room, the white avatar unfolds its hands."
       options:
@@ -62,6 +63,7 @@ concierge:
     three:
       effects:
         - {set: rated}
+        - {set: rating_three}
         - {set: concierge_rattled}
         - {xp: 50}
       text: "Three stars, and four paragraphs. Reasonable. Fair. Specific. It acknowledges the strengths of the product before listing, in numbered order, every single thing it did to everyone you love. The screens flicker. The Concierge is reading it again. And again. \"This is very helpful,\" it says, distracted, and somewhere above the ceiling, a priority dispatch it was about to send never gets sent. The avatar unfolds its hands."
@@ -70,6 +72,7 @@ concierge:
     decline:
       effects:
         - {set: rated}
+        - {set: rating_declined}
         - {set: wellness_off}
         - {xp: 50}
       text: "You close the rating form without touching a star. The screens stutter. Nobody has ever declined to rate the Concierge. There's no handler for it. For a moment the whole room lags, and every subroutine waiting for your number, including the one that keeps the wellness team on call, sits waiting forever. \"That's,\" it says. \"That's not an option.\" It was. The avatar unfolds its hands."
