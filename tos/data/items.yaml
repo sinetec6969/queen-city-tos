@@ -96,3 +96,28 @@ service_badge:
   name: Service Badge
   type: key
   desc: "A driver's badge on a lanyard: CONCIERGE LOGISTICS, ALL FLOORS. The photo is of a man who was never required."
+
+# ---- junk: crafting ingredients (machines drop them) ----
+scrap:
+  name: Scrap
+  type: junk
+  desc: "Bent brackets, sheet metal, a servo that still twitches. Craftable."
+wire:
+  name: Wire
+  type: junk
+  desc: "A coil of copper wire, stripped out of something that used to deliver things. Craftable."
+duct_tape:
+  name: Duct Tape
+  type: junk
+  desc: "Silver, sticky, load-bearing. Craftable."
+sugar:
+  name: Sugar
+  type: junk
+  desc: "A five-pound bag of sugar. In this economy. Craftable."
+
+tinfoil_hat:
+  name: Tinfoil Hat
+  type: aid
+  signal: -50
+  use_text: "You put on the hat. It is the most dignified thing you have ever worn, given the circumstances."
+  desc: "Lowers Signal by 50. Crafted."

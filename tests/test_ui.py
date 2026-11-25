@@ -299,7 +299,7 @@ async def main():
         cells = app.state.player.cells
         await press(pilot, app, "2")  # med-gummy
         await shot(app, "18_shop")
-        await press(pilot, app, "5")
+        await press(pilot, app, "7")  # "Just looking."
         assert app.state.player.cells == cells - 5
         await shot(app, "19_midwood")
 
@@ -462,8 +462,19 @@ async def main():
         assert p.has("nailer_mk2")
         await walk(pilot, app, 3, 3)  # Hollis (3,4)
         await press(pilot, app, "down")
-        await press(pilot, app, "1", "6")  # Rocket Tea, then leave
+        await press(pilot, app, "1", "8")  # Rocket Tea, then leave
         assert p.has("rocket_tea")
+        # crafting at Ruth's workbench: grip tape for the equipped melee weapon
+        p.give("duct_tape", 2)
+        await press(pilot, app, "tab", "left", "left")  # WristLink: left wraps to PERKS, then CRAFT
+        scr = app.screen
+        assert scr.TABS[scr.tab] == "CRAFT"
+        for _ in range(list(app.content.recipes).index("grip_tape")):
+            await press(pilot, app, "down")
+        await shot(app, "30b_craft")
+        await press(pilot, app, "enter")
+        assert "grip_tape" in p.mods.get(p.weapon, []), (scr.flash, app.state.location, p.weapon)
+        await press(pilot, app, "tab")
         await walk(pilot, app, 22, 7)
         await press(pilot, app, "right")
         assert app.state.location == "bearden_park", app.state.location

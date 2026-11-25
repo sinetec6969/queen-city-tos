@@ -36,6 +36,7 @@ class Player:
     hp_bonus: int = 0  # permanent max-HP upgrades (the `max_hp` effect)
     perks: list = field(default_factory=list)  # perk ids (data/perks.yaml)
     perk_points: int = 0  # one per level-up
+    mods: dict = field(default_factory=dict)  # weapon id -> [recipe ids] (crafted weapon mods)
 
     def recalc(self) -> None:
         self.max_hp = 20 + 4 * self.stats["Grit"] + 5 * (self.level - 1) + self.hp_bonus

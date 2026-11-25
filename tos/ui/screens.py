@@ -10,7 +10,7 @@ from textual.containers import Horizontal, Vertical
 from textual.screen import ModalScreen, Screen
 from textual.widgets import Input, RichLog, Static
 
-from ..engine import perks, travel, tutorial
+from ..engine import crafting, perks, travel, tutorial
 from ..engine.combat import Combat, use_aid
 from ..engine.dialogue import Dialogue
 from ..engine.game import follow_exit, new_game
@@ -255,7 +255,7 @@ class LocationScreen(Screen):
         t.append(f"cells {p.cells}\n", style="cyan")
         if p.perk_points:
             t.append(f"PERK POINTS {p.perk_points} (Tab, ←)\n", style="bold bright_yellow")
-        t.append(f"{w['name']}{ammo}\n", style="white")
+        t.append(f"{crafting.weapon_label(st, self.app.content, p.weapon)}{ammo}\n", style="white")
         if st.companion:
             cname = self.app.content.companions.get(st.companion, {}).get("name", st.companion)
             t.append(f"with {cname}\n", style="bright_cyan")
@@ -576,7 +576,7 @@ class HackScreen(ModalScreen):
 
 # =========================================================================
 class WristLinkScreen(ModalScreen):
-    TABS = ["STATUS", "ITEMS", "QUESTS", "DATA", "PERKS"]
+    TABS = ["STATUS", "ITEMS", "QUESTS", "DATA", "CRAFT", "PERKS"]
     BINDINGS = [Binding("tab,escape", "close", priority=True, show=False),
                 Binding("left,h", "tab(-1)", show=False), Binding("right,l", "tab(1)", show=False),
                 Binding("up,k", "cursor(-1)", show=False), Binding("down,j", "cursor(1)", show=False),
@@ -590,6 +590,7 @@ class WristLinkScreen(ModalScreen):
         self.tab = 0
         self.cursor = 0
         self.pcursor = 0
+        self.ccursor = 0
         self.flash = ""
         self.draw()
 
@@ -622,7 +623,8 @@ class WristLinkScreen(ModalScreen):
                 it = c.item(iid)
                 sel = i == self.cursor
                 eq = " [equipped]" if iid == p.weapon else ""
-                t.append(f"{'▶' if sel else ' '} {it['name']} x{p.inventory[iid]}{eq}\n",
+                name = crafting.weapon_label(st, c, iid) if it.get("type") == "weapon" else it["name"]
+                t.append(f"{'▶' if sel else ' '} {name} x{p.inventory[iid]}{eq}\n",
                          style="bold reverse" if sel else "white")
             if items:
                 it = c.item(items[self.cursor])
@@ -646,6 +648,24 @@ class WristLinkScreen(ModalScreen):
             for title, body in st.notes:
                 t.append(title + "\n", style="bold cyan")
                 t.append(body + "\n\n", style="grey70")
+        elif tab == "CRAFT":
+            bench = crafting.at_workbench(st, c)
+            t.append("At a workbench.\n" if bench else "No workbench here. Ruth's at the safehouse has one.\n",
+                     style="bold green" if bench else "grey62")
+            rids = list(c.recipes)
+            self.ccursor = min(self.ccursor, len(rids) - 1)
+            for i, rid in enumerate(rids):
+                r = c.recipes[rid]
+                sel = i == self.ccursor
+                ok = crafting.check_recipe(st, c, rid) is None
+                style = "bold reverse" if sel else ("white" if ok else "grey50")
+                t.append(f"{'▶' if sel else ' '} {r['name']:<24}", style=style)
+                t.append(f" {crafting.ingredients(c, rid)}\n", style="grey62" if ok else "grey42")
+            sel_rid = rids[self.ccursor]
+            why = crafting.check_recipe(st, c, sel_rid)
+            desc = c.recipes[sel_rid].get("desc", "")
+            t.append(f"{desc}\n" if desc else "", style="grey62")
+            t.append("ENTER craft\n" if why is None else f"{why}\n", style="grey50" if why is None else "yellow")
         else:
             t.append(f"Perk points: {p.perk_points}\n", style="bold bright_yellow" if p.perk_points else "grey62")
             rows = perks.listing(st, c)
@@ -679,7 +699,11 @@ class WristLinkScreen(ModalScreen):
         self.draw()
 
     def action_cursor(self, d: int) -> None:
-        if self.TABS[self.tab] == "PERKS":
+        if self.TABS[self.tab] == "CRAFT":
+            self.ccursor = (self.ccursor + d) % len(self.app.content.recipes)
+            self.flash = ""
+            self.draw()
+        elif self.TABS[self.tab] == "PERKS":
             self.pcursor = (self.pcursor + d) % len(self.app.content.perks)
             self.flash = ""
             self.draw()
@@ -689,6 +713,15 @@ class WristLinkScreen(ModalScreen):
             self.draw()
 
     def action_use(self) -> None:
+        if self.TABS[self.tab] == "CRAFT":
+            rid = list(self.app.content.recipes)[self.ccursor]
+            _, events = crafting.craft(self.app.state, self.app.content, rid)
+            msgs = [e[1] for e in events if e[0] == "log"]
+            for m in msgs:
+                self.app.state.say(m)
+            self.flash = " ".join(msgs)
+            self.draw()
+            return
         if self.TABS[self.tab] == "PERKS":
             pid = perks.listing(self.app.state, self.app.content)[self.pcursor][0]
             _, events = perks.take(self.app.state, self.app.content, pid)

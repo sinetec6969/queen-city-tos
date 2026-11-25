@@ -3,7 +3,7 @@ from __future__ import annotations
 
 import random
 
-from . import perks
+from . import crafting, perks
 from .content import apply_effects
 from .world import Entity, Location
 
@@ -46,7 +46,7 @@ class Combat:
         self.target_id = ids[(i + 1) % len(ids)]
 
     def weapon(self) -> dict:
-        return self.content.item(self.p.weapon)
+        return crafting.weapon_stats(self.state, self.content, self.p.weapon)
 
     def parts(self, e: Entity) -> list[dict]:
         return e.template.get("parts", [])

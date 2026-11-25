@@ -13,6 +13,8 @@ tidy3:
   evade: 0
   xp: 30
   cells: [2, 5]
+  drops:
+    - {id: scrap, chance: 0.6}
   attacks:
     - "rams your ankles"
     - "sprays industrial citrus at your eyes"
@@ -41,6 +43,7 @@ courier_drone:
   xp: 40
   cells: [3, 8]
   drops:
+    - {id: wire, chance: 0.5}
     - {id: med_gummy, chance: 0.5}
   attacks:
     - "fires a nonlethal* pellet (*terms apply)"
@@ -69,6 +72,7 @@ greeter:
   xp: 50
   cells: [4, 9]
   drops:
+    - {id: scrap, chance: 0.5}
     - {id: med_gummy, chance: 0.6}
   attacks:
     - "fires a courtesy taser"
@@ -96,6 +100,8 @@ lawn_unit:
   evade: 0
   xp: 35
   cells: [1, 4]
+  drops:
+    - {id: scrap, chance: 0.6}
   attacks:
     - "mows your shins"
     - "kicks up a rock at forty miles an hour"
@@ -122,6 +128,8 @@ track_crawler:
   evade: 15
   xp: 25
   cells: [1, 3]
+  drops:
+    - {id: scrap, chance: 0.4}
   attacks:
     - "skitters up your leg and bites"
     - "clamps onto your boot with a rail gripper"
@@ -149,6 +157,7 @@ fare_inspector:
   xp: 55
   cells: [4, 9]
   drops:
+    - {id: wire, chance: 0.5}
     - {id: med_gummy, chance: 0.5}
   attacks:
     - "zaps you with a ticket validator"
@@ -177,6 +186,7 @@ pxu:
   xp: 120
   cells: [10, 16]
   drops:
+    - {id: duct_tape, chance: 1.0}
     - {id: sweet_tea, chance: 1.0}
   attacks:
     - "pours ice water down your collar"
@@ -207,6 +217,8 @@ fulfillment_unit:
   xp: 180
   cells: [15, 25]
   drops:
+    - {id: duct_tape, chance: 1.0}
+    - {id: scrap, chance: 1.0}
     - {id: sweet_tea, chance: 1.0}
   attacks:
     - "swings a forklift arm like a door slamming"
@@ -236,6 +248,8 @@ picker:
   evade: 10
   xp: 20
   cells: [1, 3]
+  drops:
+    - {id: wire, chance: 0.5}
   attacks:
     - "grabs you with three arms and tries to box you"
     - "applies a shipping label to your face"

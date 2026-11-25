@@ -204,6 +204,7 @@ controls:
       N S E W  move (N3 = 3 steps)   walk into things to use them
       L look around   M map   I items   USE n / EQ n   ST status
       Q quests   NOTES data   PERKS / PERK n   SAVE   BYE   BRIEF
+      CRAFT / CRAFT n at a workbench
     COMBAT
       N S E W move (1 AP)   F attack   A aim (A2 = part 2)
       T next target   U heal (2 AP)   . end turn

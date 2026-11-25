@@ -391,7 +391,15 @@ def test_quests_1_to_6():
     assert p.weapon == "nailer_mk2"
     walk(s, 3, 3)
     send(s, "s")  # Hollis
-    talk(s, 1, 1, 6)  # two Rocket Teas, leave
+    talk(s, 1, 1, 8)  # two Rocket Teas, leave
+    # crafting at Ruth's workbench: a rail sight for the nailer
+    p.give("scrap", 2)
+    p.give("wire", 1)
+    r = send(s, "craft")
+    assert "At a workbench" in r
+    send(s, "craft rail")
+    assert p.mods.get("nailer_mk2") == ["rail_sight"]
+    assert "+1" in send(s, "st")
     walk(s, 22, 7)
     send(s, "e")
     assert s.state.location == "bearden_park"

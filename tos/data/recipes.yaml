@@ -1,0 +1,51 @@
+# Crafting needs a workbench: a location tagged `workbench`.
+# inputs: {item: count}. Consumables: output {item, n}. Weapon mods: mod {applies: melee|ranged, acc, dmg};
+# a mod goes on the equipped weapon (one of each kind per weapon, at most MAX_MODS per weapon).
+# requires: optional conditions, same language as everywhere else.
+
+nails:
+  name: Nails x12
+  inputs: {scrap: 2}
+  output: {item: nails, n: 12}
+
+sweet_tea:
+  name: Sweet Tea
+  inputs: {sugar: 2}
+  output: {item: sweet_tea}
+
+rocket_tea:
+  name: Rocket Tea
+  inputs: {sweet_tea: 1, sugar: 1}
+  output: {item: rocket_tea}
+
+tinfoil_hat:
+  name: Tinfoil Hat
+  inputs: {tinfoil: 1, duct_tape: 1}
+  output: {item: tinfoil_hat}
+
+grip_tape:
+  name: "Mod: Grip Tape"
+  desc: "Melee weapon: +5% hit."
+  inputs: {duct_tape: 2}
+  mod: {applies: melee, acc: 5}
+
+weighted_head:
+  name: "Mod: Weighted Head"
+  desc: "Melee weapon: +2 damage."
+  inputs: {scrap: 3, duct_tape: 1}
+  requires: {stat: Brawn, gte: 2}
+  mod: {applies: melee, dmg: 2}
+
+rail_sight:
+  name: "Mod: Rail Sight"
+  desc: "Ranged weapon: +10% hit."
+  inputs: {scrap: 2, wire: 1}
+  requires: {stat: Aim, gte: 2}
+  mod: {applies: ranged, acc: 10}
+
+overcharged_coil:
+  name: "Mod: Overcharged Coil"
+  desc: "Ranged weapon: +2 damage."
+  inputs: {wire: 2, scrap: 2}
+  requires: {stat: Wits, gte: 3}
+  mod: {applies: ranged, dmg: 2}

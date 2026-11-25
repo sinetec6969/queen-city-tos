@@ -12,7 +12,7 @@ import random
 import re
 from collections import deque
 
-from ..engine import perks, travel, tutorial
+from ..engine import crafting, perks, travel, tutorial
 from ..engine.combat import Combat, use_aid
 from ..engine.content import Content
 from ..engine.dialogue import Dialogue
@@ -375,6 +375,8 @@ class Session:
         elif verb in ("notes", "data"):
             st.flags.add("did:wristlink")
             self.show_notes(arg)
+        elif verb == "craft":
+            self.craft(arg)
         elif verb == "perks":
             self.show_perks(show_all=arg == "all")
         elif verb == "perk":
@@ -424,7 +426,7 @@ class Session:
             eq = "*" if iid == p.weapon else ""
             out.append(f"{i} {self.c.item(iid)['name']}{eq} x{p.inventory[iid]}")
         self.lines(["  ".join(out) if sum(len(o) + 2 for o in out) <= R.WIDTH else "\n".join(out)])
-        self.lines([f"Wielding {self.c.item(p.weapon)['name']}. USE n, EQ n, I n = details."])
+        self.lines([f"Wielding {crafting.weapon_label(self.state, self.c, p.weapon)}. USE n, EQ n, I n = details."])
 
     def describe_item(self, arg: str) -> None:
         iid = self.find_item(arg)
@@ -459,7 +461,7 @@ class Session:
         self.lines([f"DEZ HARLAN LV{p.level} XP{p.xp}/{p.xp_to_next()} HP{p.hp}/{p.max_hp} "
                     f"SIG{int(p.signal)} cells {p.cells}",
                     " ".join(f"{s} {p.stats[s]}" for s in STATS),
-                    f"{w['name']}{ammo}{comp}"])
+                    f"{crafting.weapon_label(st, self.c, p.weapon)}{ammo}{comp}"])
 
     def show_quests(self) -> None:
         st = self.state
@@ -478,6 +480,25 @@ class Session:
                 self.say(f"* {q['name']}: {q['stages'][stage]}", log=False)
         if done:
             self.say("Done: " + ", ".join(done), log=False)
+
+    def craft(self, arg: str) -> None:
+        rids = list(self.c.recipes)
+        if not arg:
+            bench = crafting.at_workbench(self.state, self.c)
+            out = ["At a workbench. CRAFT n to make one." if bench else "No workbench here (Ruth's at the safehouse)."]
+            for i, rid in enumerate(rids, 1):
+                ok = crafting.check_recipe(self.state, self.c, rid) is None
+                out.append(f"{'+' if ok else ' '}{i} {self.c.recipes[rid]['name']}: {crafting.ingredients(self.c, rid)}")
+            self.lines(out)
+            return
+        rid = rids[int(arg) - 1] if arg.isdigit() and 0 < int(arg) <= len(rids) else \
+            next((r for r in rids if self.c.recipes[r]["name"].lower().replace("mod: ", "").startswith(arg)), None)
+        if rid is None:
+            self.lines(["Craft what? CRAFT lists recipes."])
+            return
+        for e in crafting.craft(self.state, self.c, rid)[1]:
+            if e[0] == "log":
+                self.say(e[1])
 
     def show_perks(self, show_all: bool = False) -> None:
         rows = perks.listing(self.state, self.c)

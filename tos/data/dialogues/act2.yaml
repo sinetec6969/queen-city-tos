@@ -174,4 +174,12 @@ hollis:
           if: {cells_gte: 10}
           effects: [{cells: -10}, {give: tinfoil}]
           to: shop
+        - text: "Sugar, five-pound bag — 4 cells"
+          if: {cells_gte: 4}
+          effects: [{cells: -4}, {give: sugar}]
+          to: shop
+        - text: "Duct tape — 6 cells"
+          if: {cells_gte: 6}
+          effects: [{cells: -6}, {give: duct_tape}]
+          to: shop
         - text: "Just looking."

@@ -452,7 +452,7 @@ def play_act5(rng):
     talk("ruth_ward", st, 0 if p.has("nail_gun") else 1, 0)
     assert p.has("nailer_mk2") and not p.has("nail_gun")
     tea = p.inventory.get("rocket_tea", 0)
-    talk("hollis_ward", st, 0, 5)
+    talk("hollis_ward", st, 0, 7)
     assert p.inventory.get("rocket_tea", 0) == tea + 1
     p.weapon = "nailer_mk2"
     exit_via(ward, 22, 7, 1, 0, rng)
@@ -680,6 +680,57 @@ def test_perks():
     d["version"], d["player"]["perks"], d["player"]["level"] = 2, [], 4
     d["player"].pop("perk_points")
     assert GameState.from_json(d).player.perk_points == 3
+
+
+def test_crafting_and_mods():
+    from tos.engine import crafting
+    from tos.engine.game import place
+    from tos.engine.state import GameState
+    st, _ = new_game(C, STATS)
+    p = st.player
+    p.give("scrap", 9)
+    p.give("duct_tape", 6)
+    p.give("wire", 3)
+    p.give("sugar", 3)
+    p.give("tire_iron")
+    p.weapon = "tire_iron"
+    assert crafting.check_recipe(st, C, "nails") == "You need a workbench."
+    place(st, C, "third_ward", "city")
+    ok, ev = crafting.craft(st, C, "nails")
+    assert ok and p.inventory["nails"] == 12 and p.inventory["scrap"] == 7
+    assert crafting.craft(st, C, "sweet_tea")[0] and p.has("sweet_tea")
+    # mods on the equipped melee weapon
+    st.flags.add("tidy_awake")
+    place(st, C, "lumen_1412", "start")
+    loc = Location("lumen_1412", st, C)
+    cb = Combat(loc, random.Random(1))
+    tidy = loc.get("tidy")
+    hit = cb.hit_chance(tidy)
+    st.location = "third_ward"
+    assert "ranged" in crafting.check_recipe(st, C, "rail_sight"), "wrong weapon kind"
+    assert crafting.craft(st, C, "grip_tape")[0]
+    assert "already" in crafting.check_recipe(st, C, "grip_tape")
+    assert crafting.craft(st, C, "weighted_head")[0]
+    assert crafting.weapon_label(st, C, "tire_iron") == "Tire Iron +2"
+    w = crafting.weapon_stats(st, C, "tire_iron")
+    assert w["acc"] == C.item("tire_iron").get("acc", 0) + 5 and w["dmg"] == [6, 9]
+    assert C.item("tire_iron")["dmg"] == [4, 7], "content itself is never modified"
+    st.location = "lumen_1412"
+    assert Combat(loc, random.Random(1)).hit_chance(tidy) == min(95, hit + 5)
+    p.give("duct_tape", 4)
+    st.location = "third_ward"
+    assert crafting.check_recipe(st, C, "grip_tape")  # already has it
+    p.mods["tire_iron"] = ["grip_tape", "weighted_head"]
+    p.weapon = "fists"
+    assert "Equip a weapon" in crafting.check_recipe(st, C, "grip_tape")
+    assert crafting.craft(st, C, "rocket_tea")[0] and p.has("rocket_tea")
+    assert "Missing" in crafting.check_recipe(st, C, "rocket_tea"), "sugar used up"
+    assert GameState.from_json(st.to_json()).player.mods == p.mods, "mods survive a save"
+    for rid, r in C.recipes.items():
+        for item in r["inputs"]:
+            assert item in C.items, (rid, item)
+        if "output" in r:
+            assert r["output"]["item"] in C.items, rid
 
 
 def test_city_labels_fit_their_canvas():
