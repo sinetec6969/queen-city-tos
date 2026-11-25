@@ -1,5 +1,7 @@
 # Queen City over AX.25 (DigiPi node)
 
+> **Superseded for hosting:** use `deploy/pi-os/` (Raspberry Pi OS + direwolf + ax25d). DigiPi is built as a read-only appliance; changes are erased at reboot, which conflicts with the game's saves and node entry. Keep a DigiPi card only as a quick radio check. `install.sh` here is still the generic game installer that both setups use.
+
 The node starts `qcts-line CALLSIGN` once per incoming connection and connects
 it to the program's stdin/stdout. The game speaks plain ASCII with CR line
 endings and keeps most replies under ~250 bytes, so 1200 baud is playable.
@@ -35,7 +37,7 @@ name in `/etc/ax25/axports`:
 [N0CALL-5 VIA radio]
 default  * * * * * *  -  qcts  /usr/local/bin/qcts-line  qcts-line %U
 ```
-`%U` should be the caller's callsign without SSID. The game strips any SSID
+`%U` is the caller's callsign in upper case without the SSID (confirmed in `man ax25d.conf` and the loopback lab). The game strips any SSID
 anyway. Restart ax25d after editing.
 
 **URONode**: add an external command so node users can type `GAME`.

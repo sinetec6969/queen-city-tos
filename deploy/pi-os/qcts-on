@@ -1,0 +1,2 @@
+#!/bin/sh
+systemctl start qcts-direwolf.service qcts-ax25.service && echo "Queen City node ON."

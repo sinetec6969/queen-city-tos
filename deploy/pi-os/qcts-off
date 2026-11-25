@@ -1,0 +1,5 @@
+#!/bin/sh
+# Kill switch: stop the node and the modem. Nothing can key the radio after this.
+systemctl stop qcts-ax25.service qcts-direwolf.service
+pkill -x direwolf 2>/dev/null
+echo "Queen City node OFF: transmitter idle. 'qcts-on' to restart."

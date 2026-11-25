@@ -1,0 +1,19 @@
+[Unit]
+Description=Queen City node: kernel AX.25 port + ax25d (spawns qcts-line per caller)
+Requires=qcts-direwolf.service
+After=qcts-direwolf.service
+
+[Service]
+Type=forking
+ExecStartPre=/bin/sh -c 'for i in $(seq 1 30); do [ -e /tmp/kisstnc ] && exit 0; sleep 1; done; exit 1'
+ExecStartPre=/sbin/modprobe ax25
+ExecStartPre=/sbin/modprobe mkiss
+ExecStartPre=/usr/sbin/kissattach /tmp/kisstnc radio
+ExecStartPre=/usr/sbin/kissparms -p radio -t 400 -s 100 -r 63
+ExecStart=/usr/sbin/ax25d -l
+ExecStopPost=/bin/sh -c 'pkill -x kissattach || true'
+Restart=on-failure
+RestartSec=10
+
+[Install]
+WantedBy=multi-user.target

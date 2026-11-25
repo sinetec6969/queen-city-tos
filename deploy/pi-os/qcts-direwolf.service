@@ -1,0 +1,11 @@
+[Unit]
+Description=Queen City node: direwolf 1200-baud modem (Digirig + UV-5R)
+After=sound.target network.target
+
+[Service]
+ExecStart=/usr/bin/direwolf -p -t 0 -q hd -c /etc/qcts/direwolf.conf
+Restart=on-failure
+RestartSec=10
+
+[Install]
+WantedBy=multi-user.target
