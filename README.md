@@ -75,32 +75,22 @@ The first quest is the tutorial. Turn it off with `O` on the character screen if
 
 ## Play it over packet radio
 
-The game also has a **line mode**: plain ASCII, one command in, one reply out, built for **1200-baud AX.25** on amateur radio. An AX.25 node launches it for each connection, and saves are kept per callsign. This is what it looks like on the air:
+The game also has a **line mode**: plain ASCII, one command in, one reply out, built for **1200-baud AX.25** on amateur radio. An AX.25 node launches it for each connection, and saves are kept per callsign. This is what it looks like from a packet terminal:
 
-```
-HP32/32 SIG0> l
-Bed o 1N 1W
-Tablet o 1S 1E
-Rating Rig o 2S 1W
-Closet $ 1N 4E
-Couch o 5S
-Fridge $ 1N 6E
-Window o 7S 1W
-LUMEN HOME panel N 7S 9E
-(+5 more; M for map)
-HP32/32 SIG0> e
-Beside you: Tablet 1S
-HP32/32 SIG0> s
-Your old tablet, 2% battery. One unread message from Teo, June 8, 2:11 a.m.:
-"they're moving me uptown for onboarding, it's actually kind of nice?? dont be
-weird about it. love u. accept the thing"
-WristLink: new data -- Teo's last message
-NEW QUEST: Pending Onboarding
-Teo's last message says they moved him Uptown for "onboarding." Find him.
-+ ORIENTATION: Using things
-+ ORIENTATION: Messages
-HP32/32 SIG0>
-```
+<table>
+  <tr>
+    <td width="33%"><img src="docs/screenshots/packet-connect.png" alt="Connecting to the node and starting a game"></td>
+    <td width="33%"><img src="docs/screenshots/packet-explore.png" alt="Exploring in line mode"></td>
+    <td width="33%"><img src="docs/screenshots/packet-combat.png" alt="Hacking and combat in line mode"></td>
+  </tr>
+  <tr>
+    <td align="center"><sub>Connect, character creation, the intro.</sub></td>
+    <td align="center"><sub>Look around, read a message, talk.</sub></td>
+    <td align="center"><sub>Hack a terminal, then a fight. The prompt carries round, AP, HP and your target.</sub></td>
+  </tr>
+</table>
+
+<sub>Rendered from a real line-mode session; typed commands are in white, the node's replies in green. <code>[...]</code> marks where long replies were trimmed for the picture.</sub>
 
 It was built around the airtime budget, not the screen:
 - The map is sent only when you arrive somewhere or ask for it (`M`). `BRIEF` turns off the arrival map.
