@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "queen-city-tos"
-version = "0.2.1"
+version = "0.3.0"
 description = "Queen City: Terms of Service - a turn-based terminal RPG set in Charlotte, 2027"
 requires-python = ">=3.10"
 dependencies = ["textual>=0.80", "pyyaml>=6"]

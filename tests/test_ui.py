@@ -273,6 +273,82 @@ async def main():
         await press(pilot, app, "5")
         assert app.state.player.cells == cells - 5
         await shot(app, "19_midwood")
+
+        # ---- QUEST 3: Analog Only (fight route) ----
+        await walk(pilot, app, 22, 7)
+        await press(pilot, app, "right")
+        assert isinstance(app.screen, CityScreen)
+        for _ in range(4):  # Plaza Midwood -> NoDa (city list is sorted top to bottom)
+            await press(pilot, app, "up")
+        await press(pilot, app, "enter")
+        assert app.state.location == "noda", app.state.location
+        await shot(app, "20_noda")
+        # Ruth (6,5) from (6,4): Delia vouches
+        await walk(pilot, app, 6, 4)
+        await press(pilot, app, "down")
+        assert isinstance(app.screen, DialogueScreen)
+        await press(pilot, app, "1")
+        await press(pilot, app, "1")
+        assert "ruth_ok" in app.state.flags
+        # Mags (11,3) from (10,3)
+        await walk(pilot, app, 10, 3)
+        await press(pilot, app, "right")
+        assert isinstance(app.screen, DialogueScreen)
+        await shot(app, "21_mags")
+        await press(pilot, app, "1", "1", "1")
+        assert app.state.quests["analog_only"] == 2
+        # library (3,3): tinfoil + gummy; foil off the Signal
+        await walk(pilot, app, 3, 4)
+        await press(pilot, app, "up")
+        await press(pilot, app, "tab")
+        await press(pilot, app, "right")
+        scr = app.screen
+        for _ in range(scr.items().index("tinfoil")):
+            await press(pilot, app, "down")
+        await press(pilot, app, "enter")
+        await press(pilot, app, "tab")
+        await walk(pilot, app, 1, 4)
+        await press(pilot, app, "left")
+        assert isinstance(app.screen, CityScreen)
+        await press(pilot, app, "down")  # NoDa -> Lynx Blue Line
+        await press(pilot, app, "enter")
+        assert app.state.location == "lynx_36th", app.state.location
+        # platform fight, then pry the train doors (12,7) from (12,6)
+        for _ in range(5):
+            await walk(pilot, app, 12, 6)
+            await fight(pilot, app)
+        await shot(app, "22_platform")
+        await press(pilot, app, "down")
+        assert "train_open" in app.state.flags
+        await press(pilot, app, "down")
+        assert app.state.location == "lynx_train", app.state.location
+        # Dante (9,7) from (9,6)
+        await walk(pilot, app, 9, 6)
+        await press(pilot, app, "down")
+        assert isinstance(app.screen, DialogueScreen)
+        await press(pilot, app, "1", "1", "1")
+        assert app.state.player.has("faraday_drive")
+        for _ in range(5):
+            await walk(pilot, app, 1, 2)
+            await fight(pilot, app)
+        assert "lynx_train:pxu" in app.state.taken, "PXU-1 should have woken and been beaten"
+        await shot(app, "23_train")
+        await press(pilot, app, "left")
+        assert app.state.location == "lynx_36th"
+        for _ in range(3):
+            await walk(pilot, app, 1, 3)
+            await fight(pilot, app)
+        await press(pilot, app, "left")
+        assert isinstance(app.screen, CityScreen)
+        await press(pilot, app, "up")  # back to NoDa
+        await press(pilot, app, "enter")
+        await walk(pilot, app, 10, 3)
+        await press(pilot, app, "right")
+        await press(pilot, app, "1", "1", "1", "1")
+        await shot(app, "24_trusted")
+        assert app.state.quests["analog_only"] == "done", app.state.quests
+        assert app.state.quests["service_interruption"] == 1
+
         print("tips shown:", TIPS_SEEN)
         print("UI playthrough OK. HP", app.state.player.hp, "/", app.state.player.max_hp,
               "LV", app.state.player.level, "signal", int(app.state.player.signal))

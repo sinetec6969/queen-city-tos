@@ -1,4 +1,4 @@
-"""Line-mode (packet radio) frontend: scripted playthrough of quests 1-2 using text
+"""Line-mode (packet radio) frontend: scripted playthrough of quests 1-3 using text
 commands only, plus entry-point checks. Prints reply sizes and an airtime estimate.
 
 Run: python tests/test_line.py
@@ -117,7 +117,7 @@ def new_session(seed=11, slot="TEST1"):
     return s
 
 
-def test_quests_1_and_2():
+def test_quests_1_to_3():
     s = new_session()
     send(s, "n")
     assert s.mode == "profile"
@@ -246,17 +246,73 @@ def test_quests_1_and_2():
     talk(s, 2)
     leave(s)
     assert s.state.player.cells == cells - 5
+
+    # ---- quest 3: Analog Only (stealth route: both terminals) ----
+    walk(s, 22, 7)
+    send(s, "e")
+    assert s.mode == "city"
+    send(s, str(s.city_order.index("noda") + 1))
+    assert s.state.location == "noda"
+    walk(s, 6, 4)
+    send(s, "s")
+    talk(s, 1, 1)  # Delia vouches
+    assert "ruth_ok" in s.state.flags
+    walk(s, 10, 3)
+    send(s, "e")
+    talk(s, 1, 1, 1)
+    assert s.state.quests["analog_only"] == 2
+    walk(s, 3, 4)
+    send(s, "n")
+    send(s, "use tinfoil")
+    walk(s, 1, 4)
+    send(s, "w")
+    send(s, str(s.city_order.index("blue_line") + 1))
+    assert s.state.location == "lynx_36th"
+    for _ in range(5):  # station control (20,5) from (19,5); the platform fight comes to you
+        walk(s, 19, 5)
+        fight(s)
+    send(s, "e")
+    assert s.mode == "hack"
+    send(s, s.hack.password)
+    assert "train_open" in s.state.flags
+    for _ in range(3):
+        walk(s, 12, 6)
+        fight(s)
+    send(s, "s")
+    assert s.state.location == "lynx_train"
+    send(s, "l")
+    walk(s, 20, 5)  # operator console (21,5)
+    send(s, "e")
+    assert s.mode == "hack"
+    send(s, s.hack.password)
+    assert "service_ended" in s.state.flags
+    walk(s, 9, 6)  # Dante (9,7)
+    send(s, "s")
+    talk(s, 1, 1, 1)
+    assert s.state.player.has("faraday_drive")
+    walk(s, 1, 2)
+    assert s.mode == "explore", "PXU-1 stays off shift"
+    send(s, "w")
+    walk(s, 1, 3)
+    send(s, "w")
+    send(s, str(s.city_order.index("noda") + 1))
+    walk(s, 10, 3)
+    send(s, "e")
+    talk(s, 1, 1, 1, 1)
+    assert s.state.quests["analog_only"] == "done" and s.state.quests["service_interruption"] == 1
+    assert "lynx_train:pxu" not in s.state.taken
+
     send(s, "st")
     send(s, "notes")
     send(s, "notes 1")
     p = s.state.player
-    print(f"  quest 2 end: HP {p.hp}/{p.max_hp} LV {p.level} cells {p.cells}")
+    print(f"  quest 3 end: HP {p.hp}/{p.max_hp} LV {p.level} cells {p.cells}")
     send(s, "bye")
     assert s.done
-    # reconnect: same callsign resumes in Plaza Midwood
+    # reconnect: same callsign resumes in NoDa
     s2 = new_session(slot="TEST1")
     send(s2, "c")
-    assert s2.mode == "explore" and s2.state.location == "plaza_midwood"
+    assert s2.mode == "explore" and s2.state.location == "noda"
 
 
 def test_accept_game_over_and_reload():

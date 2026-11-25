@@ -37,12 +37,16 @@ nodes:
     x: 31
     y: 3
     unlocked_if: {flag: reached_midwood}
+    location: noda
+    spawn: city
     blurb: "The Opt-Outs, in a dead brewery. Analog only. Bring proof."
   blue_line:
     name: LYNX BLUE LINE
     x: 13
     y: 4
-    unlocked_if: {flag: reached_midwood}
+    unlocked_if: {quest: analog_only, gte: 2}
+    location: lynx_36th
+    spawn: city
     blurb: "Stalled trains since June. Something is still riding them."
   uptown:
     name: UPTOWN

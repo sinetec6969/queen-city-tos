@@ -180,10 +180,98 @@ Either way **TIDY-3 wakes up** and the fight starts.
 | Nails ×12 | 6 |
 | Tinfoil (−30 Signal) | 10 |
 
-- **Next:** NoDa is on the city map but not built yet (quest 3).
+- **Next:** NoDa opens on the city map once you've reached Midwood (quest 3).
 
 ---
 
 ## Quest 3 — Analog Only
 
-*Not built yet.*
+**Goal:** earn the Opt-Outs' trust by recovering their courier's drive from a stalled train. **Time:** about 20 min. **Route:** city map → **NoDa** → (job) → city map → **Lynx Blue Line** (36th Street) → Train 112 → back to NoDa.
+
+The **Lynx Blue Line** node stays locked until Mags gives you the job.
+
+### NoDa · North Davidson Street
+
+```
+########################
+#..m...#..FFF......n...#     m murals (lore)        F fermenters (photos)
+#......#..........h....#     x little free library (tinfoil + med-gummy)
+#..x...#...M...........#     r Ruth, outside the door (talk)
+E......D...........t...#     D brewery door (locked until Ruth lets you in)
+#.....r#..........c....#     M Mags (talk; quest giver)   h Bev (radios; lore)
+#..m...#..bbb..........#     t Ossie (typewriter)   c Priya (camera)
+#......#.......k.......#     n photo wall   b tap wall   k darkroom (lore)
+########################     E » west to the city map
+```
+
+- **Signal falls here** (−0.3 per step), like Midwood.
+- **Ruth (6,5):** talk from (6,4). She opens the door if:
+  - you've met **Delia** (option "Delia at Moo & Brew sent me"), or
+  - you have **Charm ★★★** ("I declined the Terms ninety-four times...", +25 XP).
+  - Otherwise she sends you to find someone to vouch for you. Go talk to Delia.
+- **Mags (11,3):** talk from (10,3). "They took my brother..." → "So how do I prove it's a miracle?" sets the job. *Analog Only* moves to stage 2 and the Blue Line node unlocks.
+- **Grab the library (3,3)** before you go: the **tinfoil** helps a lot at the station.
+
+### 36th Street Station
+
+```
+########################
+#..m...#...............#     m route map   C fare machine (lore)
+#......=.......1.......#     k maintenance locker (12 nails + sweet tea)
+E......................#     = turnstiles: the gap at (7,3) is the way through
+#..C...=.........f.....#     1 2 Track Crawlers (awake)   f Fare Inspector (awake)
+#......#.....2......K..#     K station control (hack: opens the train)
+#...k..#...............#     T Train 112   D train door (12,7)
+#......#TTTTDTTTTTTTTTT#     E » west to the city map
+########################
+```
+
+- **Signal rises here** (+0.6 per step). Foil first if you're above about 40. At 75, enemies get +10 to hit.
+- **The platform fight can't be skipped.** Once anything notices you, all three join: 2 Track Crawlers (HP 10, melee, two bites a turn for 1–3) and a Fare Inspector (HP 24, range 4, 2–5).
+  - Kill the crawlers first. They're fragile but fast.
+  - Then close on the inspector, or shoot it.
+  - The turnstile gap is a good choke point.
+- **Opening the train (two ways):**
+
+| Method | How |
+| --- | --- |
+| Force | Walk into the train door (12,7) with the **Tire Iron** equipped (or Brawn ★★★★). +15 XP. |
+| Hack | **Station control (20,5)**: 6-letter words. +30 XP. Failure = +15 Signal, retry allowed. |
+
+### Train 112
+
+```
+########################
+#h.h.o.h.h.h.o.h.h.h.ha#     h seats   o Onboarded riders (lore)   a ad panel
+D......................#     D door back to the platform
+#h.h.h.h.o.h.h.h.h.o...#     gangway to the second car at (20,4)
+####################.###
+#h.h.h.o.h.h.h.h..#..K.#     K operator console (hack: PXU-1 goes off shift)
+#......................#     S Dante, the courier (talk; has the pouch)
+#h.h.h.h.S.h.o.h.P#..L.#     P PXU-1, dormant in the vestibule   L lost and found (tinfoil + med-gummy)
+########################
+```
+
+- **Dante (9,7):** talk from (9,6). "Mags sent me" → "Can I take the pouch to her?" gives you the **Faraday Pouch** (stage 3).
+  - **Charm ★★★** option: "The darkroom. Priya's red light." +25 XP and a note. Lore only; he stays onboarded.
+- **Taking the pouch wakes PXU-1**, unless you hacked the console first. It attacks on your next step.
+
+| Route | How | Result |
+| --- | --- | --- |
+| Stealth | Hack the **operator console (21,5)** *before* talking to Dante: walk the top car to the gangway (20,4), then down. 6-letter words. +35 XP. Failure = +15 Signal, retry allowed. | PXU-1 stays off shift. No boss fight. |
+| Fight | Take the pouch first. | Boss fight. |
+
+**Boss: PXU-1** (Passenger Experience Unit): HP 48, range 3, 2 attacks a turn for 3–6. Drops a sweet tea, 10–16 cells, 120 XP.
+- Heal to full before you talk to Dante, and grab the lost and found (21,7).
+- **Rail Bogies** (slow) halves its AP: one attack a turn instead of two. Do it early.
+- **Smile Screen** (blind) is −40 to its hit chance for 2 rounds.
+- Biscuit helps.
+- Bot runs (24 seeds, a player who heals between fights): no deaths, finishing at 11–34 of 47 HP. Never healing or foiling: 2 deaths in 24.
+
+### Back to Mags
+
+Talk to Mags with the pouch to finish *Analog Only*:
+- Rewards: +100 XP and 30 cells.
+- *Pending Onboarding* moves to stage 4.
+- **Service Interruption** (quest 4) begins: a relay on Central Avenue. Central Ave is still "not built yet" on the city map.
+- After this, Ruth, Ossie, Priya, Bev and the photo wall all have new lines.

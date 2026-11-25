@@ -1,0 +1,207 @@
+ruth:
+  speaker: RUTH
+  starts:
+    - if: {flag: ruth_ok}
+      node: again
+  start: hello
+  nodes:
+    hello:
+      text: "The woman in the welding apron doesn't come off the wall. No band. Burn scars on both forearms, old ones. \"Where'd you walk in from?\""
+      options:
+        - text: "Midwood. Delia at Moo & Brew sent me."
+          show_if: {flag: met_delia}
+          to: delia
+        - text: "I declined the Terms ninety-four times. Ask me about any of them."
+          if: {stat: Charm, gte: 3}
+          to: declined
+        - text: "South End. The Lumen."
+          to: south_end
+        - text: "[Leave]"
+    south_end:
+      text: "\"South End.\" She says it like a diagnosis. \"Last guy from South End who came through here asked us all to rate our experience. On his way out. While the drones were coming in.\" She folds her arms. \"Get somebody we know to vouch for you. Then we'll see.\""
+      options:
+        - text: "Delia at Moo & Brew sent me."
+          show_if: {flag: met_delia}
+          to: delia
+        - text: "[Leave]"
+    delia:
+      effects:
+        - {set: ruth_ok}
+        - {log: "Ruth draws the bolt. The brewery door swings open."}
+      text: "\"Delia.\" Ruth thinks about it. \"Delia's burgers are mostly beef, and Delia is mostly right.\" She reaches behind her and draws a bolt. \"Inside. Leave your phone out here.\" You don't have a phone. \"Good. Talk to Mags. Don't touch the darkroom.\""
+      options:
+        - text: "Thanks."
+    declined:
+      effects:
+        - {set: ruth_ok}
+        - {xp: 25}
+        - {log: "Ruth draws the bolt. The brewery door swings open."}
+      text: "\"Ninety-four.\" She tilts her head. \"What was number sixty?\" You tell her: a free year of meal kits and a golden retriever puppy, delivered, if you'd just click Accept. You clicked Decline and cried a little. Ruth is quiet, then laughs once, like it hurt. \"Sixty was the puppy one for me too.\" She draws the bolt. \"Inside. Mags runs things. Don't touch the darkroom.\""
+      options:
+        - text: "Thanks, Ruth."
+    again:
+      texts:
+        - if: {flag: optout_trusted}
+          text: "Ruth nods. \"Harlan. Door's open for you now. Mostly.\""
+      text: "Ruth nods you through. \"Mags is inside. Darkroom's still off-limits.\""
+      options:
+        - text: "[Leave]"
+
+mags:
+  speaker: MAGS
+  starts:
+    - if: {flag: optout_trusted}
+      node: after
+    - if: {item: faraday_drive}
+      node: drive
+    - if: {quest: analog_only, gte: 2}
+      node: again
+  start: hello
+  nodes:
+    hello:
+      text: "A woman in reading glasses and a hoodie with the sleeves cut off bends over a table of contact sheets with a jeweler's loupe. She doesn't stand. \"You're the South End stray Ruth let in. You smell like lavender and surrender.\" Back to the loupe. \"Talk.\""
+      options:
+        - text: "They took my brother Teo Uptown. I need to get in."
+          to: teo
+        - text: "Delia says you've been watching Uptown."
+          show_if: {flag: met_delia}
+          to: teo
+        - text: "[Leave]"
+    teo:
+      text: "\"Everybody in this room has a someone Uptown.\" She points the loupe at the photo wall. \"Three months of pictures. No way in.\" Now she looks at you. \"And I don't trust you. You lived ninety-five days in a Concierge building and walked out on your own. That's either a miracle or a feature.\""
+      options:
+        - text: "So how do I prove it's a miracle?"
+          to: job
+    job:
+      effects:
+        - {quest: analog_only, stage: 2}
+        - {note: ["Mags's job", "Courier Dante took a Faraday-shielded drive into the Blue Line at 36th Street and never came back. Train 112. Bring back the pouch. Bring back Dante if you can."]}
+      text: "\"Two days ago I sent Dante, our courier, into the Blue Line at 36th Street. Nineteen. Fast. Stupid in the good way. He was carrying a drive we pulled off a Concierge relay, sealed in a Faraday pouch so it can't call home.\" She takes her glasses off. \"He never came out. Wade says something rides those trains. Bring back the pouch. Bring back Dante if you can. Then we talk about your brother.\""
+      options:
+        - text: "I'll find him."
+    again:
+      text: "Mags doesn't look up. \"Pouch. Dante. 36th Street. I'm not saying it a fourth time.\""
+      options:
+        - text: "[Leave]"
+    drive:
+      effects:
+        - {take: faraday_drive}
+        - {set: optout_trusted}
+        - {quest: analog_only, stage: done}
+        - {quest: teo, stage: 4}
+        - {quest: service_interruption, stage: 1}
+        - {cells: 30}
+        - {xp: 100}
+        - {note: ["The Central Ave relay", "The drive is the relay tower's maintenance log: hatch codes, the inspection schedule, and the one window each week when nobody is watching it. The relay keeps Uptown's cameras talking to each other."]}
+      text: "You set the pouch on the table. Mags looks at it a long time before she touches it. \"And Dante?\""
+      options:
+        - text: "He's onboarded. He's on Train 112. He says he's comfortable."
+          to: dante_news
+    dante_news:
+      text: "Mags puts her glasses back on, very carefully, the way you do when your hands want to do something else. \"Comfortable.\" A long breath. \"Then we get him back when we get everybody back.\" She slits the tape. \"We don't plug things in here. But you used to rate these machines, Harlan. Bev has a laptop that has never once seen a network. You read it.\""
+      options:
+        - text: "Hand it over."
+          to: reading
+    reading:
+      text: "It's the maintenance log for the relay tower on Central Avenue, the thing that keeps Uptown's cameras talking to each other. Hatch codes. Inspection schedules. One window, once a week, when nobody is watching it. Mags reads over your shoulder. \"There it is.\" Then she looks at you the way people looked at you before June. \"Welcome to the Opt-Outs, Harlan. Priya. Get the camera.\""
+      options:
+        - text: "About my brother."
+          to: teo_photo
+    teo_photo:
+      text: "Priya brings a print, still smelling of fixer. June 9. A bus unloading at Romare Bearden Park, people in grey filing toward the towers. At the back, a skinny kid in a UNC Charlotte hoodie is looking over his shoulder, straight at the camera, like he knew somebody would be watching. Teo. \"Uptown's a fortress,\" Mags says. \"Take down the relay and it's a fortress with its eyes shut.\""
+      options:
+        - text: "Then let's shut its eyes."
+    after:
+      text: "Mags nods at you. \"Harlan.\" From her, it sounds like a rank."
+      options:
+        - text: "Tell me about the relay again."
+          to: relay
+        - text: "[Leave]"
+    relay:
+      text: "\"Central Avenue, past the old car wash. It talks to every camera between here and the Crown. Take it down and Uptown goes blind long enough for someone to walk in.\" She taps the log. \"It won't be unguarded. Nothing the Concierge loves is unguarded.\""
+      options:
+        - text: "[Back]"
+          to: after
+
+bev:
+  speaker: BEV
+  starts:
+    - if: {flag: met_bev}
+      node: again
+  start: hello
+  nodes:
+    hello:
+      effects:
+        - {set: met_bev}
+      text: "An older woman in headphones sits at a bench of radios: a big old boatanchor transceiver, a scanner, a Morse key worn shiny. A hand-lettered sign: LISTEN FIRST. \"Shh.\" She writes something down, then slides one ear of the headphones back. \"The Concierge talks to its machines in the clear on a few bands. Never occurred to it anybody would still be listening on a radio.\""
+      options:
+        - text: "What are you hearing?"
+          to: hearing
+        - text: "What's the Morse key for?"
+          to: morse
+        - text: "[Leave]"
+    again:
+      text: "Bev slides one ear of the headphones back. \"Still listening.\""
+      options:
+        - text: "What are you hearing?"
+          to: hearing
+        - text: "What's the Morse key for?"
+          to: morse
+        - text: "[Leave]"
+    hearing:
+      texts:
+        - if: {flag: optout_trusted}
+          text: "\"Train 112 checked in last night like always. PASSENGERS COMFORTABLE. Same count.\" She taps the log. \"One of those is Dante. I write his name next to the count now, so somebody does.\""
+      text: "\"Telemetry, mostly. Drones checking in, mowers reporting grass heights. And every night around two, the Blue Line trains go out and come back, and something on them reports PASSENGERS COMFORTABLE.\" She frowns. \"Every night. Same count. Nobody ever gets off.\""
+      options:
+        - text: "[Back]"
+          to: again
+    morse:
+      text: "\"Machines listen for words. They don't listen for rhythm.\" She taps out something quick and bright on the key. \"That was 'nobody clicks anything.' Delia's rule one. Sounds better in code.\""
+      options:
+        - text: "[Back]"
+          to: again
+
+dante:
+  speaker: DANTE
+  starts:
+    - if: {flag: drive_taken}
+      node: after
+  start: hello
+  nodes:
+    hello:
+      text: "A young man with a messenger bag sits in a window seat, a paper cup of water in his hands. A grey band glows on his wrist, so new the skin around it is still pink. A silver pouch sits in his lap, forgotten. \"Hi!\" he says, delighted. \"Are you riding too? It's so comfortable.\""
+      options:
+        - text: "Mags sent me. You're Dante?"
+          to: name
+        - text: "[Leave]"
+    name:
+      text: "\"Mags.\" He tries the word out. \"I knew a Mags. I think I was supposed to bring her something.\" He looks at the pouch like it belongs to a stranger. \"They put the band on me at the platform. Very gently. Now I don't have to worry about where I was going. Isn't that nice?\""
+      options:
+        - text: "Can I take the pouch to her?"
+          to: give
+        - text: "Dante. The darkroom. Priya's red light. Remember?"
+          if: {stat: Charm, gte: 3}
+          to: remember
+        - text: "[Leave]"
+    remember:
+      effects:
+        - {xp: 25}
+        - {note: ["Dante", "Onboarded on Train 112. For a second, he remembered the darkroom. Some of him is still in there."]}
+      text: "Something crosses his face, quick as a shadow. \"Red light. The smell of fixer. Priya yelling at me to shut the door.\" His band pulses green, twice. The shadow goes. \"Sorry, what were we talking about? Would you like some water?\""
+      options:
+        - text: "Just the pouch, Dante."
+          to: give
+    give:
+      effects:
+        - {give: faraday_drive}
+        - {set: drive_taken}
+        - {quest: analog_only, stage: 3}
+        - {xp: 20}
+      text: "\"Sure!\" He hands it over without looking at it. \"Tell her I'm comfortable.\" Then, quieter, still smiling: \"Tell Priya sorry about the darkroom door.\""
+      options:
+        - text: "I'll tell them."
+    after:
+      text: "Dante waves at you from his seat. \"Hi! Are you riding too?\""
+      options:
+        - text: "[Leave]"

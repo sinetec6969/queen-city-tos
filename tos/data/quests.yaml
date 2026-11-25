@@ -14,6 +14,7 @@ teo:
     1: "Teo's last message says they moved him Uptown for \"onboarding.\" Find him."
     2: "Mr. Pruitt saw Teo board the first bus uptown in June. Uptown won't be easy. You'll need help."
     3: "Delia says the Opt-Outs in NoDa have been watching Uptown since June. They might know where Teo is."
+    4: "Priya's photos show a June bus unloading at Romare Bearden Park. One of the faces might be Teo's. Getting into Uptown means blinding it first."
 
 last_mile:
   name: Last Mile
@@ -38,3 +39,12 @@ analog_only:
   main: true
   stages:
     1: "Delia at Moo & Brew says the Opt-Outs in NoDa have been watching Uptown. Find them."
+    2: "Mags, who runs the Opt-Outs, sent a courier named Dante into the Blue Line at 36th Street with a shielded drive. He never came back. Bring back the drive."
+    3: "You have the Faraday pouch. Take it back to Mags in NoDa."
+    done: "The Opt-Outs vouch for you now."
+
+service_interruption:
+  name: Service Interruption
+  main: true
+  stages:
+    1: "The drive holds the maintenance schedule for the relay on Central Avenue. Take the relay down with the Opt-Outs and Uptown goes blind for an hour."

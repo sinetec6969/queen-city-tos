@@ -53,3 +53,8 @@ tinfoil:
   signal: -30
   use_text: "You line your cap with tinfoil. You were right all along. It doesn't make it better."
   desc: "Lowers Signal by 30. Yes, really."
+
+faraday_drive:
+  name: Faraday Pouch
+  type: key
+  desc: "A silver pouch, heavy as a brick, sealed with electrical tape. A hard drive inside, pulled from something the Concierge owns. It's for Mags."

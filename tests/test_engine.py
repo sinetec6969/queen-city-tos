@@ -183,8 +183,7 @@ def exit_via(loc, x, y, dx, dy, rng=None):
     raise AssertionError(f"could not exit at {loc.state.pos}")
 
 
-def test_last_mile_playthrough():
-    rng = random.Random(5)
+def play_act2(rng):
     st = play_act1(rng)
     st.player.weapon = "nail_gun"
     street = Location(st.location, st, C)
@@ -245,7 +244,129 @@ def test_last_mile_playthrough():
     d = Dialogue("hollis", st, C)
     d.choose(1)
     assert st.player.cells == cells - 5
+    return st
+
+
+def test_last_mile_playthrough():
+    st = play_act2(random.Random(5))
     print("  act 2 end: HP", st.player.hp, "/", st.player.max_hp, "LV", st.player.level, "cells", st.player.cells)
+
+
+def talk(did, st, *choices):
+    d = Dialogue(did, st, C)
+    for c in choices:
+        assert d.choose(c), (did, d.node_id, c, [o[0] for o in d.options()])
+    return d
+
+
+def prep(st):
+    """Between fights: foil off high Signal, heal up to 60% HP (what a careful player does)."""
+    from tos.engine.combat import use_aid
+    p = st.player
+    if p.signal >= 40 and p.has("tinfoil"):
+        use_aid(st, C, "tinfoil")
+    for item in ("med_gummy", "sweet_tea"):
+        while p.hp < p.max_hp * 0.6 and p.has(item):
+            use_aid(st, C, item)
+
+
+def play_act3(rng, stealth=False):
+    """Quest 3. stealth=True: hack station control and the cab console (no boss fight)."""
+    from tos.engine.content import check
+    from tos.engine.game import place
+    st = play_act2(rng)
+    node = C.city["nodes"]["noda"]
+    assert check(node.get("unlocked_if"), st)
+    assert not check(C.city["nodes"]["blue_line"].get("unlocked_if"), st), "Blue Line opens with the job"
+    place(st, C, node["location"], node["spawn"])
+    noda = Location(st.location, st, C)
+    noda.update_rules()
+    # Ruth (6,5) from (6,4): the brewery door is shut until she lets you in
+    assert not noda.door_open(noda.get("brewery_door"))
+    events = []
+    walk_to(noda, 6, 4, events)
+    assert ("dialogue", "ruth") in noda.player_move(0, 1)
+    talk("ruth", st, 0)  # Delia vouches
+    assert "ruth_ok" in st.flags and noda.door_open(noda.get("brewery_door"))
+    # Mags (11,3) from (10,3)
+    walk_to(noda, 10, 3, events)
+    assert ("dialogue", "mags") in noda.player_move(1, 0)
+    talk("mags", st, 0, 0, 0)
+    assert st.quests["analog_only"] == 2
+    talk("bev", st, 0, 0, 2)
+    # little free library (3,3): tinfoil + med-gummy, then prep like a player would
+    walk_to(noda, 3, 4, events)
+    noda.player_move(0, -1)
+    assert "noda:book_box" in st.taken
+    prep(st)
+    # 36th Street station
+    node = C.city["nodes"]["blue_line"]
+    assert check(node.get("unlocked_if"), st)
+    place(st, C, node["location"], node["spawn"])
+    station = Location(st.location, st, C)
+    if stealth:
+        station.terminal_result("station_control", True)
+        assert "train_open" in st.flags
+    assert exit_via(station, 12, 6, 0, 1, rng) == "location", "force or walk through the train door"
+    assert st.location == "lynx_train"
+    if not stealth:
+        assert "train_open" in st.flags  # forced with the tire iron
+    train = Location(st.location, st, C)
+    prep(st)
+    if stealth:
+        events = []
+        walk_to(train, 20, 5, events)
+        assert ("hack", "cab_console") in train.player_move(1, 0)
+        train.terminal_result("cab_console", True)
+        assert "service_ended" in st.flags
+    # Dante (9,7) from (9,6)
+    events = []
+    walk_to(train, 9, 6, events)
+    assert ("dialogue", "dante") in train.player_move(0, 1)
+    talk("dante", st, 0, 0, 0)
+    assert st.player.has("faraday_drive") and st.quests["analog_only"] == 3
+    logs = [e[1] for e in train.update_rules()]
+    if stealth:
+        assert not train.awake_enemies() and any("Off shift" in m for m in logs)
+    else:
+        assert train.awake_enemies() and any("unfolds" in m for m in logs)
+        events = []
+        walk_to(train, 8, 6, events)
+        assert ("combat",) in events
+        assert fight(train, rng) == "won", st.player.hp
+        assert "lynx_train:pxu" in st.taken
+    assert exit_via(train, 1, 2, -1, 0, rng) == "location"
+    assert st.location == "lynx_36th"
+    # back to Mags
+    place(st, C, "noda", "city")
+    talk("mags", st, 0, 0, 0, 0)
+    assert st.quests["analog_only"] == "done" and "optout_trusted" in st.flags
+    assert st.quests["service_interruption"] == 1 and st.quests["teo"] == 4
+    assert not st.player.has("faraday_drive")
+    return st
+
+
+def test_analog_only_fight():
+    st = play_act3(random.Random(5))
+    print("  act 3 end (fight): HP", st.player.hp, "/", st.player.max_hp, "LV", st.player.level, "cells", st.player.cells)
+
+
+def test_analog_only_stealth():
+    st = play_act3(random.Random(9), stealth=True)
+    assert "lynx_train:pxu" not in st.taken
+    print("  act 3 end (stealth): HP", st.player.hp, "/", st.player.max_hp, "LV", st.player.level)
+
+
+def test_ruth_needs_a_voucher():
+    from tos.engine.game import place
+    st, _ = new_game(C, {**STATS, "Charm": 2})
+    place(st, C, "noda", "city")
+    d = Dialogue("ruth", st, C)
+    labels = [(o[0], o[1]) for o in d.options()]
+    assert not any("Delia" in l for l, _ in labels), "no Delia option without meeting her"
+    assert any("CHARM" in l and not ok for l, ok in labels), "Charm option shown but locked"
+    d.choose(1)  # "South End."
+    assert "ruth_ok" not in st.flags
 
 
 def test_yard_controller_stealth():

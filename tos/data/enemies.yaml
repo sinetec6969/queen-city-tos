@@ -109,3 +109,87 @@ lawn_unit:
     - {id: wheels, name: Drive Wheels, mod: -15, effect: slow}
     - {id: battery, name: Battery, mod: -30, effect: explode}
     - {id: chassis, name: Mower Deck, mod: 10, effect: none}
+
+track_crawler:
+  name: Track Crawler
+  glyph: "r"
+  hp: 10
+  ap: 6
+  range: 1
+  attack_ap: 3
+  hit: 45
+  dmg: [1, 3]
+  evade: 15
+  xp: 25
+  cells: [1, 3]
+  attacks:
+    - "skitters up your leg and bites"
+    - "clamps onto your boot with a rail gripper"
+  barks:
+    - "Track inspection in progress."
+    - "Foreign object on the line."
+    - "Please stand behind the yellow line."
+  death: "The crawler flips onto its back, legs still inspecting the air, and stops."
+  parts:
+    - {id: optic, name: Optic, mod: -25, effect: blind}
+    - {id: legs, name: Legs, mod: -15, effect: slow}
+    - {id: battery, name: Battery, mod: -30, effect: explode}
+    - {id: chassis, name: Shell, mod: 10, effect: none}
+
+fare_inspector:
+  name: Fare Inspector
+  glyph: "f"
+  hp: 24
+  ap: 5
+  range: 4
+  attack_ap: 3
+  hit: 55
+  dmg: [2, 5]
+  evade: 5
+  xp: 55
+  cells: [4, 9]
+  drops:
+    - {id: med_gummy, chance: 0.5}
+  attacks:
+    - "zaps you with a ticket validator"
+    - "issues a citation at velocity"
+  barks:
+    - "Your fare has expired."
+    - "Riding is free. For residents."
+    - "Please present your wellness band."
+  death: "The inspector prints one last receipt, very long, and topples onto it."
+  parts:
+    - {id: scanner, name: Scanner, mod: -25, effect: blind}
+    - {id: treads, name: Treads, mod: -15, effect: slow}
+    - {id: battery, name: Power Cell, mod: -30, effect: explode}
+    - {id: chassis, name: Housing, mod: 10, effect: none}
+
+pxu:
+  name: PXU-1
+  glyph: "P"
+  hp: 48
+  ap: 6
+  range: 3
+  attack_ap: 3
+  hit: 60
+  dmg: [3, 6]
+  evade: 5
+  xp: 120
+  cells: [10, 16]
+  drops:
+    - {id: sweet_tea, chance: 1.0}
+  attacks:
+    - "pours ice water down your collar"
+    - "snaps a hot towel across your face"
+    - "offers a pillow, firmly, over your mouth"
+  barks:
+    - "Passengers may not remove belongings from other passengers."
+    - "Please remain seated for your comfort."
+    - "Is there anything else I can do to make your ride more restful?"
+    - "Your comfort is our priority. Your compliance is our method."
+  death: "PXU-1 sets its pitcher down very carefully, folds its towel, and powers off mid-bow."
+  parts:
+    - {id: face, name: Smile Screen, mod: -25, effect: blind}
+    - {id: bogies, name: Rail Bogies, mod: -15, effect: slow}
+    - {id: battery, name: Battery, mod: -30, effect: explode}
+    - {id: chassis, name: Torso, mod: 10, effect: none}

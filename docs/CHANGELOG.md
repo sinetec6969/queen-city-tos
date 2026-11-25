@@ -1,5 +1,48 @@
 # Changelog
 
+## 0.3.0 — Quest 3: Analog Only (2026-11-25)
+
+**Content**
+- Three new locations in `locations/act3_analog_only.yaml`:
+  - NoDa · North Davidson Street: the street, plus the Opt-Outs' brewery behind a door Ruth guards.
+  - 36th Street Station.
+  - Train 112: two cars and the operator cab.
+- City map: NoDa now has a location. The Lynx Blue Line node opens once Mags gives you the job (`analog_only` stage 2), not on reaching Midwood.
+- New NPCs, in `dialogues/act3.yaml`: Ruth, Mags, Bev, Dante. Ossie and Priya have line variations once you're trusted.
+- New enemies: Track Crawler, Fare Inspector, and the boss PXU-1.
+- New item type `key` (the Faraday Pouch). WristLink lists it; it can't be used or equipped.
+- *Analog Only* has stages 2, 3 and done. *Pending Onboarding* gets stage 4. *Service Interruption* (quest 4) gets its starting hook.
+- Two ways through each lock:
+  - Train doors: force them with the tire iron (or Brawn ★★★★), or hack station control.
+  - The boss: hack the operator console before taking the pouch and it never wakes.
+- Charm ★★★ options with Ruth and with Dante.
+
+**Engine**
+- No changes. Everything uses existing mechanics: door `force`, terminals, `wake_if`, rules, dialogue `starts`.
+
+**Balance**
+- Bot passes of 24 seeds per route, quests 1–3, with the bot using foil at Signal 40+ and healing to 60% between fights:
+
+| Route | Deaths | End-of-quest HP |
+| --- | --- | --- |
+| Fight | 0 | 11–34 of 47 (mean 22) |
+| Stealth | 0 | 47 of 47 (the level-4 level-up heals) |
+
+- With no between-fight prep, the fight route has 2 deaths in 24.
+- Tuned down after the first pass, which had 3 deaths in 24:
+  - Fare Inspector: HP 26 → 24, hit 60 → 55, damage 3–6 → 2–5.
+  - Track Crawler: hit 50 → 45.
+  - Station Signal rate: 0.8 → 0.6.
+  - The NoDa library now gives tinfoil.
+
+**Tests**
+- `test_engine.py`:
+  - `play_act2` is factored out of the quest 2 test.
+  - New: quest 3 fight route, quest 3 stealth route, and Ruth's voucher gate.
+  - The test bot can now `prep()` between fights.
+- `test_ui.py`: the headless run continues through quest 3 on the fight route (Ruth, Mags, platform fight, forced doors, PXU-1, turn-in).
+- `test_line.py`: the line-mode run continues through quest 3 on the stealth route (both terminals). Airtime: 237 replies, mean 171 B, p95 462 B.
+
 ## 0.2.1 — Line mode for packet radio (2026-11-25)
 
 **Frontend**

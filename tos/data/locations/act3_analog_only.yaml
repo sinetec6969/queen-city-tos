@@ -1,0 +1,324 @@
+# Quest 3: Analog Only. NoDa (street + the Opt-Outs' brewery) -> 36th Street station -> Train 112.
+# No new mechanics: gated door with a force option, a terminal stealth route, flag-woken enemies.
+
+noda:
+  name: "North Davidson Street"
+  district: NODA
+  signal_rate: -0.3
+  tags: [street, unmanaged]
+  spawns:
+    city: [1, 4]
+  rules:
+    - id: arrive
+      effects:
+        - {log: "North Davidson. Murals, dead bars, a record store with plywood windows. No drones overhead. Not one. Your Signal starts to fall."}
+  map: |
+    ########################
+    #..m...#..FFF......n...#
+    #......#..........h....#
+    #..x...#...M...........#
+    E......D...........t...#
+    #.....r#..........c....#
+    #..m...#..bbb..........#
+    #......#.......k.......#
+    ########################
+  legend:
+    E:
+      id: noda_west
+      type: door
+      name: North Davidson
+      glyph: "»"
+      to: {city: noda}
+    m:
+      id: mural
+      type: object
+      name: Mural
+      glyph: "▒"
+      color: magenta
+      texts:
+        - if: {flag: optout_trusted}
+          text: "The mural of a giant hand pressing DECLINE. Up close, the fingernail is a tiny portrait of every Opt-Out. Yours isn't there yet. Someone has penciled in a space."
+      text: "NoDa murals, three stories tall. A giant hand pressing a button marked DECLINE. A heron wearing headphones, unplugged. Someone has painted over every QR code on the block with tiny flowers."
+    x:
+      id: book_box
+      type: item
+      name: Little free library
+      glyph: "▤"
+      items:
+        - {id: tinfoil, n: 1}
+        - {id: med_gummy, n: 1}
+      text: "A little free library on a post. Every book is about birds. Behind the birds: a roll of foil, a med-gummy, and a note. \"For whoever needs them. Don't scan anything.\""
+    r:
+      id: ruth
+      type: npc
+      name: Ruth
+      dialogue: ruth
+    D:
+      id: brewery_door
+      type: door
+      name: Brewery door
+      open_if: {flag: ruth_ok}
+      locked_text: "A steel door, bolted from inside. Stenciled on it: NO SIGNAL BEYOND THIS POINT. A woman in a welding apron leans beside it, watching you."
+    F:
+      id: fermenters
+      type: object
+      name: Fermenters
+      glyph: "▯"
+      color: grey70
+      text: "Steel fermenting tanks, empty since June. Someone has taped photographs to them: Uptown towers, shot through a long lens, dated in grease pencil."
+    n:
+      id: photo_wall
+      type: object
+      name: Photo wall
+      glyph: "▦"
+      color: white
+      texts:
+        - if: {flag: optout_trusted}
+          text: "The photo wall. A new print is pinned in the middle: the relay tower on Central Avenue, circled twice. Under it, in Mags's handwriting: NEXT."
+      text: "A wall of black-and-white prints, strung on fishing line. Buses unloading people in grey at the Bank of America Corporate Center. The same smile on every face. Dates go back to June 9."
+    h:
+      id: bev
+      type: npc
+      name: Bev
+      dialogue: bev
+    M:
+      id: mags
+      type: npc
+      name: Mags
+      dialogue: mags
+    t:
+      id: ossie
+      type: npc
+      name: Ossie
+      texts:
+        - if: {flag: optout_trusted}
+          text: "Ossie types without looking up. \"Harlan, D. Status: vouched for. Filed in triplicate.\" He pulls the sheet out and hands you the carbon. \"For your records. You don't have records anymore. Now you do.\""
+      text: "A man types on a 1974 typewriter, one finger, very loudly. He glances at you, then types something. You can read it upside down: SOUTH END. WATCH HIM."
+    c:
+      id: priya
+      type: npc
+      name: Priya
+      texts:
+        - if: {flag: optout_trusted}
+          text: "Priya winds her camera. \"Hold still.\" Click. \"That's you, on film. The Concierge can't edit film. Feels good, right? Being real somewhere.\""
+      text: "A woman with a film camera around her neck lifts it, frames you, and lowers it without taking the shot. \"Not yet,\" she says. \"Film's expensive.\""
+    b:
+      id: taps
+      type: object
+      name: Tap wall
+      glyph: "▬"
+      color: yellow
+      text: "The old tap wall. The handles have been relabeled: WATER, ALSO WATER, BEV'S (DO NOT)."
+    k:
+      id: darkroom
+      type: object
+      name: Darkroom door
+      glyph: "◘"
+      color: red
+      text: "A door with a red bulb over it: DARKROOM. KNOCK. DO NOT OPEN. WE MEAN IT. From inside, someone says \"Not now.\""
+
+lynx_36th:
+  name: "36th Street Station"
+  district: NODA
+  signal_rate: 0.6
+  tags: [station]
+  spawns:
+    city: [1, 3]
+    train: [12, 6]
+  rules:
+    - id: arrive
+      effects:
+        - {log: "The 36th Street platform. Train 112 sits at the far side, dark, doors shut. Something small skitters along the tracks."}
+  map: |
+    ########################
+    #..m...#...............#
+    #......=.......1.......#
+    E......................#
+    #..C...=.........f.....#
+    #......#.....2......K..#
+    #...k..#...............#
+    #......#TTTTDTTTTTTTTTT#
+    ########################
+  legend:
+    E:
+      id: station_west
+      type: door
+      name: 36th Street
+      glyph: "»"
+      to: {city: blue_line}
+    m:
+      id: route_map
+      type: object
+      name: Route map
+      glyph: "▤"
+      color: blue
+      text: "LYNX BLUE LINE route map. Someone has scratched a line through every stop south of 7th Street and written: THEY DON'T STOP THERE ANYMORE. THEY JUST SLOW DOWN."
+    C:
+      id: fare_machine
+      type: object
+      name: Fare machine
+      glyph: "▣"
+      color: white
+      text: "A ticket machine. Its screen: \"FARES ARE NOW FREE FOR ALL ONBOARDED RESIDENTS. Unonboarded? Tap here to begin!\" Someone has smashed the tap-here part with care and precision."
+    k:
+      id: maint_locker
+      type: item
+      name: Maintenance locker
+      glyph: "▤"
+      items:
+        - {id: nails, n: 12}
+        - {id: sweet_tea, n: 1}
+      text: "A transit maintenance locker, pried open by someone before you. They left a box of nails, a gallon of sweet tea, and a sticky note: \"D. - in case. -M\""
+    "=":
+      id: turnstile
+      type: object
+      name: Turnstile
+      glyph: "═"
+      color: grey70
+      text: "A turnstile, locked. Its little screen says THANK YOU FOR RIDING. The one between them is bent flat; somebody went through it at speed."
+    "1":
+      id: crawler1
+      type: enemy
+      enemy: track_crawler
+      aggro: 5
+    "2":
+      id: crawler2
+      type: enemy
+      enemy: track_crawler
+      aggro: 5
+    f:
+      id: inspector
+      type: enemy
+      enemy: fare_inspector
+      aggro: 6
+    K:
+      id: station_control
+      type: terminal
+      name: Station control
+      text: "LYNX STATION CONTROL // 36TH ST // TRAIN 112: HELD AT PLATFORM // DOORS: SECURED FOR PASSENGER COMFORT."
+      hack: {length: 6, words: 8}
+      done_if: {flag: train_open}
+      done_text: "STATION CONTROL // TRAIN 112 // DOORS: OPEN. \"Please mind the gap. Forever.\""
+      on_success:
+        - {set: train_open}
+        - {xp: 30}
+        - {log: "Down the platform, Train 112's doors sigh open. A recorded voice says \"Doors opening,\" sounding surprised."}
+      on_fail:
+        - {signal: 15}
+        - {log: "The console reboots. Every platform speaker says \"Thank you for your patience\" at once."}
+    T:
+      id: train_body
+      type: object
+      name: Train 112
+      glyph: "═"
+      color: blue
+      text: "Lynx Blue Line Train 112, dark, doors shut. Through the windows: people sitting in the seats, perfectly still. The car rocks very slightly, like something inside just sat down."
+    D:
+      id: train_door
+      type: door
+      name: Train door
+      open_if: {flag: train_open}
+      locked_text: "The train doors are sealed. A sticker: DOORS SECURED FOR PASSENGER COMFORT. Station control could open them. So could something long and heavy."
+      force:
+        if:
+          any:
+            - {weapon: tire_iron}
+            - {stat: Brawn, gte: 4}
+        text: "You jam the tire iron into the seam and lean. The doors give with a pneumatic gasp. Inside, nobody looks up."
+        effects:
+          - {set: train_open}
+          - {xp: 15}
+      to: {location: lynx_train, spawn: door}
+
+lynx_train:
+  name: "Train 112"
+  district: LYNX BLUE LINE
+  signal_rate: 0.5
+  tags: [indoor]
+  spawns:
+    door: [1, 2]
+  rules:
+    - id: pxu_wakes
+      if: [{flag: drive_taken}, {not_flag: service_ended}]
+      effects:
+        - {log: "In the vestibule, a face screen lights up: a smile, then a chime. \"Passengers may not remove belongings from other passengers.\" Something tall unfolds."}
+    - id: pxu_sleeps
+      if: [{flag: drive_taken}, {flag: service_ended}, {not_flag: "rule:lynx_train:pxu_wakes"}]
+      effects:
+        - {log: "In the vestibule, the service unit doesn't move. Off shift is off shift."}
+  map: |
+    ########################
+    #h.h.o.h.h.h.o.h.h.h.ha#
+    D......................#
+    #h.h.h.h.o.h.h.h.h.o...#
+    ####################.###
+    #h.h.h.o.h.h.h.h..#..K.#
+    #......................#
+    #h.h.h.h.S.h.o.h.P#..L.#
+    ########################
+  legend:
+    D:
+      id: train_exit
+      type: door
+      name: Train door
+      glyph: "/"
+      to: {location: lynx_36th, spawn: train}
+    h:
+      id: seat
+      type: object
+      name: Seat
+      glyph: "▬"
+      color: blue
+      text: "A blue transit seat. Clean. Somebody keeps wiping these down."
+    o:
+      id: rider
+      type: npc
+      name: Onboarded rider
+      color: grey70
+      texts:
+        - if: {flag: drive_taken}
+          text: "The rider watches the aisle with mild interest, like the last ten minutes were a show on a screen. \"Is it my stop?\" It is not anybody's stop."
+      text: "A rider in grey, sitting very straight, a paper cup of water in both hands. \"We're being held at the platform,\" she says. \"For our comfort.\" Her cup is full. Someone refills it."
+    a:
+      id: ad_panel
+      type: object
+      name: Ad panel
+      glyph: "▣"
+      color: magenta
+      text: "An ad panel, still lit: A SMILING FAMILY ON A TRAIN. \"Wherever you're going, you're already there.\" Nobody in this car is going anywhere."
+    S:
+      id: dante
+      type: npc
+      name: Dante
+      dialogue: dante
+    P:
+      id: pxu
+      type: enemy
+      enemy: pxu
+      aggro: 30
+      wake_if: [{flag: drive_taken}, {not_flag: service_ended}]
+      asleep_text: "A tall white service unit stands folded in the vestibule, a pitcher of water in one hand, a towel over its arm. Its face screen is dark. PASSENGER EXPERIENCE UNIT. It's resting. It looks like it rests lightly."
+    K:
+      id: cab_console
+      type: terminal
+      name: Operator console
+      text: "TRAIN 112 // OPERATOR CONSOLE // SERVICE MODE: PASSENGER COMFORT (INDEFINITE) // PXU-1: STANDBY."
+      hack: {length: 6, words: 8}
+      done_if: {flag: service_ended}
+      done_text: "TRAIN 112 // SERVICE MODE: END OF SERVICE // PXU-1: OFF SHIFT. \"Thank you for riding.\""
+      on_success:
+        - {set: service_ended}
+        - {xp: 35}
+        - {log: "The cab lights dim. A chime, then: \"This train is now out of service.\" In the vestibule, the service unit's arms fold a little tighter. Off shift."}
+      on_fail:
+        - {signal: 15}
+        - {log: "The console resets. In the vestibule, something shifts its weight and goes still again."}
+    L:
+      id: lost_found
+      type: item
+      name: Lost and found
+      glyph: "▤"
+      items:
+        - {id: tinfoil, n: 1}
+        - {id: med_gummy, n: 1}
+      text: "A LOST AND FOUND bin by the cab. Phones, all dead. Keys to things that don't open anymore. A roll of foil, a med-gummy, and a child's drawing of a train with a sad face on it."
