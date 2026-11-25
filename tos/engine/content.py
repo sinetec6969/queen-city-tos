@@ -16,6 +16,13 @@ Content files never touch Python. Conditions and effects are small dicts:
 Enemy entities may also carry `on_death: [effects]` and
 `phases: [{hp_below: 0.5, effects: [...]}]` (each phase runs once, the first time
 the enemy drops below that fraction of its max HP; see Combat.phases).
+
+Other data files and the modules that read them:
+  perks.yaml       engine/perks.py      (requires, mods, effects)
+  recipes.yaml     engine/crafting.py   (inputs -> output item, or a weapon mod; needs a
+                                          location tagged `workbench`)
+  encounters.yaml  engine/travel.py     (per-region travel events and ambushes)
+  city.yaml        engine/travel.py     (regions, nodes, gateways via `goto:`)
 """
 from __future__ import annotations
 

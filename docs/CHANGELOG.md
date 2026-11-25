@@ -1,5 +1,48 @@
 # Changelog
 
+## 0.7.0 — Chapter two systems (2026-11-25)
+
+No new quests. This build adds the systems chapter two (*Quality Assurance*, Lake Norman / McGuire Station) is built on. Every system works in both the Textual UI and line mode, and chapter one plays exactly as before.
+
+**Systems**
+- **Regions.** `city.yaml` gains `regions` (each with its own canvas, flavour line and encounter chance), `region:` per node, and gateway nodes (`goto:`).
+  - Charlotte's LAKE NORMAN node opens a new Lake Norman map with seven places (placeholders for now) and a road back.
+  - Travel rules live in one place, `engine/travel.py`, instead of being duplicated in both frontends.
+- **Perks.** One point per level-up and 13 perks in `data/perks.yaml`: two per stat plus a level-6 capstone. `engine/perks.py` applies them to:
+  - hit chance, damage, crits and Lock-On cost,
+  - AP per turn, surprises and companion damage,
+  - healing, Signal per step, and hack attempts and words.
+  - Hacks are now built by the engine (`hack.for_terminal`), so both frontends agree.
+  - Textual: a PERKS tab (Tab, ←). Line: `PERKS` / `PERK n`.
+- **Crafting.** `data/recipes.yaml` has 4 consumables and 4 weapon mods.
+  - Only at a workbench (a location tagged `workbench`; Ruth's safehouse for now).
+  - Mods are stored per weapon (max 2) and applied through `crafting.weapon_stats`.
+  - Junk items drop from machines; Hollis sells sugar and duct tape.
+  - Textual: a CRAFT tab (Tab, ← ←). Line: `CRAFT` / `CRAFT n`.
+- **Travel encounters.** `data/encounters.yaml` holds text events and ambushes per region.
+  - Rolled on trips to a different node: the region's chance plus Signal/400, capped at 0.6.
+  - Ambush maps reset every time, and their exit continues the trip (`{city: $dest}`).
+  - Every current encounter needs `chapter2`, and an empty pool consumes no randomness.
+- **The chapter one rating carries over.** The Crown's choices set `rating_one` / `rating_three` / `rating_declined`.
+
+**Saves**
+- `SAVE_VERSION` 3, with `GameState.migrate()`.
+- Saves from 0.6 load: older saves get their rating flag inferred, and are back-paid one perk point per level already earned. New fields default sensibly.
+
+**Tests**
+- Engine (27 tests): every perk mod, every crafting rule, encounters (forced RNG), gateways, rating flags, migrations, a real v0.6 save.
+- New guards: every spawn is walkable (it caught the lakeshore map spawning you in the water), and every map label fits its canvas.
+- The UI and line playthroughs each take a perk, craft a mod, travel between regions and hit an encounter.
+- All pass on Python 3.11 and 3.14. Line-mode airtime unchanged (mean 163 B per reply).
+
+**Balance**
+- Ambushes at post-chapter-one strength (24 seeds, level 6):
+
+| Ambush | Deaths | HP after |
+| --- | --- | --- |
+| Roadside | 0 | 24–47 of 57 |
+| Shoreline | 0 | 40–56 of 57 |
+
 ## 0.6.2 — Pre-OTA audit (2026-11-25)
 
 **Fixes**

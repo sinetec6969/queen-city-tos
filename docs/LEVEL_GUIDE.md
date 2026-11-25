@@ -24,7 +24,7 @@ Same game and same saves format, but typed commands instead of keys. Saves are p
 
 | Where | Commands |
 | --- | --- |
-| Exploring | `N` `S` `E` `W` move (`N3` = three steps, stops when something happens) · walk into things to use them · `L` what's around you and which way · `M` map · `I` items (`I 2` details) · `USE n`/`EQ n` (number or name: `EQ TIRE`) · `ST` status · `Q` quests + orientation step · `NOTES` (`NOTES 1`) · `SAVE` · `BYE` save + disconnect · `BRIEF`/`VERBOSE` · `?` |
+| Exploring | `N` `S` `E` `W` move (`N3` = three steps, stops when something happens) · walk into things to use them · `L` what's around you and which way · `M` map · `I` items (`I 2` details) · `USE n`/`EQ n` (number or name: `EQ TIRE`) · `ST` status · `Q` quests + orientation step · `NOTES` (`NOTES 1`) · `PERKS` / `PERK n` · `CRAFT` / `CRAFT n` (at a workbench) · `SAVE` · `BYE` save + disconnect · `BRIEF`/`VERBOSE` · `?` |
 | Combat | `N` `S` `E` `W` move (1 AP) · `F` attack · `A` then `1`–`4`, or `A2` in one go (+2 AP) · `T` next target · `U` best heal (2 AP) · `.` end turn. The prompt shows round, AP, HP, then the target's HP, direction, hit % and AP cost. |
 | Talking | reply with the option number |
 | Hacking | type a word · `D` reprint the dump · `X` back out |
@@ -33,6 +33,62 @@ Same game and same saves format, but typed commands instead of keys. Saves are p
 **Line-mode map symbols:** `@` you · `#` wall · `$` things to search · `o` objects to examine · `N` people · `T` terminal · enemy letters as above · `+` locked door · `/` `>` exits. `L` names everything with its direction from you, e.g. `Closet $ 1N 4E`.
 
 **Airtime:** ordinary replies are 50–250 bytes (1–3 s at 1200 baud). The map (~300 bytes) only appears when you arrive somewhere (off with `BRIEF`) or type `M`. First-time tips and hack dumps are the biggest sends (up to ~900 bytes, ~8 s).
+
+---
+
+## Systems (v0.7)
+
+### Perks
+You get **one perk point per level-up** (saves from before v0.7 are back-paid one point per level already earned). Spend it in the WristLink: **Tab, then ←** to PERKS. In line mode: `PERKS`, `PERKS ALL`, `PERK n`.
+
+| Perk | Needs | Effect |
+| --- | --- | --- |
+| Heavy Hands | [BRAWN ★★★] | Melee hits do +2 damage. |
+| Follow Through | [BRAWN ★★★★] | +10% melee hit chance. |
+| Steady | [AIM ★★★] | +10% ranged hit chance. |
+| Quick Lock | [AIM ★★★★] | Lock-On costs 1 AP less. |
+| Thick Skin | [GRIT ★★★] | +10 max HP. |
+| Off the Grid | [GRIT ★★] | Signal builds 25% slower as you move. |
+| Prompt Engineer | [WITS ★★★] | +1 attempt on every hack. |
+| Pattern Match | [WITS ★★] | Hack dumps show 2 fewer decoy words. |
+| Delivery Partner | [CHARM ★★] | Biscuit hits for +2 damage. |
+| Bedside Manner | [CHARM ★★★] | Healing items restore +5 HP. |
+| Lucky Break | [LUCK ★★★] | +5% critical hit chance. |
+| Happy Accident | [LUCK ★★] | Combat surprises break your way 15% more often. |
+| Overclocked | [LEVEL 6] | +1 AP every combat turn. |
+
+### Crafting
+You need a **workbench**: a location tagged for one. So far that's **Ruth's bench in the Third Ward safehouse**. WristLink **Tab, ← ←** to CRAFT, or `CRAFT` / `CRAFT n` in line mode.
+
+**Ingredients:**
+- Scrap, wire and duct tape drop from machines.
+- Both Hollis stalls sell sugar (4 cells) and duct tape (6 cells).
+
+**Mods** go on the equipped weapon: one of each kind, at most 2 per weapon. A modded weapon shows as e.g. "Tire Iron +2".
+
+| Recipe | Ingredients | Result | Needs |
+| --- | --- | --- | --- |
+| Nails x12 | 2 Scrap | Gives Nails x12 | — |
+| Sweet Tea | 2 Sugar | Gives Sweet Tea (gallon) | — |
+| Rocket Tea | 1 Sweet Tea (gallon), 1 Sugar | Gives Rocket Tea | — |
+| Tinfoil Hat | 1 Tinfoil, 1 Duct Tape | Gives Tinfoil Hat | — |
+| Mod: Grip Tape | 2 Duct Tape | Melee weapon: +5% hit. | — |
+| Mod: Weighted Head | 3 Scrap, 1 Duct Tape | Melee weapon: +2 damage. | [BRAWN ★★] |
+| Mod: Rail Sight | 2 Scrap, 1 Wire | Ranged weapon: +10% hit. | [AIM ★★] |
+| Mod: Overcharged Coil | 2 Wire, 2 Scrap | Ranged weapon: +2 damage. | [WITS ★★★] |
+
+### Travel encounters
+- Travelling **to a different node** on a map can trigger an encounter. Re-entering the node you're on never does.
+- **Chance per trip:** the region's base (Charlotte 15%, Lake Norman 25%) plus Signal ÷ 4 (%), capped at 60%. Tinfoil helps here too.
+- Every current encounter needs **chapter two**, so chapter one never rolls.
+- **Charlotte:** two text events (one gives sugar and duct tape) and a **wellness-check ambush**: a Greeter and a Courier Drone on the roadside.
+- **Lake Norman:** two text events (one lowers Signal, one gives wire and scrap) and a **shoreline ambush**: two Lawn Units.
+- Win an ambush and walk out the exit (») to carry on to where you were going.
+- Bot balance (24 seeds, level 6, tire iron): roadside 0 deaths, ending at 24–47 of 57 HP; shoreline 0 deaths, ending at 40–56.
+
+### Regions
+- The city map now has regions. **LAKE NORMAN** on the Charlotte map opens the Lake Norman map; **CHARLOTTE (I-77)** there brings you back.
+- Lake nodes other than THE SHORE are "not built yet". They're chapter two.
 
 ---
 

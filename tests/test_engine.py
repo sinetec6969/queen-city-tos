@@ -796,6 +796,21 @@ def test_every_spawn_is_walkable():
             assert not L.is_wall(x, y) and (e is None or L.passable(e)), (lid, name, (x, y))
 
 
+def test_v06_save_loads():
+    """A save written by 0.6.x (no perks, mods, hp_bonus or travel_dest; version 1) still loads."""
+    from tos.engine.state import GameState
+    st = play_act1(random.Random(7))
+    d = st.to_json()
+    for k in ("perks", "perk_points", "mods", "hp_bonus"):
+        d["player"].pop(k)
+    d.pop("travel_dest")
+    d["version"] = 1
+    st2 = GameState.from_json(d)
+    p = st2.player
+    assert p.perks == [] and p.mods == {} and p.hp_bonus == 0 and st2.travel_dest is None
+    assert p.perk_points == p.level - 1 and st2.location == st.location and st2.flags == st.flags
+
+
 def test_city_labels_fit_their_canvas():
     from tos.engine import travel
     for rid in C.city.get("regions", {}):
