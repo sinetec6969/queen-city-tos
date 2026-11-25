@@ -3,7 +3,6 @@ commands only, plus entry-point checks. Prints reply sizes and an airtime estima
 
 Run: python tests/test_line.py
 """
-import math
 import os
 import random
 import subprocess
@@ -541,6 +540,28 @@ def test_session_cap():
     assert b"hello KN4CCC" in r.stdout, "room again once the others hang up"
 
 
+def test_output_fits_ax25_mtu():
+    """AX.25 sockets refuse writes larger than the interface MTU (kissattach sets it from the
+    axports paclen). Found in the loopback lab: the game exited before its title screen."""
+    import errno
+    import tos.line.__main__ as M
+    sent, real = [], M.os.write
+    def mtu_write(fd, data, mtu=64):
+        if len(data) > mtu:
+            raise OSError(errno.EMSGSIZE, "Message too long")
+        sent.append(bytes(data))
+        return len(data)
+    M.os.write = mtu_write
+    try:
+        out = M.Out(b"\r", 0)
+        text = "x" * 50 + "\n" + "y" * 900 + "\nprompt>"
+        out.write(text)
+    finally:
+        M.os.write = real
+    assert b"".join(sent) == text.replace("\n", "\r").encode() + b" "
+    assert max(len(c) for c in sent) <= 64 and out.chunk == 64
+
+
 def test_callsigns_and_allowlist():
     assert base_call("kn4abc-7") == "KN4ABC"
     assert base_call("../etc") == "" and base_call("A") == ""
@@ -606,10 +627,11 @@ def test_cli_broken_pipe_is_quiet():
 
 
 def airtime(n: int) -> float:
-    """Rough seconds on air at 1200 baud: 128-byte frames, ~20 bytes of header/flags
-    each, up to 4 frames per transmission, 300 ms TXDELAY per transmission."""
-    frames = max(1, math.ceil(n / 128))
-    return (n + 20 * frames) * 8.25 / 1200 + 0.3 * math.ceil(frames / 4)
+    """Seconds from Enter to a complete reply over AX.25 connected mode at 1200 baud.
+    Fitted to the loopback lab (2026-11-25: two direwolf modems, paclen 128, maxframe 4,
+    TXDELAY 400 ms): 40 B -> 2.7 s, 174 B -> 3.8 s, 378 B -> 8.3 s, 945 B -> 18.1 s.
+    Real UV-5R turnaround will add a little."""
+    return 2.0 + 0.017 * n
 
 
 def report():

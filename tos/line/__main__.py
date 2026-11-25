@@ -11,6 +11,7 @@ connection.
 from __future__ import annotations
 
 import argparse
+import errno
 import fcntl
 import os
 import re
@@ -43,10 +44,35 @@ def allowed(call: str, path: str | None) -> bool:
     return call in calls
 
 
+HANGUPS = {errno.EPIPE, errno.ECONNRESET, errno.ENOTCONN, errno.EIO, errno.EBADF}
+
+
 class Out:
-    def __init__(self, eol: bytes, baud: int):
-        self.eol, self.baud = eol, baud
+    """Writes replies to the connection.
+
+    An AX.25 socket refuses any single write larger than the interface MTU, and kissattach
+    sets that MTU from the axports paclen (often 128 or less). So replies go out in chunks,
+    and a chunk the kernel calls too big (EMSGSIZE) is halved and retried.
+    """
+
+    def __init__(self, eol: bytes, baud: int, chunk: int = 128):
+        self.eol, self.baud, self.chunk = eol, baud, chunk
         self.sent = 0
+
+    def _send(self, data: bytes) -> None:
+        i = 0
+        while i < len(data):
+            piece = data[i:i + self.chunk]
+            try:
+                n = os.write(1, piece)
+            except OSError as e:
+                if e.errno == errno.EMSGSIZE and self.chunk > 16:
+                    self.chunk //= 2
+                    continue
+                raise
+            i += n
+            if self.baud:
+                time.sleep(n * 10 / self.baud)  # throttle: 10 bits per byte on async serial
 
     def write(self, text: str) -> None:
         if not text:
@@ -56,12 +82,7 @@ class Out:
         if not data.endswith(self.eol):
             data += b" "  # prompts end with a space so the cursor sits after '>'
         self.sent += len(data)
-        if self.baud:
-            for i in range(0, len(data), 32):  # throttle: 10 bits per byte on async serial
-                os.write(1, data[i:i + 32])
-                time.sleep(len(data[i:i + 32]) * 10 / self.baud)
-        else:
-            os.write(1, data)
+        self._send(data)
 
 
 def active_sessions(sdir, mine: str) -> int:
@@ -166,8 +187,10 @@ def main() -> None:
             if session.done:
                 out.write("\n")
                 return
-    except OSError:
-        pass  # the link dropped mid-read or mid-write: nobody left to tell
+    except OSError as e:
+        if e.errno not in HANGUPS:  # a real fault, not the caller leaving: leave a trace
+            with open(sdir / "line-errors.log", "a") as f:
+                f.write(f"--- {time.ctime()} {call} {e!r}\n{traceback.format_exc()}")
     finally:
         if not session.done:
             session.save()  # EOF, dropped link, hangup, idle: always keep progress
