@@ -518,7 +518,7 @@ def play_act6(rng, deny_both=False):
     crown = Location(st.location, st, C)
     crown.update_rules()
     assert not crown.door_open(crown.get("freight_elevator"))
-    d = talk("teo", st, 0, 0)
+    talk("teo", st, 0, 0)
     assert "extremely fine" in C.dialogues["teo"]["nodes"]["hello"]["text"]
     if deny_both:
         st.player.stats["Charm"] = 4  # as if trained for it

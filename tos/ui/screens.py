@@ -1,7 +1,6 @@
 """All Textual screens."""
 from __future__ import annotations
 
-import random
 from collections import deque
 
 from rich.text import Text

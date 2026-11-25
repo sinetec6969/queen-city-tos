@@ -517,7 +517,7 @@ class Session:
         cb = self.combat
         t = cb.target()
         parts = [f"{i} {p['name']} {cb.hit_chance(t, p)}%" for i, p in enumerate(cb.parts(t), 1)]
-        self.lines([f"LOCK-ON (+2 AP): " + "  ".join(parts) + "  x cancel"])
+        self.lines(["LOCK-ON (+2 AP): " + "  ".join(parts) + "  x cancel"])
 
     def in_combat(self, cmd: str) -> None:
         cb = self.combat
