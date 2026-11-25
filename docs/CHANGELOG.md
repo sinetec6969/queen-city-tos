@@ -1,5 +1,36 @@
 # Changelog
 
+## 0.6.2 — Pre-OTA audit (2026-11-25)
+
+**Fixes**
+- **AX.25 writes (launch blocker, found in the loopback lab):** an AX.25 socket refuses any single write larger than the interface MTU, which `kissattach` sets from the axports paclen. The game wrote whole replies at once, got `EMSGSIZE` and exited before its title screen, so every real connection would have dropped instantly. Replies now go out in chunks of at most 128 bytes, halving automatically if the kernel still refuses. Socket errors that aren't hang-ups are logged.
+- **Input sanitizing:** player input is reduced to printable ASCII and capped at 80 characters. Hack prompts echo the typed word, so control characters and ESC sequences could previously be sent back over the air.
+- **Durable saves:** each save fsyncs the file and its directory, so it survives the Pi losing power.
+- **Session cap:** `--max-sessions` / `QCTS_MAX_SESSIONS`, default 3. Extra callers get a polite "full" message.
+
+**Station kit**
+- New `deploy/pi-os/`: Raspberry Pi OS + direwolf + kernel AX.25 + ax25d for a Pi 4 / Digirig Mobile / UV-5R. It includes:
+  - The direwolf config.
+  - axports and ax25d.conf in the lab-proven format.
+  - systemd units and the `qcts-on` / `qcts-off` kill switch.
+  - `install-station.sh`, which never starts transmitting by itself.
+  - A bench-guide README.
+- DigiPi is now a radio-check card only. It's built as a read-only appliance, which conflicts with the game's saves.
+
+**Audit (no RF)**
+
+| Check | Result |
+| --- | --- |
+| Python | All suites pass on 3.11, 3.13 and 3.14 |
+| Lint | pyflakes clean |
+| Content | No profanity; ASCII-safe; no business names |
+| Fuzzing | 60k hostile inputs plus 40 raw-byte streams: 0 failures |
+| Load | 5 concurrent players at ~24 MB each |
+| Installers | Pass in a clean Debian Bookworm container |
+
+- **AX.25 loopback lab:** two direwolf modems over 1200-baud AFSK with kernel AX.25 and ax25d. Three connected sessions, save/resume, a dropped link keeps progress, and the node passes `%U` = callsign.
+- **Measured round trips:** 2.5–4 s for short replies and ~18 s for the largest one-time scene change. `tests/test_line.py`'s `airtime()` is refitted to them.
+
 ## 0.6.1 — The Unsubscribe (2026-11-25)
 - The Plaza Midwood bar is now **The Unsubscribe**, a fictional name, everywhere in the game and docs: the location name, menu board, city blurb, quest text, and Ruth's and Delia's lines. Delia explains the name.
 
