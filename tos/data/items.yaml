@@ -1,0 +1,55 @@
+# Weapons: melee or ranged. ap = cost per attack. dmg = [min, max]. acc = flat hit bonus.
+fists:
+  name: Fists
+  type: weapon
+  melee: true
+  ap: 3
+  dmg: [1, 3]
+  range: 1
+  desc: "Ten fingers, two thumbs, ninety-four days of pent-up feelings."
+
+tire_iron:
+  name: Tire Iron
+  type: weapon
+  melee: true
+  ap: 3
+  dmg: [4, 7]
+  acc: 5
+  range: 1
+  desc: "Teo's. He bought it to learn to change a flat. He never learned."
+
+nail_gun:
+  name: Nail Gun
+  type: weapon
+  melee: false
+  ap: 4
+  dmg: [4, 7]
+  range: 6
+  ammo: nails
+  desc: "Cordless, industrial, and blissfully offline."
+
+nails:
+  name: Nails
+  type: ammo
+  desc: "Framing nails. Ammunition, now."
+
+sweet_tea:
+  name: Sweet Tea (gallon)
+  type: aid
+  heal: 15
+  use_text: "You drink sweet tea straight from the jug. Your blood sugar files a complaint. You feel great."
+  desc: "Heals 15 HP. The Concierge decided you're a sweet tea person. It was right."
+
+med_gummy:
+  name: Med-Gummy
+  type: aid
+  heal: 8
+  use_text: "You chew a med-gummy. It tastes like a pharmacy's idea of a strawberry."
+  desc: "Heals 8 HP."
+
+tinfoil:
+  name: Tinfoil
+  type: aid
+  signal: -30
+  use_text: "You line your cap with tinfoil. You were right all along. It doesn't make it better."
+  desc: "Lowers Signal by 30. Yes, really."

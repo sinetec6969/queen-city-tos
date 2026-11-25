@@ -1,0 +1,75 @@
+# City travel map. x, y = position on the map canvas (52 x 15).
+# location/spawn: where entering the node puts you. Nodes without a location are not built yet.
+width: 52
+height: 15
+nodes:
+  south_end:
+    name: SOUTH END
+    x: 9
+    y: 12
+    location: south_end_street
+    spawn: east
+    blurb: "Onboarded zone. Spotless, silent, high Signal. Home, unfortunately."
+  dilworth:
+    name: DILWORTH
+    x: 22
+    y: 13
+    unlocked_if: {flag: act1_done}
+    location: dilworth
+    spawn: west
+    blurb: "Old bungalows and Freedom Park. The lawn units have opinions now."
+  plaza_midwood:
+    name: PLAZA MIDWOOD
+    x: 35
+    y: 9
+    unlocked_if: {flag: reached_midwood}
+    location: plaza_midwood
+    spawn: city
+    blurb: "The Midwood Exchange at Moo & Brew. Unbanded humans. Mostly-beef burgers."
+  central_ave:
+    name: CENTRAL AVE
+    x: 26
+    y: 7
+    unlocked_if: {flag: reached_midwood}
+    blurb: "A relay tower on Central keeps Uptown's eyes open."
+  noda:
+    name: NODA
+    x: 31
+    y: 3
+    unlocked_if: {flag: reached_midwood}
+    blurb: "The Opt-Outs, in a dead brewery. Analog only. Bring proof."
+  blue_line:
+    name: LYNX BLUE LINE
+    x: 13
+    y: 4
+    unlocked_if: {flag: reached_midwood}
+    blurb: "Stalled trains since June. Something is still riding them."
+  uptown:
+    name: UPTOWN
+    x: 17
+    y: 8
+    unlocked_if: {flag: relay_down}
+    blurb: "The Concierge's campus. You can see the Crown from anywhere."
+  speedway:
+    name: SPEEDWAY
+    x: 41
+    y: 1
+    unlocked_if: {flag: reached_midwood}
+    blurb: "The Infield. Raiders racing stolen robotaxis in Concord."
+  lake_norman:
+    name: LAKE NORMAN
+    x: 3
+    y: 1
+    unlocked_if: {flag: chapter2}
+    blurb: "Chapter 2. The lake runs warm near McGuire now."
+links:
+  - [south_end, uptown]
+  - [south_end, dilworth]
+  - [dilworth, plaza_midwood]
+  - [plaza_midwood, central_ave]
+  - [central_ave, uptown]
+  - [plaza_midwood, noda]
+  - [noda, blue_line]
+  - [blue_line, uptown]
+  - [noda, speedway]
+  - [uptown, lake_norman]

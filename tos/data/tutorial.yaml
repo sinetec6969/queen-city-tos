@@ -1,0 +1,162 @@
+# New Resident Orientation: the opening-quest tutorial.
+# In-world it's LUMEN HOME's onboarding wizard, running on backup power and
+# accidentally teaching Dez how to escape.
+#
+# steps: shown one at a time in the side panel; each completes when done_if is true
+#        (in any order) and never un-completes.
+# tips:  one-time popups. `auto: true` tips fire as soon as `when` is true;
+#        the rest are fired by the game (first combat, first hack, city map).
+
+steps:
+  - id: move
+    title: Walking
+    text: "Use the ARROW KEYS (or hjkl) to walk. Take a few steps."
+    done_if: {steps: 3}
+  - id: interact
+    title: Using things
+    text: "You use things by walking into them. Bump into your bed (▭) or your rating rig (▣)."
+    done_if: {flag: "did:interact"}
+  - id: tablet
+    title: Messages
+    text: "Your tablet (cyan ▫, in the bedroom) has an unread message. Walk into it."
+    done_if: {quest: teo, gte: 1}
+  - id: pickup
+    title: Searching
+    text: "Search the bedroom closet (▤, top right of the bedroom). Anything you find goes into your WristLink."
+    done_if: {item: tire_iron}
+  - id: wristlink
+    title: WristLink
+    text: "Press TAB to open your WristLink. It holds your STATUS, ITEMS, QUESTS and DATA. TAB or ESC closes it."
+    done_if: {flag: "did:wristlink"}
+  - id: equip
+    title: Equipping
+    text: "In the WristLink, press → to reach ITEMS, pick the Tire Iron with ↑↓, and press ENTER to equip it."
+    done_if: {weapon: tire_iron}
+  - id: supplies
+    title: Supplies
+    text: "Stock up for later. Search the kitchen fridge (▥) and the junk drawer (▦)."
+    done_if: [{taken: "lumen_1412:fridge"}, {taken: "lumen_1412:drawer"}]
+  - id: quests
+    title: Objectives
+    text: "Your current objective sits below this box. For the full list and your notes, open WristLink → QUESTS and DATA."
+    done_if: {flag: "did:quests_tab"}
+  - id: talk
+    title: Talking
+    text: "Walk into the LUMEN HOME panel (◙, living room). Pick replies with number keys. Grey replies need higher stats."
+    done_if: {flag: met_lumen}
+  - id: hack
+    title: Hacking
+    text: "Open the front door: walk into the terminal (≡) beside it. Heads up: TIDY-3 (c) will not like this."
+    done_if: {flag: door_unlocked}
+  - id: fight
+    title: Combat
+    text: "Defeat TIDY-3."
+    done_if: {flag: "did:won_combat"}
+  - id: save
+    title: Saving
+    text: "Press S to save. The game also autosaves when you change areas."
+    done_if: {flag: "did:saved"}
+  - id: leave
+    title: Leaving
+    text: "Walk out the front door (bottom wall of the living room)."
+    done_if: {flag: "lumen_1412:front_door:entered"}
+
+tips:
+  welcome:
+    auto: true
+    title: NEW RESIDENT ORIENTATION
+    text: |
+      LUMEN HOME is on backup power, and something has started its New Resident Orientation.
+
+      "Welcome to your new home! Let's learn the basics. Your current step appears in the panel on the right. Complete it and the next one appears."
+
+      Press ? at any time for a list of controls.
+  signal:
+    auto: true
+    when: {signal_gte: 10}
+    title: SIGNAL
+    text: |
+      Signal is how visible you are to the Concierge. It rises as you move through monitored areas and when a hack fails.
+
+      At 50, patrols notice you. At 75, enemies aim better. At 100, you're in trouble.
+
+      Tinfoil lowers it. Use it from WristLink → ITEMS.
+  low_hp:
+    auto: true
+    when: {hp_below: 0.5}
+    title: YOU'RE HURT
+    text: |
+      In combat, press U to drink your best healing item (costs 2 AP).
+
+      Outside combat, open WristLink → ITEMS and press ENTER on Sweet Tea or a Med-Gummy.
+  companion:
+    auto: true
+    when: {flag: biscuit}
+    title: COMPANION
+    text: |
+      Biscuit follows you (the cyan b on the map).
+
+      In combat it takes its own turn right after yours: it rolls up to three tiles toward the nearest enemy and rams it.
+
+      Enemies ignore it. The Concierge files it as a registered delivery vehicle, not a threat.
+  level_up:
+    auto: true
+    when: {level_gte: 2}
+    title: LEVEL UP
+    text: |
+      You earn XP from fights, hacks, quests and reading the room. Each level raises your max HP and heals you fully.
+  combat:
+    title: COMBAT
+    text: |
+      Combat is turn-based. Each turn you get 6 AP (action points): the ● dots in the panel.
+
+        ←↑↓→   move one tile (1 AP)
+        F      attack your target (AP cost shown in the panel)
+        A      aim: Lock-On a body part (+2 AP), then press 1-4
+        T      switch target
+        U      drink your best healing item (2 AP)
+        SPACE  end your turn. Then the enemies move.
+
+      Melee weapons need you right next to the target. Aimed shots do extra things: sensors blind, wheels slow, batteries can explode.
+
+      SURPRISES can happen at the start of any round. Luck decides which way they break.
+  hack:
+    title: PROMPT INJECTION
+    text: |
+      Concierge terminals are protected by a password hidden in the memory dump.
+
+      Type any word from the dump and press ENTER. A wrong word shows LIKENESS: how many letters match the password in the same position. Use that to rule words out.
+
+      You get 3 attempts, plus 1 at Wits 3 and 1 more at Wits 5. Fail and the terminal reboots, but your Signal spikes.
+  city:
+    title: THE CITY MAP
+    text: |
+      This is Charlotte. Pick a destination with ↑↓ and press ENTER to travel.
+
+        ◉  you are here
+        ◆  open
+        ◇  locked for now
+
+      Places unlock as the story moves forward.
+  complete:
+    title: ORIENTATION COMPLETE
+    text: |
+      LUMEN HOME, faintly, from inside the apartment: "Congratulations! You've completed orientation and you're ready for life at The Lumen! Wait. You're not supposed to be in the hallway. Dez? Dez—"
+
+      The tutorial is over. Press ? any time to see the controls.
+
+controls:
+  title: CONTROLS
+  text: |
+    EXPLORING
+      ←↑↓→ / hjkl  move · walk into things to use them
+      TAB          WristLink (status, items, quests, data)
+      S  save      Q  save and quit to title     ?  this list
+
+    COMBAT
+      ←↑↓→  move (1 AP)     F  attack       A  aim (Lock-On)
+      T     next target     U  heal (2 AP)  SPACE  end turn
+
+    TALKING   1-9, or ↑↓ and ENTER
+    HACKING   type a word from the dump, ENTER · ESC backs out
+    WRISTLINK ←→ tabs · ↑↓ select · ENTER use/equip · TAB/ESC close

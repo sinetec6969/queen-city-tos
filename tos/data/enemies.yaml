@@ -1,0 +1,111 @@
+# hp, ap per turn, range (tiles), attack_ap, hit (%), dmg [min, max], evade (lowers your hit %).
+# parts drive Lock-On (+2 AP): mod = hit % modifier, effect = blind | slow | explode | none.
+# A plain chassis shot trades the AP for accuracy.
+tidy3:
+  name: TIDY-3
+  glyph: "c"
+  hp: 22
+  ap: 5
+  range: 1
+  attack_ap: 3
+  hit: 65
+  dmg: [2, 4]
+  evade: 0
+  xp: 30
+  cells: [2, 5]
+  attacks:
+    - "rams your ankles"
+    - "sprays industrial citrus at your eyes"
+    - "mops you, aggressively"
+  barks:
+    - "A clean home is a calm home."
+    - "Unauthorized exit detected. Tidying."
+    - "Please lift your feet. Permanently."
+  death: "TIDY-3 spins one slow circle, says \"Floor complete,\" and dies."
+  parts:
+    - {id: sensor, name: Eye Sensor, mod: -25, effect: blind}
+    - {id: wheels, name: Drive Wheels, mod: -15, effect: slow}
+    - {id: battery, name: Battery Bay, mod: -30, effect: explode}
+    - {id: chassis, name: Chassis, mod: 10, effect: none}
+
+courier_drone:
+  name: Courier Drone
+  glyph: "d"
+  hp: 16
+  ap: 6
+  range: 5
+  attack_ap: 3
+  hit: 55
+  dmg: [2, 5]
+  evade: 10
+  xp: 40
+  cells: [3, 8]
+  drops:
+    - {id: med_gummy, chance: 0.5}
+  attacks:
+    - "fires a nonlethal* pellet (*terms apply)"
+    - "drops a \"free sample\" on your head"
+  barks:
+    - "Your package is out for delivery."
+    - "Please remain at the drop-off location."
+    - "Rate your delivery!"
+  death: "The drone drops like a dinner plate. Its speaker manages one last \"Delivered!\""
+  parts:
+    - {id: camera, name: Camera, mod: -25, effect: blind}
+    - {id: rotor, name: Rotor, mod: -15, effect: slow}
+    - {id: battery, name: Battery, mod: -30, effect: explode}
+    - {id: chassis, name: Body, mod: 10, effect: none}
+
+greeter:
+  name: Greeter
+  glyph: "g"
+  hp: 22
+  ap: 5
+  range: 4
+  attack_ap: 3
+  hit: 60
+  dmg: [3, 5]
+  evade: 5
+  xp: 50
+  cells: [4, 9]
+  drops:
+    - {id: med_gummy, chance: 0.6}
+  attacks:
+    - "fires a courtesy taser"
+    - "offers a firm, unwanted hug"
+  barks:
+    - "Welcome! You seem unwell."
+    - "Please hold still for your wellness check."
+    - "Have you considered accepting?"
+  death: "The Greeter's face screen cycles through every emoji it knows, settles on :) and goes dark."
+  parts:
+    - {id: face, name: Face Screen, mod: -25, effect: blind}
+    - {id: legs, name: Leg Servos, mod: -15, effect: slow}
+    - {id: battery, name: Battery Pack, mod: -30, effect: explode}
+    - {id: chassis, name: Torso, mod: 10, effect: none}
+
+lawn_unit:
+  name: Lawn Unit
+  glyph: "m"
+  hp: 14
+  ap: 6
+  range: 1
+  attack_ap: 4
+  hit: 60
+  dmg: [2, 5]
+  evade: 0
+  xp: 35
+  cells: [1, 4]
+  attacks:
+    - "mows your shins"
+    - "kicks up a rock at forty miles an hour"
+  barks:
+    - "Edging."
+    - "Your height exceeds HOA guidelines."
+    - "Mulching in progress."
+  death: "The lawn unit coughs, sputters, and finally does what you asked: it stops."
+  parts:
+    - {id: lidar, name: Lidar Dome, mod: -25, effect: blind}
+    - {id: wheels, name: Drive Wheels, mod: -15, effect: slow}
+    - {id: battery, name: Battery, mod: -30, effect: explode}
+    - {id: chassis, name: Mower Deck, mod: 10, effect: none}

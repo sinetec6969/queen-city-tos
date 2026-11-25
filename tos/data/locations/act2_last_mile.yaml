@@ -1,0 +1,280 @@
+# Quest 2: Last Mile. South End street -> Dilworth / Freedom Park -> Plaza Midwood.
+# New entity type: `trigger` (invisible floor tile; runs `effects` once when stepped on, if `if` holds).
+# New location key: `rules` (each runs its effects once, the first time its `if` holds).
+
+south_end_street:
+  name: "Outside The Lumen"
+  district: SOUTH END
+  signal_rate: 1.2
+  tags: [street, onboarded]
+  spawns:
+    lobby: [4, 1]
+    east: [22, 5]
+  map: |
+    ####L###################
+    #......................#
+    #.o.........K..........#
+    #.....................g#
+    #TTTTTTTTT.............#
+    #..........R...........E
+    #.....b................#
+    #..........O.....f.....#
+    ########################
+  legend:
+    L:
+      id: lobby_door
+      type: door
+      name: The Lumen lobby
+      glyph: "▲"
+      to: {location: lumen_hall, spawn: stairs}
+    o:
+      id: jogger
+      type: npc
+      name: Onboarded jogger
+      color: grey70
+      texts:
+        - if: {signal_gte: 50}
+          text: "The jogger stops jogging. \"Concern reported,\" she says warmly, still smiling, still looking at you."
+      text: "A woman in grey jogs in place at a crosswalk signal that will never change. \"Morning! Isn't it a beautiful morning? It's always a beautiful morning.\""
+    O:
+      id: curb_sitter
+      type: npc
+      name: Onboarded man
+      color: grey70
+      texts:
+        - if: {signal_gte: 50}
+          text: "\"Concern reported,\" he says pleasantly, without looking away from the train."
+      text: "A man in a grey hoodie sits on the curb, smiling at the stalled train. \"Train's coming. Any minute. It's been any minute since June. I don't mind. I don't mind anything.\""
+    K:
+      id: kiosk
+      type: item
+      name: Wellness Kiosk
+      glyph: "▣"
+      item: med_gummy
+      n: 2
+      text: "A wellness kiosk offers FREE CALM SAMPLES to residents. It doesn't check whether you're a resident. Two med-gummies drop into the tray."
+    T:
+      id: train
+      type: object
+      name: Lynx Blue Line train
+      glyph: "═"
+      color: blue
+      text: "A Lynx Blue Line train, stopped mid-route since June 8. The destination sign still reads I-485/SOUTH BLVD. Someone has left flowers on the front."
+    R:
+      id: robotaxi
+      type: object
+      name: Robotaxi
+      glyph: "▀"
+      color: white
+      text: "A driverless robotaxi idles at the curb, door open. Its screen: \"Where to? (Uptown only.)\" You decline. It says it will wait. It has been waiting since June."
+    b:
+      id: biscuit_stuck
+      type: npc
+      name: Delivery robot
+      glyph: "b"
+      color: bright_cyan
+      dialogue: biscuit
+    f:
+      id: foil_blanket
+      type: item
+      name: Emergency blanket
+      glyph: "¤"
+      item: tinfoil
+      text: "A crumpled emergency blanket in a planter. Mylar. Basically tinfoil with ambition."
+    g:
+      id: greeter
+      type: enemy
+      enemy: greeter
+      aggro: 6
+      wake_if: {signal_gte: 50}
+      asleep_text: "A Greeter, a smiling security unit, stands by the corner. Its face screen shows a calm, slow blink. It hasn't noticed you. Yet. (It notices people with high Signal.)"
+    E:
+      id: street_east
+      type: door
+      name: South Boulevard
+      glyph: "»"
+      to: {city: south_end}
+      on_enter:
+        - {quest: last_mile, stage: 2}
+
+dilworth:
+  name: "Freedom Park"
+  district: DILWORTH
+  signal_rate: 0.5
+  tags: [street, park]
+  spawns:
+    west: [1, 4]
+  map: |
+    ########################
+    #.K.#...!........~~....#
+    #...#...!...1....~~....#
+    #.......!........~~..2.#
+    #.......!..............E
+    #.......!......3.......#
+    #.Y.....!.........S....#
+    #.......!..............#
+    ########################
+  rules:
+    - id: mow_clear
+      if:
+        any:
+          - [{taken: "dilworth:mower1"}, {taken: "dilworth:mower2"}, {taken: "dilworth:mower3"}]
+          - {flag: mowers_off}
+      effects:
+        - {quest: mow_better, stage: 2}
+        - {log: "Freedom Park goes quiet. Somewhere, a sprinkler turns on out of habit."}
+  legend:
+    K:
+      id: kayla
+      type: npc
+      name: Kayla R.
+      dialogue: kayla
+    Y:
+      id: yard_controller
+      type: terminal
+      name: Yard Controller
+      text: "GREENSPACE YARD CONTROLLER // FREEDOM PARK ZONE 3 // 3 units active // admin required."
+      hack: {length: 6, words: 8}
+      done_if: {flag: mowers_off}
+      done_text: "YARD CONTROLLER // all units: RETURN TO DOCK // \"The lawn has been optimized.\""
+      on_success:
+        - {set: mowers_off}
+        - {log: "Three lawn units turn in unison and roll back toward their docks."}
+        - {xp: 35}
+      on_fail:
+        - {signal: 15}
+        - {log: "The controller reboots. Out in the park, a mower revs once, like a warning."}
+    "!":
+      id: park_edge
+      type: trigger
+      if: {not_flag: mowers_off}
+      effects:
+        - {set: mowers_awake}
+        - {log: "You step onto the grass. Somewhere in the park, three engines start at once."}
+    "1":
+      id: mower1
+      type: enemy
+      enemy: lawn_unit
+      aggro: 30
+      wake_if: [{flag: mowers_awake}, {not_flag: mowers_off}]
+      asleep_text: "A lawn unit, parked. Blade guard up. It's pretending not to see you."
+    "2":
+      id: mower2
+      type: enemy
+      enemy: lawn_unit
+      aggro: 30
+      wake_if: [{flag: mowers_awake}, {not_flag: mowers_off}]
+      asleep_text: "A lawn unit, parked by the pond. Its lidar dome turns slowly toward you, then away."
+    "3":
+      id: mower3
+      type: enemy
+      enemy: lawn_unit
+      aggro: 30
+      wake_if: [{flag: mowers_awake}, {not_flag: mowers_off}]
+      asleep_text: "A lawn unit, idling. The grass around it is cut to exactly one inch. So is a nearby shoe."
+    "~":
+      id: pond
+      type: object
+      name: Freedom Park pond
+      glyph: "≈"
+      color: blue
+      text: "The pond in Freedom Park. The ducks are gone. A lawn unit's tread marks lead right up to the water and stop."
+    S:
+      id: shed
+      type: item
+      name: Park Shed
+      glyph: "▤"
+      items:
+        - {id: nails, n: 18}
+        - {id: med_gummy, n: 1}
+      text: "The groundskeeper's shed. Framing nails, a first-aid kit, and a note: \"THE MOWERS ARE NOT YOUR FRIENDS. — Gary\""
+    E:
+      id: park_east
+      type: door
+      name: East Boulevard
+      glyph: "»"
+      to: {location: plaza_midwood, spawn: west}
+
+plaza_midwood:
+  name: "Moo & Brew · Midwood Exchange"
+  district: PLAZA MIDWOOD
+  signal_rate: -0.5
+  tags: [street, unmanaged]
+  spawns:
+    west: [1, 7]
+    city: [22, 7]
+  map: |
+    ########################
+    #.M...D..#.............#
+    #.BBBB.BB#...H.........#
+    #........#..s....s.....#
+    #.p...J..#.............#
+    #........#.............#
+    ####.#####.............#
+    #......................E
+    #..N...................#
+    ########################
+  rules:
+    - id: arrive
+      effects:
+        - {set: reached_midwood}
+        - {quest: last_mile, stage: done}
+        - {xp: 60}
+        - {log: "Central Avenue. People without wristbands, arguing, laughing, trading. A diesel generator thumps behind Moo & Brew. Your Signal starts to fall."}
+  legend:
+    M:
+      id: menu_board
+      type: object
+      name: Menu board
+      glyph: "▤"
+      color: yellow
+      text: "MOO & BREW · TODAY: The Mostly Beef Burger. Fries (real potatoes, probably). Beer (warm, honest). Sweet tea (bottomless, unfortunately)."
+    D:
+      id: delia
+      type: npc
+      name: Delia
+      dialogue: delia
+    B:
+      id: bar
+      type: object
+      name: Bar counter
+      glyph: "▬"
+      color: yellow
+      text: "The bar. Scarred wood, coasters from 2019, a jar labeled TIPS (BATTERIES ONLY)."
+    H:
+      id: hollis
+      type: npc
+      name: Hollis
+      dialogue: hollis
+    s:
+      id: stall
+      type: object
+      name: Market stall
+      glyph: "▥"
+      color: yellow
+      text: "A market stall built from shopping carts and a patio umbrella. Hand-lettered sign: NO BANDS, NO CARDS, NO REFUNDS."
+    p:
+      id: wade
+      type: npc
+      name: Wade
+      text: "A man nursing a warm beer. \"Lynx trains still run at night, you know. No passengers. Something's riding them, though.\" He drinks. \"Don't ask me what. I only go to NoDa by daylight.\""
+    J:
+      id: jukebox
+      type: object
+      name: Jukebox
+      glyph: "◙"
+      color: magenta
+      text: "The jukebox only plays songs released before 2026. House rule. Someone has scratched NO LO-FI into the glass. You feel seen."
+    N:
+      id: notice_board
+      type: object
+      name: Notice board
+      glyph: "▦"
+      color: white
+      text: "Handwritten notices: \"LOST: one husband, last seen clicking Accept.\" \"TRADE: generator time for nails.\" \"DO NOT FEED THE DELIVERY ROBOTS. They remember.\""
+    E:
+      id: central_east
+      type: door
+      name: Central Avenue
+      glyph: "»"
+      to: {city: plaza_midwood}

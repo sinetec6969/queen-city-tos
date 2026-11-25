@@ -1,0 +1,177 @@
+biscuit:
+  speaker: DELIVERY ROBOT
+  start: hello
+  nodes:
+    hello:
+      text: "A six-wheeled sidewalk delivery robot is wedged against the curb, wheels spinning. Its little screen reads: DELIVERY ATTEMPT 4,112 · RECIPIENT: KAYLA R. · STATUS: SO CLOSE."
+      options:
+        - text: "Push it free."
+          to: freed
+        - text: "Reroute its delivery through you."
+          if: {stat: Wits, gte: 3}
+          to: rerouted
+        - text: "[Leave it]"
+    freed:
+      text: "You shove. The robot lurches onto the sidewalk, spins to face you, and beeps three times. Its screen: ROUTE LOST. NEAREST VALID HUMAN: YOU. NAME ASSIGNED: BISCUIT. FOLLOWING."
+      effects:
+        - {companion: biscuit}
+        - {take_entity: "south_end_street:biscuit_stuck"}
+        - {quest: order_shipped, stage: 1}
+        - {xp: 20}
+        - {log: "Biscuit joined you. It will follow you, and it fights on its own turn."}
+      options:
+        - text: "Hi, Biscuit."
+    rerouted:
+      text: "You pop the service panel and set yourself as a waypoint. The robot shudders free, considers you, and displays: WAYPOINT ACQUIRED. NAME ASSIGNED: BISCUIT. ETA: WHEREVER YOU'RE GOING."
+      effects:
+        - {companion: biscuit}
+        - {take_entity: "south_end_street:biscuit_stuck"}
+        - {quest: order_shipped, stage: 1}
+        - {xp: 35}
+        - {log: "Biscuit joined you. It will follow you, and it fights on its own turn."}
+      options:
+        - text: "Welcome aboard, Biscuit."
+
+kayla:
+  speaker: KAYLA R.
+  starts:
+    - if: {flag: met_kayla}
+      node: again
+  start: hello
+  nodes:
+    hello:
+      effects:
+        - {set: met_kayla}
+      text: "A woman in a grey cardigan waters a dead hydrangea with an empty watering can. Her wellness band glows a soft green. \"Oh! A visitor. Nobody visits. Nobody can get across the park.\""
+      options:
+        - text: "What's wrong with the park?"
+          to: park
+        - text: "[Leave]"
+    again:
+      text: "Kayla smiles at the hydrangea, then at you. \"Still here! That's nice. Isn't it nice?\""
+      options:
+        - text: "Biscuit has a delivery for you. From June."
+          show_if: [{flag: biscuit}, {not_flag: burrito_delivered}]
+          to: burrito
+        - text: "The mowers are handled."
+          show_if: [{quest: mow_better, gte: 2}, {not_flag: mow_paid}]
+          to: paid
+        - text: "What's wrong with the park?"
+          show_if: {not_flag: heard_park}
+          to: park
+        - text: "[Leave]"
+    park:
+      effects:
+        - {set: heard_park}
+        - {quest: mow_better, stage: 1}
+      text: "\"The lawn units optimized it. Nobody's allowed on the grass now. People included. People especially.\" She lowers her voice. \"The yard controller is right there by my fence. My husband used to know the password. He doesn't remember it now. He doesn't remember a lot of things. He's very happy.\""
+      options:
+        - text: "Biscuit has a delivery for you. From June."
+          show_if: [{flag: biscuit}, {not_flag: burrito_delivered}]
+          to: burrito
+        - text: "I'll see what I can do."
+    burrito:
+      effects:
+        - {set: burrito_delivered}
+        - {quest: order_shipped, stage: done}
+        - {xp: 40}
+        - {log: "Biscuit: \"DELIVERED. Please rate your delivery!\" Kayla gives it five stars. Everyone does."}
+      text: "Biscuit opens its lid. Kayla takes the foil-wrapped burrito and stares at it. \"Did I order this? In June? I don't remember June. They took out all the sad parts.\" She holds it close. \"It smells like a Tuesday I was happy on. Is that sad? I can't tell anymore.\""
+      options:
+        - text: "Enjoy it, Kayla."
+          to: again
+    paid:
+      effects:
+        - {set: mow_paid}
+        - {quest: mow_better, stage: done}
+        - {cells: 25}
+        - {give: sweet_tea}
+        - {xp: 40}
+      text: "\"You did? Oh!\" She looks out at the park like she's seeing it for the first time. \"I could walk on it. I could walk on the grass.\" She doesn't move. \"Here. Take these. I have plenty. They deliver every Tuesday.\""
+      options:
+        - text: "Thanks, Kayla."
+          to: again
+
+delia:
+  speaker: DELIA
+  starts:
+    - if: {flag: met_delia}
+      node: again
+  start: hello
+  nodes:
+    hello:
+      effects:
+        - {set: met_delia}
+      text: "The woman behind the bar wipes a glass that's already clean. No band on her wrist. \"Unbanded and still breathing. Welcome to the Midwood Exchange. We trade, we don't ask questions, and the burgers are mostly beef.\""
+      options:
+        - text: "Mostly?"
+          to: beef
+        - text: "They took my brother Uptown. I need to get him back."
+          to: teo
+        - text: "What is this place?"
+          to: place
+        - text: "[Leave]"
+    again:
+      text: "Delia nods at you. \"Still unbanded. Good.\""
+      options:
+        - text: "Tell me about the Opt-Outs again."
+          show_if: {quest: analog_only, gte: 1}
+          to: teo
+        - text: "They took my brother Uptown. I need to get him back."
+          show_if: {not_flag: delia_teo}
+          to: teo
+        - text: "What is this place?"
+          to: place
+        - text: "[Leave]"
+    beef:
+      text: "\"Mostly. Rule two at the Exchange: don't ask about the rest.\""
+      options:
+        - text: "What's rule one?"
+          to: rule_one
+        - text: "[Back]"
+          to: hello
+    rule_one:
+      text: "\"Nobody clicks anything.\""
+      options:
+        - text: "[Back]"
+          to: hello
+    place:
+      text: "\"The Concierge calls us 'a future opportunity.' It means it hasn't figured out how to sell us anything yet. Power comes from a diesel generator and a guy named Pete. Hollis out front sells supplies, if you've got cells.\""
+      options:
+        - text: "[Back]"
+          to: again
+    teo:
+      effects:
+        - {set: delia_teo}
+        - {quest: analog_only, stage: 1}
+        - {quest: teo, stage: 3}
+        - {note: ["Delia on the Opt-Outs", "The Opt-Outs run out of an old brewery in NoDa. Analog only. They've watched Uptown since June. They don't trust anyone from South End."]}
+      text: "\"Then you want the Opt-Outs. NoDa, an old brewery off North Davidson. Analog crowd. Typewriters, film cameras, ham radios. They've been watching Uptown since June with binoculars and spite.\" She sets the glass down. \"They won't trust you, though. Nobody from South End gets trusted.\""
+      options:
+        - text: "I'll make them trust me."
+          to: again
+
+hollis:
+  speaker: HOLLIS
+  start: shop
+  nodes:
+    shop:
+      text: "Hollis runs a stall made of three shopping carts and a beach umbrella. \"Cells only. AA's. No bands, no cards, no haggling, no feelings.\" (You have {cells} cells.)"
+      options:
+        - text: "Sweet tea, a gallon — 8 cells"
+          if: {cells_gte: 8}
+          effects: [{cells: -8}, {give: sweet_tea}]
+          to: shop
+        - text: "Med-gummy — 5 cells"
+          if: {cells_gte: 5}
+          effects: [{cells: -5}, {give: med_gummy}]
+          to: shop
+        - text: "Nails, box of 12 — 6 cells"
+          if: {cells_gte: 6}
+          effects: [{cells: -6}, {give: nails, n: 12}]
+          to: shop
+        - text: "Tinfoil — 10 cells"
+          if: {cells_gte: 10}
+          effects: [{cells: -10}, {give: tinfoil}]
+          to: shop
+        - text: "Just looking."

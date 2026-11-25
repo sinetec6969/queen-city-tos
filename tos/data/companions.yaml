@@ -1,0 +1,14 @@
+# Companions follow the player and take a turn in combat right after the player's.
+# Enemies ignore them.
+biscuit:
+  name: Biscuit
+  glyph: "b"
+  moves: 3
+  hit: 70
+  dmg: [2, 4]
+  barks:
+    - "Excuse me!"
+    - "Your order is on its way!"
+    - "Please step aside for delivery."
+    - "Beep beep."
+    - "Rate your delivery!"

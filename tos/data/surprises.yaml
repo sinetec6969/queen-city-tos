@@ -1,0 +1,44 @@
+# Rolled at the start of each combat round (15%). Luck tilts good vs bad.
+# effect: enemy_update | blind_all | heal | enemy_damage | player_ap | signal ; n = amount
+# optional: flag (requires a world flag), tag (requires a location tag)
+- id: firmware
+  good: true
+  effect: enemy_update
+  text: "{enemy} freezes mid-motion: \"A critical update is available. Installing now.\""
+- id: brownout
+  good: true
+  effect: blind_all
+  n: 1
+  text: "The lights cut out again. Every sensor in the room squints."
+- id: found_tea
+  good: true
+  effect: heal
+  n: 6
+  text: "There's a half-finished sweet tea on the floor. You drink it. You don't think about whose it was."
+- id: robotaxi
+  good: true
+  tag: street
+  effect: enemy_damage
+  n: 12
+  text: "A driverless robotaxi swerves around a pothole and clips {enemy}. It honks an apology."
+- id: biscuit
+  good: true
+  flag: biscuit
+  effect: enemy_damage
+  n: 8
+  text: "Biscuit rolls in at full speed and \"delivers\" itself into {enemy}."
+- id: doorstop
+  good: false
+  effect: player_ap
+  n: -2
+  text: "You trip over a smart doorstop. It says \"Sorry!\" You lose 2 AP."
+- id: apology
+  good: false
+  effect: signal
+  n: 10
+  text: "A ceiling speaker: \"We're sorry you're experiencing resistance.\" Something is definitely tracking you now."
+- id: wax
+  good: false
+  effect: player_ap
+  n: -1
+  text: "The floor is freshly waxed. You slip. You lose 1 AP."

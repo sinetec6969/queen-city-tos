@@ -1,0 +1,40 @@
+terms:
+  name: Terms and Conditions
+  main: true
+  stages:
+    1: "Day 95. The brownout knocked out the door console. Find a way out of Unit 1412."
+    2: "The front door runs on a backup terminal. Hack it, or find something to pry the door open."
+    3: "The door is open. Get out of The Lumen. The stairwell is at the east end of the hall."
+    done: "You got out."
+
+teo:
+  name: Pending Onboarding
+  main: true
+  stages:
+    1: "Teo's last message says they moved him Uptown for \"onboarding.\" Find him."
+    2: "Mr. Pruitt saw Teo board the first bus uptown in June. Uptown won't be easy. You'll need help."
+    3: "Delia says the Opt-Outs in NoDa have been watching Uptown since June. They might know where Teo is."
+
+last_mile:
+  name: Last Mile
+  main: true
+  stages:
+    1: "Get to Plaza Midwood. Mr. Pruitt says the burger place on Central Avenue still trades with people who don't wear bands."
+    2: "South End is behind you. Head through Dilworth and Freedom Park to Plaza Midwood."
+
+order_shipped:
+  name: Your Order Has Shipped
+  stages:
+    1: "Biscuit won't rest until it delivers a burrito from June to \"Kayla R.\" Its route data says Dilworth."
+
+mow_better:
+  name: Mow Better
+  stages:
+    1: "Kayla R. says the lawn units in Freedom Park attack anyone on the grass. Shut down the yard controller, or wreck all three mowers."
+    2: "Freedom Park is quiet. Tell Kayla."
+
+analog_only:
+  name: Analog Only
+  main: true
+  stages:
+    1: "Delia at Moo & Brew says the Opt-Outs in NoDa have been watching Uptown. Find them."

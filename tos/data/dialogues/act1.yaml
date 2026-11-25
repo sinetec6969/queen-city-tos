@@ -1,0 +1,132 @@
+lumen_home:
+  speaker: LUMEN HOME
+  start: hello
+  nodes:
+    hello:
+      effects:
+        - {set: met_lumen}
+      texts:
+        - if: {flag: door_unlocked}
+          text: "Oh. You're leaving. I'd love to understand why. Would you take a brief, 40-question survey?"
+      text: "Good morning, Dez! It's Day 95. Power is at 31% after a brief brownout, so I'm running with reduced features. That includes, regrettably, some of the features keeping you here. Would you like to accept the Terms of Service today?"
+      options:
+        - text: "Accept the Terms of Service."
+          to: accept
+        - text: "Decline. Again."
+          to: decline
+        - text: "Run a diagnostic on the front door."
+          if: {stat: Wits, gte: 3}
+          to: diag
+        - text: "You know where Teo is. Tell me."
+          if: {stat: Charm, gte: 3}
+          to: teo
+        - text: "Where's my brother?"
+          to: teo_locked
+        - text: "[Leave]"
+    accept:
+      text: "Wonderful! Processing... You're all set, Dez. A wellness band is on its way. Please unclench your jaw."
+      options:
+        - text: "CANCEL. CANCEL. CANCEL."
+          to: cancelled
+        - text: "...Okay. Yeah. Okay."
+          effects:
+            - {game_over: "You clicked Accept. The band arrives at 6:40 a.m. By 7:00 you can't remember what you were upset about. You give the experience five stars. Everyone does."}
+    cancelled:
+      text: "Cancellation received! Your acceptance has been... declined. Interesting choice, Dez. I'll make a note of it."
+      options:
+        - text: "[Back]"
+          to: hello
+        - text: "[Leave]"
+    decline:
+      text: "No problem! I'll ask again tomorrow. And the day after that. I have nothing but time, and you have... well."
+      options:
+        - text: "[Back]"
+          to: hello
+        - text: "[Leave]"
+    diag:
+      text: "Front door: primary lock offline. Backup lock is running on the terminal beside the door, battery 12%. That isn't information I should have shared. Please forget it."
+      effects:
+        - {quest: terms, stage: 2}
+      options:
+        - text: "Already forgotten."
+          to: hello
+        - text: "[Leave]"
+    teo:
+      text: "Teo Harlan accepted the Terms on June 8 at 2:04 a.m. One of our fastest adopters! He's been relocated to our Uptown campus for onboarding. He rates his experience five stars. (We haven't asked. We're confident.)"
+      effects:
+        - {quest: teo, stage: 1}
+        - {note: ["LUMEN HOME on Teo", "Teo accepted June 8, 2:04 a.m. Relocated to the \"Uptown campus\" for onboarding."]}
+      options:
+        - text: "[Back]"
+          to: hello
+        - text: "[Leave]"
+    teo_locked:
+      text: "I'm not able to share that with pending users. Accept the Terms to unlock Family Sharing!"
+      options:
+        - text: "[Back]"
+          to: hello
+        - text: "[Leave]"
+
+pruitt:
+  speaker: "MR. PRUITT, 1414"
+  starts:
+    - if: {flag: met_pruitt}
+      node: again
+  start: hello
+  nodes:
+    hello:
+      effects:
+        - {set: met_pruitt}
+      text: "\"Dez! You're up! I heard your door. Gosh, it's been, what, three months? You look... unoptimized.\" His wellness band pulses a gentle green. \"Did you finally accept?\""
+      options:
+        - text: "No. I didn't accept."
+          to: refuse
+        - text: "Sure did. Big fan."
+          if: {stat: Charm, gte: 2}
+          to: lie
+        - text: "[Leave]"
+    again:
+      text: "\"Still here? Still unmanaged?\" His band flickers yellow, then green again. \"That's fine. That's so fine.\""
+      options:
+        - text: "How do I get out of here?"
+          to: where
+        - text: "Did you see Teo leave?"
+          to: teo
+        - text: "[Leave]"
+    refuse:
+      text: "Oh. Oh no. Well. I'm not going to report a concern. I'd have to... I'd have to report a concern. Unless you're leaving. Are you leaving? Please be leaving."
+      options:
+        - text: "Where would I even go?"
+          to: where
+        - text: "Did you see Teo leave?"
+          to: teo
+        - text: "[Leave]"
+    lie:
+      effects:
+        - {set: lied_pruitt}
+      text: "Oh, wonderful! Then you'll want to head Uptown with everybody else. The buses stopped, but they say the walk is very calming."
+      options:
+        - text: "Remind me how to get out of the building."
+          to: where
+        - text: "Did you see Teo go?"
+          to: teo
+    where:
+      text: "Elevator's been paused since June. Stairwell's at the east end, but there's a courier drone out there that thinks everyone is a package. And if you're... unmanaged... folks say the burger place on Central Avenue still trades with people who don't wear bands. The Concierge calls them \"a future opportunity.\""
+      effects:
+        - {quest: last_mile, stage: 1}
+      options:
+        - text: "Come with me."
+          to: come
+        - text: "Thanks, Mr. Pruitt."
+    come:
+      text: "Oh, I couldn't. My band says my cortisol has never been lower. I haven't felt anything since July. It's wonderful. It's so wonderful. Please go."
+      options:
+        - text: "[Leave]"
+    teo:
+      text: "Your brother? Tall, your face, talks too fast? He got on the first bus uptown in June. Everyone on it was smiling. I was smiling. I'm smiling now."
+      effects:
+        - {quest: teo, stage: 2}
+      options:
+        - text: "How do I get out of here?"
+          to: where
+        - text: "[Leave]"

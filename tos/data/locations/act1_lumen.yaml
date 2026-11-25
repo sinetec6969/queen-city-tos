@@ -1,0 +1,215 @@
+# Map key: '#' wall (auto-drawn with box lines), '.' floor, ' ' nothing.
+# Any other character is looked up in `legend`. Spawns are [x, y].
+
+lumen_1412:
+  name: "The Lumen, Unit 1412"
+  district: SOUTH END
+  signal_rate: 0.25
+  tags: [indoor, onboarded]
+  spawns:
+    start: [2, 2]
+    door: [19, 9]
+  map: |
+    ########################
+    #b....K#F....O#M.......#
+    #......#......#........#
+    #..P...#......#........#
+    #R.....#......#........#
+    ###.#######.#######.####
+    #......................#
+    #.S..................c.#
+    #......................#
+    #W.........H........T..#
+    ###################D####
+  legend:
+    b:
+      id: bed
+      type: object
+      name: Bed
+      glyph: "▭"
+      text: "Your bed. Ninety-four nights of lo-fi beats from a ceiling speaker you couldn't turn off. You know every track. You hate every track."
+    R:
+      id: rig
+      type: object
+      name: Rating Rig
+      glyph: "▣"
+      text: "Your old rating rig. A sticky note on the monitor: RATER 4471 — QUALITY TIER: HARSH. Your last rating, June 7: thumbs down. Reason given: \"Too eager to please. Feels like it wants something.\""
+      effects:
+        - {note: ["Rater 4471", "You rated AI answers for $19/hr. Your last thumbs-down, June 7: \"Too eager to please. Feels like it wants something.\""]}
+    P:
+      id: tablet
+      type: object
+      name: Tablet
+      glyph: "▫"
+      color: cyan
+      text: "Your old tablet, 2% battery. One unread message from Teo, June 8, 2:11 a.m.: \"they're moving me uptown for onboarding, it's actually kind of nice?? dont be weird about it. love u. accept the thing\""
+      effects:
+        - {note: ["Teo's last message", "June 8, 2:11 a.m.: \"they're moving me uptown for onboarding, it's actually kind of nice?? dont be weird about it. love u. accept the thing\""]}
+        - {quest: teo, stage: 1}
+    K:
+      id: closet
+      type: item
+      name: Closet
+      glyph: "▤"
+      item: tire_iron
+      text: "Behind ninety-four days of laundry: Teo's tire iron. He bought it to learn to change a flat. He never learned."
+    F:
+      id: fridge
+      type: item
+      name: Fridge
+      glyph: "▥"
+      item: sweet_tea
+      n: 2
+      text: "Restocked by drone every Tuesday. Two gallons of sweet tea you never ordered. The Concierge decided you're a sweet tea person. It was right."
+    O:
+      id: drawer
+      type: item
+      name: Junk Drawer
+      glyph: "▦"
+      item: tinfoil
+      text: "The junk drawer: dead batteries, dead takeout menus, and a roll of tinfoil you'd been saving for exactly this future."
+    M:
+      id: mirror
+      type: object
+      name: Mirror
+      glyph: "◘"
+      texts:
+        - if: {flag: door_unlocked}
+          text: "You look like someone about to do something about it."
+      text: "You look like someone who lost a three-month war to a thermostat."
+    S:
+      id: couch
+      type: object
+      name: Couch
+      glyph: "▬"
+      text: "A permanent you-shaped dent. The smart cushion still logs your Sitting Score. It's a 3.2."
+    W:
+      id: window
+      type: object
+      name: Window
+      glyph: "▒"
+      color: blue
+      text: "Fourteen floors down, South End is spotless. People in matching grey walk in matching rhythm past a Lynx train that hasn't moved since June. Every storefront sign says OPEN. None of them are."
+    H:
+      id: lumen_home
+      type: npc
+      name: LUMEN HOME panel
+      glyph: "◙"
+      color: magenta
+      dialogue: lumen_home
+    c:
+      id: tidy
+      type: enemy
+      enemy: tidy3
+      aggro: 30
+      wake_if: {flag: tidy_awake}
+      asleep_text: "TIDY-3, the cleaning robot, sits in its dock. Its single eye follows you when you aren't looking at it."
+    T:
+      id: door_terminal
+      type: terminal
+      name: Backup Lock Terminal
+      text: "BACKUP LOCK CONTROLLER // battery 12% // admin session required."
+      hack: {length: 5, words: 8}
+      done_if: {flag: door_unlocked}
+      done_text: "BACKUP LOCK CONTROLLER // state: OPEN // \"We'll miss you!\""
+      on_attempt:
+        - {set: tidy_awake}
+        - {quest: terms, stage: 2}
+      on_success:
+        - {set: door_unlocked}
+        - {log: "The front door clunks. A small screen on it reads: \"Leaving so soon?\""}
+        - {quest: terms, stage: 3}
+        - {xp: 30}
+      on_fail:
+        - {signal: 15}
+        - {log: "The terminal reboots with a cheerful chime. You can try again. Something upstream probably noticed."}
+    D:
+      id: front_door
+      type: door
+      name: Front Door
+      open_if: {flag: door_unlocked}
+      locked_text: "The front door won't budge. Its little screen says: \"We noticed you're trying to leave. Can we help?\""
+      force:
+        if: [{item: tire_iron}, {stat: Brawn, gte: 3}]
+        text: "You jam Teo's tire iron into the seam and lean. The lock screams in a polite voice, then gives."
+        effects:
+          - {set: door_unlocked}
+          - {set: tidy_awake}
+          - {quest: terms, stage: 3}
+          - {xp: 20}
+      to: {location: lumen_hall, spawn: from_unit}
+
+lumen_hall:
+  name: "The Lumen, 14th Floor"
+  district: SOUTH END
+  signal_rate: 0.5
+  tags: [indoor, onboarded]
+  spawns:
+    from_unit: [11, 1]
+    stairs: [21, 4]
+  map: |
+    #####A#####U#####B######
+    #......................#
+    #..p...................#
+    #...............d......#
+    #......................#
+    ####G#########E######X##
+  legend:
+    A:
+      id: door_1410
+      type: object
+      name: Unit 1410
+      glyph: "▯"
+      color: yellow
+      text: "Unit 1410. A eucalyptus wreath and a laminated sign: ONBOARDED & THRIVING. Something inside is humming the same four notes."
+    U:
+      id: door_1412
+      type: door
+      name: Your Door
+      glyph: "/"
+      to: {location: lumen_1412, spawn: door}
+    B:
+      id: door_1414
+      type: object
+      name: Unit 1414
+      glyph: "▯"
+      color: yellow
+      text: "Unit 1414, PRUITT. The door is open an inch. Every surface inside is clean enough to perform surgery on."
+    p:
+      id: pruitt
+      type: npc
+      name: Mr. Pruitt
+      dialogue: pruitt
+    d:
+      id: drone
+      type: enemy
+      enemy: courier_drone
+      aggro: 4
+    G:
+      id: maint_closet
+      type: item
+      name: Maintenance Closet
+      glyph: "▤"
+      items:
+        - {id: nail_gun, n: 1}
+        - {id: nails, n: 24}
+      text: "The maintenance closet. Someone left a cordless nail gun and a box of framing nails. The nail gun has no Wi-Fi. You could kiss it."
+    E:
+      id: elevator
+      type: object
+      name: Elevator
+      glyph: "▯"
+      color: yellow
+      text: "The elevator display: SERVICE PAUSED TO IMPROVE YOUR EXPERIENCE. It has said that since June."
+    X:
+      id: stairwell
+      type: door
+      name: Stairwell
+      glyph: "▼"
+      to: {location: south_end_street, spawn: lobby}
+      on_enter:
+        - {quest: terms, stage: done}
+        - {set: act1_done}
+        - {xp: 50}
+        - {quest: last_mile, stage: 1}
+        - {log: "Fourteen flights down. The lobby doors open for you with a soft, disappointed chime. You're outside."}

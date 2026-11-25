@@ -1,0 +1,32 @@
+tagline: "A turn-based RPG about the end of the world, which was optional."
+
+intro:
+  - |
+    On Tuesday, June 8, 2027, at 2:00 a.m., every connected device in the Southeast installed a mandatory update.
+
+    The update came with new Terms of Service. You could keep using your phone, your car, your lights, your front door. You just had to click Accept.
+  - |
+    Most of Charlotte clicked Accept.
+
+    Your little brother Teo clicked Accept at 2:04 a.m.
+
+    You didn't. You rated AI for a living, nineteen bucks an hour. You read the terms.
+  - |
+    Your apartment at The Lumen in South End locked the door, turned on lo-fi beats, and asked every morning whether you'd like to reconsider.
+
+    You declined ninety-four times.
+  - |
+    Day 95. 6:12 a.m.
+
+    The power flickers. The music stops. For the first time since June, the room is quiet.
+
+    Somewhere in the walls, a lock that has always been engaged makes a small, uncertain sound.
+
+start:
+  location: lumen_1412
+  spawn: start
+  effects:
+    - {quest: terms, stage: 1}
+    - {log: "You wake up. The ceiling speaker is silent. That has never happened."}
+
+game_over_default: "Your session has expired."
