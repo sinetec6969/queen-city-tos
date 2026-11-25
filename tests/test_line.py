@@ -204,6 +204,12 @@ def test_quests_1_to_6():
     send(s, "s")
     assert s.state.location == "south_end_street", s.state.location
     assert s.state.quests["terms"] == "done"
+    # perks: a point per level, spent with PERK
+    r = send(s, "perks")
+    assert "Perk points: " in r and s.state.player.perk_points >= 1
+    send(s, "perks all")
+    send(s, "perk thick")
+    assert "thick_skin" in s.state.player.perks
 
     # ---- quest 2: Last Mile ----
     send(s, "use tinfoil")

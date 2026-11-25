@@ -10,11 +10,11 @@ from textual.containers import Horizontal, Vertical
 from textual.screen import ModalScreen, Screen
 from textual.widgets import Input, RichLog, Static
 
-from ..engine import travel, tutorial
-from ..engine.combat import MAX_AP, Combat, use_aid
+from ..engine import perks, travel, tutorial
+from ..engine.combat import Combat, use_aid
 from ..engine.dialogue import Dialogue
 from ..engine.game import follow_exit, new_game
-from ..engine.hack import Hack, attempts_for
+from ..engine.hack import for_terminal
 from ..engine.state import STAT_BLURBS, STAT_BUDGET, STAT_MAX, STAT_MIN, STATS, has_save, load_game, save_game
 from ..engine.world import Location
 from .render import bar, render_city, render_map, stars
@@ -253,6 +253,8 @@ class LocationScreen(Screen):
         w = self.app.content.item(p.weapon)
         ammo = f" ({p.inventory.get(w['ammo'], 0)})" if w.get("ammo") else ""
         t.append(f"cells {p.cells}\n", style="cyan")
+        if p.perk_points:
+            t.append(f"PERK POINTS {p.perk_points} (Tab, ←)\n", style="bold bright_yellow")
         t.append(f"{w['name']}{ammo}\n", style="white")
         if st.companion:
             cname = self.app.content.companions.get(st.companion, {}).get("name", st.companion)
@@ -279,7 +281,7 @@ class LocationScreen(Screen):
         t.append(f"COMBAT · ROUND {cb.round}\n", style="bold red")
         t.append("AP ")
         t.append("●" * cb.ap, style="bold bright_cyan")
-        t.append("○" * (MAX_AP - cb.ap) + "\n", style="grey35")
+        t.append("○" * (cb.max_ap - cb.ap) + "\n", style="grey35")
         e = cb.target()
         if not e:
             return t
@@ -530,8 +532,7 @@ class HackScreen(ModalScreen):
 
     def on_mount(self) -> None:
         app = self.app
-        pool = app.content.hack_words[self.spec.get("length", 5)]
-        self.hack = Hack(pool, self.spec.get("words", 8), attempts_for(app.state.player.stats["Wits"]), app.rng)
+        self.hack = for_terminal(app.state, app.content, self.spec, app.rng)
         self.lines: list[str] = []
         self.query_one("#hack", Vertical).border_title = "CONCIERGE ADMIN SHELL · PROMPT INJECTION"
         self.draw()
@@ -575,7 +576,7 @@ class HackScreen(ModalScreen):
 
 # =========================================================================
 class WristLinkScreen(ModalScreen):
-    TABS = ["STATUS", "ITEMS", "QUESTS", "DATA"]
+    TABS = ["STATUS", "ITEMS", "QUESTS", "DATA", "PERKS"]
     BINDINGS = [Binding("tab,escape", "close", priority=True, show=False),
                 Binding("left,h", "tab(-1)", show=False), Binding("right,l", "tab(1)", show=False),
                 Binding("up,k", "cursor(-1)", show=False), Binding("down,j", "cursor(1)", show=False),
@@ -588,6 +589,7 @@ class WristLinkScreen(ModalScreen):
         self.app.state.flags.add("did:wristlink")
         self.tab = 0
         self.cursor = 0
+        self.pcursor = 0
         self.flash = ""
         self.draw()
 
@@ -638,12 +640,27 @@ class WristLinkScreen(ModalScreen):
                 t.append(("✓ " if done else "• ") + q["name"] + "\n", style="grey50" if done else "bold")
                 if not done:
                     t.append("  " + q["stages"][stage] + "\n\n", style="grey70")
-        else:
+        elif tab == "DATA":
             if not st.notes:
                 t.append("No data.\n", style="grey50")
             for title, body in st.notes:
                 t.append(title + "\n", style="bold cyan")
                 t.append(body + "\n\n", style="grey70")
+        else:
+            t.append(f"Perk points: {p.perk_points}\n", style="bold bright_yellow" if p.perk_points else "grey62")
+            rows = perks.listing(st, c)
+            self.pcursor = min(self.pcursor, len(rows) - 1)
+            for i, (pid, status) in enumerate(rows):
+                perk = c.perks[pid]
+                sel = i == self.pcursor
+                mark = {"owned": "✓", "ready": "•", "locked": " "}[status]
+                style = "bold reverse" if sel else {"owned": "bold green", "ready": "white", "locked": "grey42"}[status]
+                t.append(f"{'▶' if sel else ' '}{mark} {perk['name']:<17}", style=style)
+                t.append(f" {perk['desc']}" if status != "locked" else f" {perks.requirement_text(perk)}",
+                         style="grey62" if status != "locked" else "grey42")
+                t.append("\n")
+            if rows and rows[self.pcursor][1] == "ready" and p.perk_points:
+                t.append("ENTER take this perk\n", style="grey50")
         if self.flash:
             t.append("\n" + self.flash, style="bold green")
         t.append("\n←→ tabs · ↑↓ select · ENTER use · TAB/ESC close", style="grey42")
@@ -662,12 +679,25 @@ class WristLinkScreen(ModalScreen):
         self.draw()
 
     def action_cursor(self, d: int) -> None:
-        if self.TABS[self.tab] == "ITEMS" and self.items():
+        if self.TABS[self.tab] == "PERKS":
+            self.pcursor = (self.pcursor + d) % len(self.app.content.perks)
+            self.flash = ""
+            self.draw()
+        elif self.TABS[self.tab] == "ITEMS" and self.items():
             self.cursor = (self.cursor + d) % len(self.items())
             self.flash = ""
             self.draw()
 
     def action_use(self) -> None:
+        if self.TABS[self.tab] == "PERKS":
+            pid = perks.listing(self.app.state, self.app.content)[self.pcursor][0]
+            _, events = perks.take(self.app.state, self.app.content, pid)
+            msgs = [e[1] for e in events if e[0] == "log"]
+            for m in msgs:
+                self.app.state.say(m)
+            self.flash = " ".join(msgs)
+            self.draw()
+            return
         if self.TABS[self.tab] != "ITEMS" or not self.items():
             return
         iid = self.items()[self.cursor]

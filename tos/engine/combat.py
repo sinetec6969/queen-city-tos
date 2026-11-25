@@ -3,6 +3,7 @@ from __future__ import annotations
 
 import random
 
+from . import perks
 from .content import apply_effects
 from .world import Entity, Location
 
@@ -17,7 +18,8 @@ class Combat:
         self.p = self.state.player
         self.rng = rng or random.Random()
         self.round = 1
-        self.ap = MAX_AP
+        self.max_ap = MAX_AP + int(perks.mod(self.state, self.content, "ap"))
+        self.ap = self.max_ap
         self.target_id: str | None = None
         self.outcome: str | None = None  # None | "won" | "lost" | "fled"
         self.retarget()
@@ -58,16 +60,17 @@ class Combat:
         px, py = self.state.pos
         d = e.dist(px, py)
         if w.get("melee"):
-            base = 60 + 6 * s["Brawn"]
+            base = 60 + 6 * s["Brawn"] + perks.mod(self.state, self.content, "hit_melee")
         else:
-            base = 50 + 7 * s["Aim"] - 3 * max(0, d - 2)
+            base = 50 + 7 * s["Aim"] - 3 * max(0, d - 2) + perks.mod(self.state, self.content, "hit_ranged")
         base += w.get("acc", 0) - e.template.get("evade", 0)
         if part:
             base += part.get("mod", 0)
-        return max(5, min(95, base))
+        return int(max(5, min(95, base)))
 
     def attack_cost(self, part: dict | None = None) -> int:
-        return self.weapon().get("ap", 3) + (LOCK_ON_AP if part else 0)
+        lock = max(0, LOCK_ON_AP + int(perks.mod(self.state, self.content, "lockon_ap"))) if part else 0
+        return self.weapon().get("ap", 3) + lock
 
     # ---- player actions -----------------------------------------------
     def attack(self, part_id: str | None = None) -> list[str]:
@@ -94,8 +97,9 @@ class Combat:
         if self.rng.random() * 100 >= chance:
             return [f"You swing{aim} and miss." if w.get("melee") else f"You fire{aim} and miss."]
         dmg = self.rng.randint(*w["dmg"]) + (self.p.stats["Brawn"] - 1 if w.get("melee") else 0)
+        dmg += int(perks.mod(self.state, self.content, "dmg_melee" if w.get("melee") else "dmg_ranged"))
         msgs = []
-        if self.rng.random() < 0.03 + 0.02 * self.p.stats["Luck"]:
+        if self.rng.random() < 0.03 + 0.02 * self.p.stats["Luck"] + perks.mod(self.state, self.content, "crit") / 100:
             dmg *= 2
             msgs.append("CRITICAL. Five stars.")
         if part:
@@ -198,7 +202,7 @@ class Combat:
         if self.outcome:
             return msgs
         self.round += 1
-        self.ap = MAX_AP
+        self.ap = self.max_ap
         msgs += self.roll_surprise()
         self._check_outcome()
         return msgs
@@ -231,7 +235,7 @@ class Combat:
             return [f"{name} can't reach anything and beeps about it."]
         if self.rng.random() * 100 >= c.get("hit", 70):
             return [f"{name} rams at {target.name} and misses. \"{self.rng.choice(c.get('barks', ['Beep.']))}\""]
-        dmg = self.rng.randint(*c.get("dmg", [2, 4]))
+        dmg = self.rng.randint(*c.get("dmg", [2, 4])) + int(perks.mod(self.state, self.content, "companion_dmg"))
         target.hp -= dmg
         msgs = [f"{name} rams {target.name} for {dmg}. \"{self.rng.choice(c.get('barks', ['Beep.']))}\""]
         if target.hp <= 0:
@@ -275,7 +279,7 @@ class Combat:
     def roll_surprise(self) -> list[str]:
         if self.rng.random() >= SURPRISE_CHANCE:
             return []
-        good = self.rng.random() < 0.3 + 0.1 * self.p.stats["Luck"]
+        good = self.rng.random() < 0.3 + 0.1 * self.p.stats["Luck"] + perks.mod(self.state, self.content, "surprise_good") / 100
         pool = [s for s in self.content.surprises
                 if s["good"] == good and _requires_ok(s, self.state, self.loc)]
         if not pool:
@@ -329,7 +333,7 @@ def use_aid(state, content, iid: str) -> list[str]:
     msgs = [it.get("use_text", f"You use the {it['name']}.")]
     if it.get("heal"):
         before = p.hp
-        p.hp = min(p.max_hp, p.hp + it["heal"])
+        p.hp = min(p.max_hp, p.hp + it["heal"] + int(perks.mod(state, content, "heal_bonus")))
         msgs.append(f"+{p.hp - before} HP")
     if it.get("signal"):
         msgs += state.add_signal(it["signal"])

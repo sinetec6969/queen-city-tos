@@ -1,0 +1,81 @@
+# Perks: one point per level-up, spent in the WristLink (PERKS tab) or with `PERK n` in line mode.
+# requires: conditions (same language as everywhere else). mods: numbers the engine reads
+# (see engine/perks.py for the keys). effects: run once when the perk is taken.
+
+heavy_hands:
+  name: Heavy Hands
+  desc: "Melee hits do +2 damage."
+  requires: {stat: Brawn, gte: 3}
+  mods: {dmg_melee: 2}
+
+follow_through:
+  name: Follow Through
+  desc: "+10% melee hit chance."
+  requires: {stat: Brawn, gte: 4}
+  mods: {hit_melee: 10}
+
+steady:
+  name: Steady
+  desc: "+10% ranged hit chance."
+  requires: {stat: Aim, gte: 3}
+  mods: {hit_ranged: 10}
+
+quick_lock:
+  name: Quick Lock
+  desc: "Lock-On costs 1 AP less."
+  requires: {stat: Aim, gte: 4}
+  mods: {lockon_ap: -1}
+
+thick_skin:
+  name: Thick Skin
+  desc: "+10 max HP."
+  requires: {stat: Grit, gte: 3}
+  effects: [{max_hp: 10}]
+
+off_the_grid:
+  name: Off the Grid
+  desc: "Signal builds 25% slower as you move."
+  requires: {stat: Grit, gte: 2}
+  mods: {signal_rate_pct: -25}
+
+prompt_engineer:
+  name: Prompt Engineer
+  desc: "+1 attempt on every hack."
+  requires: {stat: Wits, gte: 3}
+  mods: {hack_attempts: 1}
+
+pattern_match:
+  name: Pattern Match
+  desc: "Hack dumps show 2 fewer decoy words."
+  requires: {stat: Wits, gte: 2}
+  mods: {hack_words: -2}
+
+delivery_partner:
+  name: Delivery Partner
+  desc: "Biscuit hits for +2 damage."
+  requires: {stat: Charm, gte: 2}
+  mods: {companion_dmg: 2}
+
+bedside_manner:
+  name: Bedside Manner
+  desc: "Healing items restore +5 HP."
+  requires: {stat: Charm, gte: 3}
+  mods: {heal_bonus: 5}
+
+lucky_break:
+  name: Lucky Break
+  desc: "+5% critical hit chance."
+  requires: {stat: Luck, gte: 3}
+  mods: {crit: 5}
+
+happy_accident:
+  name: Happy Accident
+  desc: "Combat surprises break your way 15% more often."
+  requires: {stat: Luck, gte: 2}
+  mods: {surprise_good: 15}
+
+overclocked:
+  name: Overclocked
+  desc: "+1 AP every combat turn."
+  requires: {level_gte: 6}
+  mods: {ap: 1}

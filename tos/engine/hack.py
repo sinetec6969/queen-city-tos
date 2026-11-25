@@ -3,7 +3,7 @@ from __future__ import annotations
 
 import random
 
-from . import noise
+from . import noise, perks
 
 JUNK = "!@#$%^&*()[]{}<>/\\|;:'\",.?=+-_~"
 
@@ -65,3 +65,11 @@ class Hack:
 
 def attempts_for(wits: int) -> int:
     return 3 + (1 if wits >= 3 else 0) + (1 if wits >= 5 else 0)
+
+
+def for_terminal(state, content, spec: dict, rng: random.Random | None = None) -> Hack:
+    """The Hack for a terminal's `hack:` spec, with Wits and perks applied (both frontends use this)."""
+    pool = content.hack_words[spec.get("length", 5)]
+    words = max(3, spec.get("words", 8) + int(perks.mod(state, content, "hack_words")))
+    attempts = attempts_for(state.player.stats["Wits"]) + int(perks.mod(state, content, "hack_attempts"))
+    return Hack(pool, words, attempts, rng)

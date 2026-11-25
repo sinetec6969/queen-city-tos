@@ -12,12 +12,12 @@ import random
 import re
 from collections import deque
 
-from ..engine import travel, tutorial
-from ..engine.combat import MAX_AP, Combat, use_aid
+from ..engine import perks, travel, tutorial
+from ..engine.combat import Combat, use_aid
 from ..engine.content import Content
 from ..engine.dialogue import Dialogue
 from ..engine.game import follow_exit, new_game
-from ..engine.hack import Hack, attempts_for
+from ..engine.hack import Hack, for_terminal
 from ..engine.state import STAT_BLURBS, STAT_BUDGET, STAT_MAX, STAT_MIN, STATS, has_save, load_game, save_game
 from ..engine.world import Location
 from . import render as R
@@ -375,6 +375,10 @@ class Session:
         elif verb in ("notes", "data"):
             st.flags.add("did:wristlink")
             self.show_notes(arg)
+        elif verb == "perks":
+            self.show_perks(show_all=arg == "all")
+        elif verb == "perk":
+            self.take_perk(arg)
         elif verb == "save":
             st.flags.add("did:saved")
             save_game(st, self.slot)
@@ -475,6 +479,35 @@ class Session:
         if done:
             self.say("Done: " + ", ".join(done), log=False)
 
+    def show_perks(self, show_all: bool = False) -> None:
+        rows = perks.listing(self.state, self.c)
+        out = [f"Perk points: {self.state.player.perk_points}. PERK n to take one."]
+        for i, (pid, status) in enumerate(rows, 1):
+            perk = self.c.perks[pid]
+            if status == "locked" and not show_all:
+                continue
+            tag = {"owned": "*", "ready": " ", "locked": "-"}[status]
+            detail = perk["desc"] if status != "locked" else perks.requirement_text(perk)
+            out.append(f"{tag}{i} {perk['name']}: {detail}")
+        if not show_all and any(s == "locked" for _, s in rows):
+            out.append("PERKS ALL lists the locked ones too.")
+        self.lines(out)
+
+    def take_perk(self, arg: str) -> None:
+        rows = perks.listing(self.state, self.c)
+        pid = None
+        if arg.isdigit() and 0 < int(arg) <= len(rows):
+            pid = rows[int(arg) - 1][0]
+        elif arg:
+            pid = next((p for p, _ in rows if self.c.perks[p]["name"].lower().startswith(arg)), None)
+        if pid is None:
+            self.lines(["Which perk? PERKS lists them."])
+            return
+        _, events = perks.take(self.state, self.c, pid)
+        for e in events:
+            if e[0] == "log":
+                self.say(e[1])
+
     def show_notes(self, arg: str) -> None:
         notes = self.state.notes
         if not notes:
@@ -496,7 +529,7 @@ class Session:
 
     def combat_status(self) -> str:
         cb, p = self.combat, self.state.player
-        s = f"R{cb.round} AP{cb.ap}/{MAX_AP} HP{p.hp}/{p.max_hp}"
+        s = f"R{cb.round} AP{cb.ap}/{cb.max_ap} HP{p.hp}/{p.max_hp}"
         t = cb.target()
         if t:
             px, py = self.state.pos
@@ -526,7 +559,7 @@ class Session:
             return
         if m:
             dx, dy = DIRS[m.group(1)]
-            for _ in range(max(1, min(int(m.group(2) or 1), MAX_AP))):
+            for _ in range(max(1, min(int(m.group(2) or 1), cb.max_ap))):
                 ap = cb.ap
                 events = cb.move(dx, dy)
                 if any(e[0] == "exit" for e in events):
@@ -640,8 +673,7 @@ class Session:
     # ---- hacking -----------------------------------------------------------
     def open_hack(self, eid: str) -> None:
         spec = self.loc.get(eid).data["hack"]
-        pool = self.c.hack_words[spec.get("length", 5)]
-        self.hack = Hack(pool, spec.get("words", 8), attempts_for(self.state.player.stats["Wits"]), self.rng)
+        self.hack = for_terminal(self.state, self.c, spec, self.rng)
         self.hack_eid = eid
         self.mode = "hack"
         self.lines(["ADMIN SHELL: type a word from the dump. Likeness = right letter, right spot. X = back out."])

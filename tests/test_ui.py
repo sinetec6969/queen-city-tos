@@ -214,6 +214,19 @@ async def main():
         assert app.state.location == "south_end_street", app.state.location
         assert app.state.quests["terms"] == "done"
         await shot(app, "12_street")
+        # perks: Tab, left wraps to PERKS, pick Thick Skin, Enter
+        assert app.state.player.perk_points >= 1
+        await press(pilot, app, "tab")
+        await press(pilot, app, "left")
+        scr = app.screen
+        from tos.engine import perks as _perks
+        rows = [pid for pid, _ in _perks.listing(app.state, app.content)]
+        for _ in range(rows.index("thick_skin")):
+            await press(pilot, app, "down")
+        await shot(app, "10b_perks")
+        await press(pilot, app, "enter")
+        assert "thick_skin" in app.state.player.perks, scr.flash
+        await press(pilot, app, "tab")
 
         # ---- QUEST 2: Last Mile ----
         # tinfoil first (keeps the Greeter asleep), then Biscuit at (6,6) from (6,5)

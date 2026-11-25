@@ -17,7 +17,7 @@ STAT_BLURBS = {
 }
 STAT_MIN, STAT_MAX, STAT_BUDGET = 1, 5, 15
 STAT_CAP = 6  # training can push one past character creation's max
-SAVE_VERSION = 2
+SAVE_VERSION = 3
 RATING_FLAGS = ("rating_one", "rating_three", "rating_declined")
 
 
@@ -34,6 +34,8 @@ class Player:
     inventory: dict = field(default_factory=dict)
     weapon: str = "fists"
     hp_bonus: int = 0  # permanent max-HP upgrades (the `max_hp` effect)
+    perks: list = field(default_factory=list)  # perk ids (data/perks.yaml)
+    perk_points: int = 0  # one per level-up
 
     def recalc(self) -> None:
         self.max_hp = 20 + 4 * self.stats["Grit"] + 5 * (self.level - 1) + self.hp_bonus
@@ -86,9 +88,10 @@ class GameState:
         while p.xp >= p.xp_to_next():
             p.xp -= p.xp_to_next()
             p.level += 1
+            p.perk_points += 1
             p.recalc()
             p.hp = p.max_hp
-            msgs.append(f"LEVEL {p.level}. Your rating has been updated. HP restored.")
+            msgs.append(f"LEVEL {p.level}. Your rating has been updated. HP restored. Perk point earned.")
         return msgs
 
     def add_signal(self, amount: float) -> list[str]:
@@ -132,6 +135,8 @@ class GameState:
             # v1 recorded the Crown rating only through side effects. The three-star review
             # is unambiguous; "declined" and "one star + desk hack" look the same, so one star.
             self.flags.add("rating_three" if "concierge_rattled" in self.flags else "rating_one")
+        if version < 3 and not self.player.perks:
+            self.player.perk_points = self.player.level - 1  # perks arrived in v3: back-pay earned levels
 
 
 def save_dir() -> Path:

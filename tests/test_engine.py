@@ -620,6 +620,68 @@ def test_rating_flags_and_save_migration():
     assert GameState.from_json(st.to_json()).flags == st.flags, "v2 saves round-trip untouched"
 
 
+def test_perks():
+    from tos.engine import perks
+    from tos.engine.combat import use_aid
+    from tos.engine.game import place
+    from tos.engine.hack import for_terminal
+    from tos.engine.state import GameState
+    st, _ = new_game(C, {**STATS, "Aim": 4, "Charm": 3})
+    p = st.player
+    assert p.perk_points == 0
+    st.add_xp(150)  # level 2
+    assert p.level == 2 and p.perk_points == 1
+    ok, ev = perks.take(st, C, "heavy_hands")  # Brawn 3: allowed
+    assert ok and "heavy_hands" in p.perks and p.perk_points == 0
+    assert not perks.take(st, C, "steady")[0], "no points left"
+    p.perk_points = 20
+    assert not perks.take(st, C, "heavy_hands")[0], "only once"
+    assert not perks.take(st, C, "overclocked")[0], "needs level 6"
+    assert "LEVEL 6" in perks.requirement_text(C.perks["overclocked"])
+    # combat numbers: a melee target in the tutorial apartment
+    place(st, C, "lumen_1412", "start")
+    st.flags.add("tidy_awake")
+    loc = Location("lumen_1412", st, C)
+    tidy = loc.get("tidy")
+    p.weapon = "nail_gun"
+    p.give("nail_gun")
+    cb = Combat(loc, random.Random(1))
+    ranged, lock_cost = cb.hit_chance(tidy), cb.attack_cost(cb.parts(tidy)[0])
+    perks.take(st, C, "steady")
+    perks.take(st, C, "quick_lock")  # Aim 4
+    assert cb.hit_chance(tidy) == min(95, ranged + 10)
+    assert cb.attack_cost(cb.parts(tidy)[0]) == lock_cost - 1
+    p.level = 6
+    p.recalc()
+    perks.take(st, C, "overclocked")
+    assert Combat(loc, random.Random(1)).max_ap == 7
+    hp = p.max_hp
+    perks.take(st, C, "thick_skin")
+    assert p.max_hp == hp + 10
+    spec = {"length": 5, "words": 8}
+    before = for_terminal(st, C, spec, random.Random(2))
+    perks.take(st, C, "prompt_engineer")
+    perks.take(st, C, "pattern_match")
+    after = for_terminal(st, C, spec, random.Random(2))
+    assert after.max_attempts == before.max_attempts + 1 and len(after.words) == len(before.words) - 2
+    perks.take(st, C, "bedside_manner")  # Charm 3
+    p.hp = 1
+    p.give("med_gummy")
+    use_aid(st, C, "med_gummy")
+    assert p.hp == 1 + 8 + 5
+    perks.take(st, C, "off_the_grid")
+    sig = p.signal
+    place(st, C, "south_end_street", "lobby")
+    street = Location("south_end_street", st, C)
+    street.player_move(0, 1)
+    assert abs((p.signal - sig) - C.locations["south_end_street"]["signal_rate"] * 0.75) < 1e-9
+    # saves from before perks get one point per level already earned
+    d = st.to_json()
+    d["version"], d["player"]["perks"], d["player"]["level"] = 2, [], 4
+    d["player"].pop("perk_points")
+    assert GameState.from_json(d).player.perk_points == 3
+
+
 def test_city_labels_fit_their_canvas():
     from tos.engine import travel
     for rid in C.city.get("regions", {}):

@@ -43,6 +43,7 @@ class Content:
         self.text = self._load("text.yaml")
         self.tutorial = self._load("tutorial.yaml")
         self.companions = self._load("companions.yaml")
+        self.perks = self._load("perks.yaml")
         self.locations = self._load_dir("locations")
         self.dialogues = self._load_dir("dialogues")
 

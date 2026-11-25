@@ -3,7 +3,7 @@ from __future__ import annotations
 
 from collections import deque
 
-from . import noise
+from . import noise, perks
 from .content import Content, apply_effects, check
 from .state import GameState
 
@@ -180,7 +180,10 @@ class Location:
                 events += apply_effects(ent.data.get("on_enter"), self.state, self.content)
             events.append(("exit", ent.data["to"]))
             return events
-        events += [("log", m) for m in self.state.add_signal(self.signal_rate)]
+        rate = self.signal_rate
+        if rate > 0:
+            rate *= max(0.0, 1 + perks.mod(self.state, self.content, "signal_rate_pct") / 100)
+        events += [("log", m) for m in self.state.add_signal(rate)]
         events += noise.at(self, nx, ny)
         events += self.check_aggro()
         return events

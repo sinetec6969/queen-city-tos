@@ -132,8 +132,12 @@ tips:
     auto: true
     when: {level_gte: 2}
     title: LEVEL UP
+    line: |
+      You earn XP from fights, hacks, quests and reading the room. Each level raises your max HP, heals you fully, and gives you a perk point. PERKS lists what you can take; PERK and a number takes one.
     text: |
-      You earn XP from fights, hacks, quests and reading the room. Each level raises your max HP and heals you fully.
+      You earn XP from fights, hacks, quests and reading the room. Each level raises your max HP, heals you fully, and gives you a perk point.
+
+      Spend it in the WristLink: TAB, then ← to PERKS, ↑↓ to pick, ENTER to take.
   combat:
     title: COMBAT
     line: |
@@ -199,7 +203,7 @@ controls:
     EXPLORING
       N S E W  move (N3 = 3 steps)   walk into things to use them
       L look around   M map   I items   USE n / EQ n   ST status
-      Q quests   NOTES data   SAVE   BYE save+quit   BRIEF/VERBOSE
+      Q quests   NOTES data   PERKS / PERK n   SAVE   BYE   BRIEF
     COMBAT
       N S E W move (1 AP)   F attack   A aim (A2 = part 2)
       T next target   U heal (2 AP)   . end turn
